@@ -1,0 +1,16 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/router.svg'),
+        title: 'Routing',
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="router">
+    {{ render(controller('web_profiler.controller.router::panelAction', {token: token})) }}
+    </div>
+{% endblock %}

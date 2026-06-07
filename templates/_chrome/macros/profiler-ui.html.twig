@@ -1,0 +1,22 @@
+{# Profiler panel UI macros — kernel metrics grid + ux-blocks badges. symfinity 044 SC-007 #}
+{% macro metric_cell(value, label, unit = null) %}
+    {{ include('@UiProfiler/_chrome/partials/profiler-metric-cell.html.twig', {
+        value: value,
+        label: label,
+        unit: unit,
+    }) }}
+{% endmacro %}
+
+{% macro metric_group(cells) %}
+    <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+        {% for cell in cells %}
+            {{ _self.metric_cell(cell.value, cell.label, cell.unit|default(null)) }}
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro metrics_grid(content) %}
+    <div data-ui-profiler-metrics data-ui-role="grid">
+        {{ content|raw }}
+    </div>
+{% endmacro %}

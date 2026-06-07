@@ -1,0 +1,105 @@
+{% extends '@WebProfiler/Profiler/base.html.twig' %}
+
+{% block html_attributes %} data-theme="{{ ui_kernel_active_theme_id() }}"{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+    {{ ui_kernel_css()|raw }}
+{% endblock %}
+
+{% block body %}
+    <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
+        document.body.classList.remove('theme-light', 'theme-dark');
+        document.body.classList.add('{{ ui_profiler_is_dark_theme() ? 'theme-dark' : 'theme-light' }}');
+    </script>
+    <div data-ui-profiler-shell data-ui-role="grid-container" data-theme="{{ ui_kernel_active_theme_id() }}">
+        {{ include('@WebProfiler/Profiler/header.html.twig', {profile_type: profile_type}, with_context: false) }}
+
+        <div id="summary">
+            {% block summary %}
+                {% if profile is defined %}
+                    {% set request_collector = profile.collectors.request|default(false) %}
+
+                    {{ include('@WebProfiler/Profiler/_%s_summary.html.twig'|format(profile_type), {
+                        profile: profile,
+                        command_collector: profile.collectors.command|default(false),
+                        request_collector: request_collector,
+                        request: request,
+                        token: token,
+                    }, with_context: false) }}
+                {% endif %}
+            {% endblock %}
+        </div>
+
+        <div id="content">
+            <div id="main" data-ui-role="grid">
+                <aside id="sidebar" data-ui-role="grid-cell" data-ui-span-md="3" data-ui-span-lg="3">
+                    {% block sidebar %}
+                        <div id="sidebar-contents" data-ui-role="card" data-ui-fragment="blocks.card">
+                            <div id="sidebar-shortcuts">
+                                {% block sidebar_shortcuts_links %}
+                                    <twig:ButtonGroup class="shortcuts">
+                                        <twig:Button as="a" href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}" variant="ghost" size="sm">
+                                            {{ source('@WebProfiler/Icon/search.svg') }} Search profiles
+                                        </twig:Button>
+                                        <twig:Button as="a" href="{{ path('_profiler', {token: 'latest', type: profile_type}|merge(request.query.all)) }}" variant="ghost" size="sm">
+                                            Latest
+                                        </twig:Button>
+                                    </twig:ButtonGroup>
+                                {% endblock sidebar_shortcuts_links %}
+                            </div>
+
+                            {% if templates is defined %}
+                                <ul id="menu-profiler" data-ui-role="list" data-ui-fragment="blocks.list">
+                                    {% if 'request' is same as(profile_type) %}
+                                        {% set excludes = ['command'] %}
+                                    {% elseif 'command' is same as(profile_type) %}
+                                        {% set excludes = ['request', 'router'] %}
+                                    {% endif %}
+
+                                    {% for name, template in templates|filter((t, n) => n not in excludes) %}
+                                        {% set menu -%}
+                                            {%- set collector = profile.getcollector(name) -%}
+                                            {%- set registry_menu = ui_profiler_menu(name, collector) -%}
+                                            {%- if registry_menu is not empty -%}
+                                                {{- registry_menu|raw -}}
+                                            {%- elseif block('menu', template) is defined -%}
+                                                {% with {collector: collector, profiler_markup_version: profiler_markup_version} %}
+                                                    {{- block('menu', template) -}}
+                                                {% endwith %}
+                                            {%- endif -%}
+                                        {%- endset %}
+                                        {% if menu is not empty %}
+                                            <li class="{{ name }} {{ name == panel ? 'selected' }}">
+                                                <twig:Link href="{{ path('_profiler', {token: token, panel: name, type: profile_type}) }}">
+                                                    {{ menu|raw }}
+                                                </twig:Link>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+
+                        {{ include('@UiProfiler/_chrome/profiler-settings.html.twig', {token: token, panel: panel|default(null), profile_type: profile_type}) }}
+                    {% endblock sidebar %}
+                </aside>
+
+                <div id="collector-wrapper" data-ui-role="grid-cell" data-ui-span-md="9" data-ui-span-lg="9">
+                    <div data-ui-role="card" data-ui-fragment="blocks.card">
+                        <div id="collector-content"{% if ui_profiler_stimulus_enabled() %} data-controller="ui-profiler--tabs ui-profiler--table-search"{% endif %}>
+                            {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
+                            {% block panel %}{% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ include('@UiProfiler/_chrome/profiler-settings-dialog.html.twig', {
+        token: token,
+        panel: panel|default(null),
+        profile_type: profile_type,
+    }) }}
+{% endblock %}

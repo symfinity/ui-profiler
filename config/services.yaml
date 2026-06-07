@@ -1,0 +1,48 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Symfinity\UiProfiler\:
+        resource: '../src/'
+        exclude:
+            - '../src/UiProfilerBundle.php'
+            - '../src/DependencyInjection/'
+
+    Symfinity\UiProfiler\Theme\ThemeContext:
+        arguments:
+            $toolbarDarkBar: '%ui_profiler.toolbar.dark_bar%'
+
+    Symfinity\UiProfiler\Twig\UiProfilerRuntimeExtension:
+        arguments:
+            $wdtCriticalInline: '%ui_profiler.wdt.critical_inline%'
+            $uiProfilerEnabled: '%ui_profiler.enabled%'
+            $stimulusEnabled: '%ui_profiler.stimulus_enabled%'
+        tags:
+            - { name: twig.extension }
+
+    Symfinity\UiProfiler\Menu\ProfilerMenuRegistry:
+        arguments:
+            $entries: []
+            $stateHandlerIds: []
+
+    Symfinity\UiProfiler\Menu\ProfilerMenuRenderer:
+        arguments:
+            $enabled: '%ui_profiler.enabled%'
+            $stateHandlerLocator: '@ui_profiler.menu_state_locator'
+
+    ui_profiler.menu_state_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        arguments: [[]]
+
+    Symfinity\UiProfiler\Menu\State\MercureMenuStateHandler:
+        tags:
+            - { name: ui_profiler.menu_state, collector: mercure }
+
+    Symfinity\UiProfiler\Menu\State\DebugMenuStateHandler:
+        tags:
+            - { name: ui_profiler.menu_state, collector: dump }
+
+    Symfinity\UiProfiler\Menu\State\TwigComponentMenuStateHandler:
+        tags:
+            - { name: ui_profiler.menu_state, collector: twig_component }

@@ -1,0 +1,288 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new SymfonyProfilerEventsPanel();
+        });
+
+        class SymfonyProfilerEventsPanel {
+            constructor() {
+                this.#initialize();
+            }
+
+            #initialize() {
+                this.#updatePanels();
+
+                document.querySelectorAll('#event-filter-dispatcher input, #event-filter-listeners input').forEach((input) => {
+                    input.addEventListener('change', () => { this.#updatePanels(); });
+                });
+
+                document.body.addEventListener('click', (event) => {
+                    document.querySelectorAll('[data-ui-profiler-panel="events"] details.log-filter').forEach((filterElement) => {
+                        if (!filterElement.contains(event.target) && filterElement.open) {
+                            filterElement.open = false;
+                        }
+                    });
+                });
+            }
+
+            #getActiveDispatcher() {
+                const input = document.querySelector('#event-filter-dispatcher input:checked');
+
+                return input ? input.value : null;
+            }
+
+            #getActiveListenerType() {
+                const input = document.querySelector('#event-filter-listeners input:checked');
+
+                return input ? input.value : 'called';
+            }
+
+            #updatePanels() {
+                const dispatcher = this.#getActiveDispatcher();
+                const listenerType = this.#getActiveListenerType();
+                const listenerLabels = {
+                    called: 'Called',
+                    not_called: 'Not called',
+                    orphaned: 'Orphaned',
+                };
+
+                document.querySelectorAll('.event-dispatcher-panel').forEach((panel) => {
+                    panel.hidden = panel.dataset.dispatcher !== dispatcher;
+                });
+
+                const activePanel = dispatcher
+                    ? document.querySelector(`.event-dispatcher-panel[data-dispatcher="${CSS.escape(dispatcher)}"]`)
+                    : null;
+
+                if (activePanel) {
+                    activePanel.querySelectorAll('.event-listener-panel').forEach((panel) => {
+                        panel.hidden = panel.dataset.listenerType !== listenerType;
+                    });
+                }
+
+                const dispatcherValue = document.querySelector('#event-filter-dispatcher .filter-active-value');
+                if (dispatcherValue && dispatcher) {
+                    dispatcherValue.innerText = dispatcher;
+                }
+
+                const listenerValue = document.querySelector('#event-filter-listeners .filter-active-value');
+                const listenerBadge = document.querySelector('#event-filter-listeners .filter-active-badge');
+                if (listenerValue) {
+                    listenerValue.innerText = listenerLabels[listenerType] ?? listenerType;
+                }
+                if (activePanel) {
+                    const counts = {
+                        called: activePanel.dataset.calledCount ?? '0',
+                        not_called: activePanel.dataset.notCalledCount ?? '0',
+                        orphaned: activePanel.dataset.orphanedCount ?? '0',
+                    };
+
+                    if (listenerBadge) {
+                        listenerBadge.innerText = counts[listenerType] ?? '0';
+                    }
+
+                    Object.entries(counts).forEach(([type, count]) => {
+                        const optionBadge = document.querySelector(`label[for="filter-event-listener-${type.replace('_', '-')}"] .badge`);
+                        if (optionBadge) {
+                            optionBadge.innerText = count;
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/event.svg'),
+        title: 'Events',
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="events">
+    <h2>Dispatched Events</h2>
+
+    {% if collector.data is empty %}
+        <div data-ui-role="empty" data-ui-profiler-empty-panel>
+            <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
+        </div>
+    {% else %}
+        {% set dispatcher_names = collector.data|keys %}
+        {% set initial_dispatcher = dispatcher_names|first %}
+        {% set initial_dispatcher_data = collector.data[initial_dispatcher] %}
+        {% set listener_labels = {
+            called: 'Called',
+            not_called: 'Not called',
+            orphaned: 'Orphaned',
+        } %}
+        {% set initial_listener_type = 'called' %}
+
+        <div class="event-filters">
+            <details id="event-filter-dispatcher" class="log-filter">
+                <summary>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="log-filter-summary">
+                        <span class="filter-name">Dispatcher</span>:
+                        <span class="filter-active-value">{{ initial_dispatcher }}</span>
+                    </span>
+                </summary>
+
+                <div class="log-filter-content">
+                    {% for dispatcherName in dispatcher_names %}
+                        <div class="log-filter-option">
+                            <input type="radio" id="filter-event-dispatcher-{{ loop.index }}" name="filter-event-dispatcher" value="{{ dispatcherName }}" {{ dispatcherName == initial_dispatcher ? 'checked' }}>
+                            <label for="filter-event-dispatcher-{{ loop.index }}">{{ dispatcherName }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </details>
+
+            <details id="event-filter-listeners" class="log-filter">
+                <summary>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="log-filter-summary">
+                        <span class="filter-name">Listeners</span>:
+                        <span class="filter-active-value">{{ listener_labels[initial_listener_type] }}</span>
+                        <span class="badge filter-active-badge">{{ initial_dispatcher_data.called_listeners|length }}</span>
+                    </span>
+                </summary>
+
+                <div class="log-filter-content">
+                    <div class="log-filter-option">
+                        <input type="radio" id="filter-event-listener-called" name="filter-event-listener" value="called" checked>
+                        <label for="filter-event-listener-called">
+                            Called
+                            <span class="badge">{{ initial_dispatcher_data.called_listeners|length }}</span>
+                        </label>
+                    </div>
+
+                    <div class="log-filter-option">
+                        <input type="radio" id="filter-event-listener-not-called" name="filter-event-listener" value="not_called">
+                        <label for="filter-event-listener-not-called">
+                            Not called
+                            <span class="badge">{{ initial_dispatcher_data.not_called_listeners|length }}</span>
+                        </label>
+                    </div>
+
+                    <div class="log-filter-option">
+                        <input type="radio" id="filter-event-listener-orphaned" name="filter-event-listener" value="orphaned">
+                        <label for="filter-event-listener-orphaned">
+                            Orphaned
+                            <span class="badge">{{ initial_dispatcher_data.orphaned_events|length }}</span>
+                        </label>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        {% for dispatcherName, dispatcherData in collector.data %}
+            <div
+                class="event-dispatcher-panel"
+                data-dispatcher="{{ dispatcherName }}"
+                data-called-count="{{ dispatcherData.called_listeners|length }}"
+                data-not-called-count="{{ dispatcherData.not_called_listeners|length }}"
+                data-orphaned-count="{{ dispatcherData.orphaned_events|length }}"
+                {{ dispatcherName != initial_dispatcher ? 'hidden' }}
+            >
+                {% if dispatcherData.called_listeners is empty %}
+                    <div data-ui-role="empty" data-ui-profiler-empty-panel>
+                        <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
+                    </div>
+                {% else %}
+                    <div class="event-listener-panel" data-listener-type="called">
+                        {{ _self.render_table(dispatcherData.called_listeners) }}
+                    </div>
+
+                    <div class="event-listener-panel" data-listener-type="not_called" hidden>
+                        {% if dispatcherData.not_called_listeners is empty %}
+                            <div data-ui-role="empty">
+                                <p>
+                                    <strong>There are no uncalled listeners</strong>.
+                                </p>
+                                <p>
+                                    All listeners were called or an error occurred
+                                    when trying to collect uncalled listeners (in which case check the
+                                    logs to get more information).
+                                </p>
+                            </div>
+                        {% else %}
+                            {{ _self.render_table(dispatcherData.not_called_listeners) }}
+                        {% endif %}
+                    </div>
+
+                    <div class="event-listener-panel" data-listener-type="orphaned" hidden>
+                        {% if dispatcherData.orphaned_events is empty %}
+                            <div data-ui-role="empty">
+                                <p>
+                                    <strong>There are no orphaned events</strong>.
+                                </p>
+                                <p>
+                                    All dispatched events were handled or an error occurred
+                                    when trying to collect orphaned events (in which case check the
+                                    logs to get more information).
+                                </p>
+                            </div>
+                        {% else %}
+                            <table data-ui-role="table">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for event in dispatcherData.orphaned_events %}
+                                        <tr>
+                                            <td class="font-normal">{{ event }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+    </div>
+{% endblock %}
+
+{% macro render_table(listeners) %}
+    <table data-ui-role="table">
+        <thead>
+            <tr>
+                <th class="text-right">Priority</th>
+                <th>Listener</th>
+            </tr>
+        </thead>
+
+        {% set previous_event = (listeners|first).event %}
+        {% for listener in listeners %}
+            {% if loop.first or listener.event != previous_event %}
+                {% if not loop.first %}
+                    </tbody>
+                {% endif %}
+
+                <tbody>
+                    <tr>
+                        <th colspan="2" class="colored font-normal">{{ listener.event }}</th>
+                    </tr>
+
+                {% set previous_event = listener.event %}
+            {% endif %}
+
+            <tr>
+                <td class="text-right nowrap">{{ listener.priority|default('-') }}</td>
+                <td class="font-normal"><code class="events-listener-name">{{ listener.pretty|trim('"') }}</code></td>
+            </tr>
+
+            {% if loop.last %}
+                </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
+{% endmacro %}

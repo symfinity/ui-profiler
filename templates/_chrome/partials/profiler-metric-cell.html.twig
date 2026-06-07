@@ -1,0 +1,5 @@
+{# Single profiler metric — stack cell inside [data-ui-profiler-metrics] grid. #}
+<div data-ui-role="stack" data-ui-gap="xs" data-ui-align="center" class="ui-profiler-metric-cell">
+    <span class="ui-profiler-metric__value">{{ value|raw }}{% if unit|default(null) %} <span class="ui-profiler-metric__unit">{{ unit }}</span>{% endif %}</span>
+    <span class="ui-profiler-metric__label">{{ label }}</span>
+</div>

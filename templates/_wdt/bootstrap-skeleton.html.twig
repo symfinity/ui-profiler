@@ -1,0 +1,11 @@
+{# Minimal WDT skeleton — styled via inline critical.css until toolbar.css + /_wdt hydrate. #}
+<div id="sfToolbarClearer-{{ token }}" class="sf-toolbar-clearer"></div>
+<div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset ui-profiler-wdt notranslate clear-fix" data-ui-profiler-wdt data-theme="{{ ui_profiler_toolbar_theme() }}" data-no-turbolink data-turbo="false">
+    <div class="sf-toolbar-block sf-toolbar-block-request">
+        <a class="ui-profiler-wdt__link" href="{{ profiler_url }}"><div class="sf-toolbar-icon"><span class="sf-toolbar-value sf-toolbar-ajax-request-counter">Loading&hellip;</span></div></a>
+    </div>
+    <button class="sf-toolbar-toggle-button" type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle Symfony Toolbar">
+        <i class="sf-toolbar-icon-opened" title="Close Toolbar"></i>
+        <i class="sf-toolbar-icon-closed" title="Open Toolbar">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
+    </button>
+</div>

@@ -1,0 +1,6 @@
+ui_profiler_controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: Symfinity\UiProfiler\Controller
+    type: attribute
+    prefix: /_profiler

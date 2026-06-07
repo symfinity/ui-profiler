@@ -1,0 +1,7 @@
+ui_profiler:
+    enabled: true
+    wdt:
+        critical_inline: true
+        bootstrap_max_bytes: 5120
+    toolbar:
+        dark_bar: true

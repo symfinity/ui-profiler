@@ -1,0 +1,174 @@
+{% set preference = ui_profiler_theme_preference() %}
+{% set theme_route_params = {token: token, type: profile_type|default('request')} %}
+{% if panel %}
+    {% set theme_route_params = theme_route_params|merge({panel: panel}) %}
+{% endif %}
+
+<dialog
+    id="profiler-settings"
+    data-ui-role="dialog"
+    data-ui-fragment="blocks.dialog"
+    aria-labelledby="profiler-settings-title"
+    {% if ui_profiler_stimulus_enabled() %}data-controller="ui-profiler--dialog"{% endif %}
+>
+    <div data-ui-role="stack" data-ui-gap="lg">
+        <header data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="md" style="align-items: center; justify-content: space-between;">
+            <h3 id="profiler-settings-title" style="margin: 0;">Configuration Settings</h3>
+            <button
+                type="button"
+                data-ui-role="button"
+                data-ui-variant="ghost"
+                data-ui-size="sm"
+                data-ui-profiler-settings-close
+                aria-label="Close"
+            >&times;</button>
+        </header>
+
+        <div data-ui-role="stack" data-ui-gap="sm">
+            <strong>Theme</strong>
+            <div data-ui-role="grid" data-ui-columns="3" data-ui-profiler-settings-picker role="group" aria-label="Theme">
+                <a
+                    href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'auto'})) }}"
+                    data-ui-role="button"
+                    data-ui-layout="block"
+                    data-ui-variant="{{ preference.scheme.value == 'auto' ? 'primary' : 'ghost' }}"
+                    data-turbo="false"
+                    data-no-turbolink
+                >
+                    {{ source('@WebProfiler/Icon/settings-theme-system.svg') }}
+                    System / OS
+                </a>
+                <a
+                    href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'light'})) }}"
+                    data-ui-role="button"
+                    data-ui-layout="block"
+                    data-ui-variant="{{ preference.scheme.value == 'light' ? 'primary' : 'ghost' }}"
+                    data-turbo="false"
+                    data-no-turbolink
+                >
+                    {{ source('@WebProfiler/Icon/settings-theme-light.svg') }}
+                    Light
+                </a>
+                <a
+                    href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'dark'})) }}"
+                    data-ui-role="button"
+                    data-ui-layout="block"
+                    data-ui-variant="{{ preference.scheme.value == 'dark' ? 'primary' : 'ghost' }}"
+                    data-turbo="false"
+                    data-no-turbolink
+                >
+                    {{ source('@WebProfiler/Icon/settings-theme-dark.svg') }}
+                    Dark
+                </a>
+            </div>
+        </div>
+
+        <div data-ui-role="stack" data-ui-gap="sm">
+            <strong>Page Width</strong>
+            <div data-ui-role="grid" data-ui-columns="2" data-ui-profiler-settings-picker role="radiogroup" aria-label="Page width">
+                <label data-ui-role="button" data-ui-layout="block" data-ui-variant="ghost" for="settings-width-normal">
+                    <input
+                        class="config-option config-option-width visually-hidden"
+                        type="radio"
+                        name="width"
+                        value="normal"
+                        id="settings-width-normal"
+                    >
+                    {{ source('@WebProfiler/Icon/settings-width-fixed.svg') }}
+                    Fixed width
+                </label>
+                <label data-ui-role="button" data-ui-layout="block" data-ui-variant="ghost" for="settings-width-full">
+                    <input
+                        class="config-option config-option-width visually-hidden"
+                        type="radio"
+                        name="width"
+                        value="full"
+                        id="settings-width-full"
+                    >
+                    {{ source('@WebProfiler/Icon/settings-width-fitted.svg') }}
+                    Fit to window
+                </label>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
+(function () {
+    const dialog = document.getElementById('profiler-settings');
+    const openButton = document.getElementById('open-settings');
+    const closeButton = dialog?.querySelector('[data-ui-profiler-settings-close]');
+    const widthInputs = document.querySelectorAll('.config-option-width');
+
+    if (!dialog || !openButton) {
+        return;
+    }
+
+    const syncWidthVariant = () => {
+        const widthSetting = localStorage.getItem('symfony/profiler/width') || 'width-normal';
+        const widthValue = widthSetting.replace(/^width-/, '');
+
+        widthInputs.forEach((input) => {
+            if (!(input instanceof HTMLInputElement)) {
+                return;
+            }
+
+            const isActive = input.value === widthValue;
+            input.checked = isActive;
+            const label = input.closest('[data-ui-profiler-settings-picker] label');
+            if (label instanceof HTMLElement) {
+                label.dataset.uiVariant = isActive ? 'primary' : 'ghost';
+            }
+        });
+    };
+
+    widthInputs.forEach((option) => {
+        option.addEventListener('change', function (event) {
+            event.stopPropagation();
+
+            const settingValue = 'width-' + option.value;
+            localStorage.setItem('symfony/profiler/width', settingValue);
+            const shell = document.querySelector('[data-ui-profiler-shell]');
+            [document.body, shell].forEach((node) => {
+                if (!(node instanceof HTMLElement)) {
+                    return;
+                }
+                node.classList.forEach((cssClass) => {
+                    if (cssClass.startsWith('width')) {
+                        node.classList.remove(cssClass);
+                    }
+                });
+                node.classList.add(settingValue);
+            });
+            syncWidthVariant();
+        });
+    });
+
+    openButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        syncWidthVariant();
+
+        if (typeof dialog.showModal === 'function') {
+            dialog.showModal();
+        } else {
+            dialog.setAttribute('open', 'open');
+        }
+
+        closeButton?.focus();
+    });
+
+    closeButton?.addEventListener('click', () => {
+        dialog.close();
+    });
+
+    dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) {
+            dialog.close();
+        }
+    });
+
+    dialog.addEventListener('close', () => {
+        openButton.focus();
+    });
+})();
+</script>

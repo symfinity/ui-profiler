@@ -1,0 +1,11 @@
+{# Sidebar collector row — kernel menu chrome via data-ui-profiler-menu-label + ux-blocks Badge counts. #}
+<span
+    data-ui-profiler-menu-label
+    {% if disabled|default(false) %}class="disabled" data-ui-profiler-menu-disabled{% endif %}
+>
+    <span data-ui-profiler-menu-icon aria-hidden="true">{{ icon|raw }}</span>
+    <strong>{{ title }}</strong>
+    {% if count is defined and count is not null %}
+        <twig:Badge variant="{{ badgeVariant|default((status is defined and status == 'error') ? 'danger' : ((status is defined and status == 'warning') ? 'warning' : 'secondary')) }}">{{ count }}</twig:Badge>
+    {% endif %}
+</span>

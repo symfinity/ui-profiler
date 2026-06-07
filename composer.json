@@ -1,0 +1,102 @@
+{
+    "name": "symfinity/ui-profiler",
+    "description": "Chameleon Web Profiler chrome — UI Kernel + ux-blocks greenfield (051)",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "keywords": [
+        "symfony",
+        "symfony-bundle",
+        "web-profiler",
+        "debug-toolbar",
+        "ui-kernel",
+        "chameleon"
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/config": "^7.4||^8.0",
+        "symfony/dependency-injection": "^7.4||^8.0",
+        "symfony/framework-bundle": "^7.4||^8.0",
+        "symfony/http-kernel": "^7.4||^8.0",
+        "symfony/twig-bundle": "^7.4||^8.0",
+        "symfony/web-profiler-bundle": "^7.4||^8.0",
+        "symfinity/ui-kernel": "@dev",
+        "symfinity/ui-action": "@dev",
+        "symfinity/ux-blocks-core": "@dev",
+        "symfinity/ux-blocks-extended": "@dev",
+        "twig/twig": "^3.0"
+    },
+    "require-dev": {
+        "doctrine/doctrine-bundle": "^2.13||^3.0",
+        "phpunit/phpunit": "^11.0",
+        "symfony/asset-mapper": "^7.4||^8.0",
+        "symfony/browser-kit": "^7.4||^8.0",
+        "symfony/css-selector": "^7.4||^8.0",
+        "symfony/form": "^7.4||^8.0",
+        "symfony/http-client": "^7.4||^8.0",
+        "symfony/mailer": "^7.4||^8.0",
+        "symfony/messenger": "^7.4||^8.0",
+        "symfony/monolog-bundle": "^3.10",
+        "symfony/security-bundle": "^7.4||^8.0",
+        "symfony/serializer": "^7.4||^8.0",
+        "symfony/translation": "^7.4||^8.0",
+        "symfony/validator": "^7.4||^8.0"
+    },
+    "suggest": {
+        "symfinity/ux-runtime": "Optional Stimulus transport for dual-interaction mode"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfinity\\UiProfiler\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Symfinity\\UiProfiler\\Tests\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../ui-kernel",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../ui-action",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../ux-blocks-core",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "../ux-blocks-extended",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "scripts": {
+        "test": "phpunit -c phpunit.xml.dist"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "version": "0.2.0-dev",
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.2.x-dev"
+        },
+        "symfony": {
+            "allow-contrib": false,
+            "require": "^7.4||^8.0"
+        }
+    }
+}
