@@ -1,71 +1,59 @@
 # symfinity/ui-profiler — maintainer quickstart (051)
 
-Greenfield Chameleon Web Profiler — **zero owned `.css` files**, UI Kernel tokens, ux-blocks markup.
+Greenfield Chameleon profiler — **UI Kernel + ux-blocks**, zero owned CSS files.
 
-## QA (package)
+**Read first:** [greenfield-implement-rules.md](greenfield-implement-rules.md)
+
+## QA gates
 
 ```bash
 cd src/symfinity
 
-# Parity gate (P0)
-docker compose --env-file .env.docker run --rm -T -w /app php \
-  php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist --group ui-profiler-parity
+# Full package gate (default before merge)
+./bin/php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist
 
-# Unit gate
-docker compose --env-file .env.docker run --rm -T -w /app php \
-  php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist --testsuite default
+# Parity subset
+./bin/php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist --group ui-profiler-parity
 
-# Optional Stimulus path (DI-T2)
-docker compose --env-file .env.docker run --rm -T -w /app php \
-  php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist --group ui-profiler-runtime
+# Zero CSS + asset ownership
+./bin/php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist \
+  --filter 'GreenfieldMarkupTest|CssBudgetTest|AssetOwnershipTest'
+
+# Optional Stimulus path (when ux-runtime / StimulusBundle present)
+./bin/php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist --group ui-profiler-runtime
 ```
 
-## Dogfood (post GC-6)
-
-Chameleon showcase overlay ships `symfinity/ui-profiler` + `UiProfilerBundle`:
+## Dogfood smoke (GC-6)
 
 ```bash
-# From org L0 — recreate or composer update existing sandbox
-make dogfood-new SLUG=chameleon-showcase VERSION='7.4.*'
+# From org L0
 make dogfood-serve SLUG=chameleon-showcase
 ```
 
 | URL | Check |
 |-----|-------|
-| `/` | WDT stable; no layout jump |
-| `/_profiler/latest` | `data-ui-profiler-shell`; ux-blocks sidebar |
-| `/_profiler/latest?panel=request` | Request collector CO-01 |
-| `/_profiler/latest?panel=time` | Timeline CO-02 |
+| `/` | WDT stable; no FOUC; collector badges |
+| `/_profiler/{token}?panel=request` | Greenfield shell (`data-ui-profiler-shell`); sidebar menu; collector tabs |
+| `/_profiler/{token}?panel=time` | Timeline panel |
+| Profiler settings | Theme System/Light/Dark; Fixed width / Fit to window |
 
-## Keyboard map
+Use the WDT token from the page you profiled — `/_profiler/latest` may point at an asset request.
+
+## Keyboard affordances
 
 | Key | Action |
 |-----|--------|
-| `/` | Focus profiler table search (when not in an input) |
-| `Esc` | Close settings dialog |
-
-## Architecture
-
-| Layer | Source |
-|-------|--------|
-| L0 look | `ui_kernel_css()` |
-| L1 markup | ux-blocks-core + ux-blocks-extended |
-| WDT skeleton | Inline Twig/PHP (ZOC-*) — no `assets/**/*.css` |
-| L3 native | `assets/profiler/shell.js`, `assets/wdt/index.js` |
-| L3 optional | `assets/controllers/ui-profiler/*` when StimulusBundle registered |
-
-Archive inspiration (read-only): `packages/temp/ui-profiler/`.
-
-Spec: [51-ui-profiler-reboot](../../../../specs/symfinity/symfinity/51-ui-profiler-reboot/spec.md)
+| `/` | Focus first table search field (when not in an input) |
+| `Esc` | Close settings `<dialog>` |
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
-| Toolbar FOUC / height jump | Check inline WDT skeleton in `toolbar_js.html.twig` |
-| Empty `/_wdt/styles` | Verify `toolbar.css.twig` + `WdtToolbarStylesheet` PHP embed |
-| Unstyled third-party collector | Migrate collector Twig to ux-blocks — no stock CSS copy |
+| Toolbar layout jump | Inline WDT skeleton in `toolbar_js.html.twig`; no external WDT CSS |
+| Single-column profiler shell | Hard refresh; shell embeds grid CSS (schema 1.0 dogfood) |
+| System theme wrong | `scheme=auto` uses client `prefers-color-scheme`; cookie `symfinity_ui_kernel_scheme` |
+| Width toggle no effect | Clear `localStorage['symfony/profiler/width']`; expect `width-normal` (max 75rem) vs `width-full` |
+| Unstyled third-party panel | Expected for unmigrated `sf-*` collector markup |
 | Dogfood broken assets | Delete `var/dogfood/{slug}/public/assets/` (AssetMapper dev rule) |
-| `CssBudgetTest` fails | Remove owned `.css` — use Kernel tokens or ux-blocks |
-
-Upstream pin: [upstream-sync.md](./upstream-sync.md)
+| CssBudgetTest fails | Remove owned `.css` — use ux-blocks + PHP-embedded shell chrome only |

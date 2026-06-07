@@ -11,11 +11,15 @@ services:
 
     Symfinity\UiProfiler\Theme\ThemeContext:
         arguments:
-            $toolbarDarkBar: '%ui_profiler.toolbar.dark_bar%'
+            $toolbarThemeOverride: '%ui_profiler.toolbar_theme%'
 
     Symfinity\UiProfiler\Twig\UiProfilerRuntimeExtension:
         arguments:
-            $wdtCriticalInline: '%ui_profiler.wdt.critical_inline%'
+            $bundlePath: '%ui_profiler.bundle_path%'
+            $wdtCriticalCssInline: '%ui_profiler.wdt.critical_css_inline%'
+            $wdtModulePreload: '%ui_profiler.wdt.module_preload%'
+            $legacySfShim: '%ui_profiler.legacy_sf_shim%'
+            $assetVersion: '%ui_profiler.asset_version%'
             $uiProfilerEnabled: '%ui_profiler.enabled%'
             $stimulusEnabled: '%ui_profiler.stimulus_enabled%'
         tags:
@@ -30,6 +34,14 @@ services:
         arguments:
             $enabled: '%ui_profiler.enabled%'
             $stateHandlerLocator: '@ui_profiler.menu_state_locator'
+
+    Symfinity\UiProfiler\Controller\ProfilerThemePreferenceController:
+        tags: ['controller.service_arguments']
+
+    Symfinity\UiProfiler\Controller\ProfilerAssetController:
+        arguments:
+            $bundlePath: '%ui_profiler.bundle_path%'
+        tags: ['controller.service_arguments']
 
     ui_profiler.menu_state_locator:
         class: Symfony\Component\DependencyInjection\ServiceLocator

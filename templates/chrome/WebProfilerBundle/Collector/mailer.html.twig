@@ -97,7 +97,7 @@
     {% endif %}
 
     {% macro render_transport_details(collector, transport, show_transport_name = false) %}
-        <div class="card">
+        <div data-ui-role="card" data-ui-fragment="blocks.card">
             {% set num_emails = collector.events.events(transport)|length %}
             {% if num_emails > 1 %}
                 <div class="mailer-email-summary-table-wrapper">
@@ -153,7 +153,7 @@
 
             <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
         {% else %}
-            <div class="sf-tabs">
+            <div data-ui-profiler-tabs data-ui-role="tabs">
                 <div class="tab">
                     <h3 class="tab-title">Email contents</h3>
                     <div class="tab-content">
@@ -206,7 +206,7 @@
                         {% endif %}
 
                         <div class="card-block">
-                            <div class="sf-tabs sf-tabs-sm">
+                            <div data-ui-profiler-tabs data-ui-role="tabs">
                             {% if message.htmlBody is defined %}
                                 {% set textBody = message.textBody %}
                                 {% set htmlBody = message.htmlBody %}

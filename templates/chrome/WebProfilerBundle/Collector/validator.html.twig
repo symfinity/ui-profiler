@@ -46,7 +46,7 @@
     <h2>Validator calls</h2>
 
     {% for call in collector.calls %}
-        <div class="sf-validator sf-reset">
+        <div data-ui-profiler-validator-call data-ui-role="stack" data-ui-gap="md">
             <span class="metadata">In
                 {% set caller = call.caller %}
                 {% if caller.line %}
@@ -59,10 +59,26 @@
                 {% else %}
                     {{ caller.name }}
                 {% endif %}
-                line <button type="button" class="btn-link text-small sf-toggle" data-toggle-selector="#sf-trace-{{ loop.index0 }}">{{ caller.line }}</button> (<button type="button" class="btn-link text-small sf-toggle" data-toggle-selector="#sf-context-{{ loop.index0 }}">context</button>):
+                line <twig:Button
+                    as="button"
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    data-ui-profiler-toggle
+                    data-ui-profiler-toggle-target="#validator-trace-{{ loop.index0 }}"
+                    data-ui-profiler-toggle-alt="Hide excerpt"
+                >{{ caller.line }}</twig:Button> (<twig:Button
+                    as="button"
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    data-ui-profiler-toggle
+                    data-ui-profiler-toggle-target="#validator-context-{{ loop.index0 }}"
+                    data-ui-profiler-toggle-alt="Hide context"
+                >context</twig:Button>):
             </span>
 
-            <div class="sf-validator-compact hidden" id="sf-trace-{{ loop.index0 }}">
+            <div id="validator-trace-{{ loop.index0 }}" data-ui-profiler-toggle-panel hidden>
                 {{ include('@UiProfiler/_chrome/partials/code-block.html.twig', {
                     content: caller.file|file_excerpt(caller.line)|replace({
                         '#DD0000': 'var(--highlight-string)',
@@ -73,7 +89,7 @@
                 }) }}
             </div>
 
-            <div class="sf-validator-compact hidden sf-validator-context" id="sf-context-{{ loop.index0 }}">
+            <div id="validator-context-{{ loop.index0 }}" data-ui-profiler-toggle-panel hidden>
                 {{ profiler_dump(call.context, maxDepth: 1) }}
             </div>
 

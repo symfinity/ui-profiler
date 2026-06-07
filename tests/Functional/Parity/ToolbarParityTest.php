@@ -27,9 +27,8 @@ final class ToolbarParityTest extends WebTestCase
         self::assertResponseIsSuccessful();
         $content = (string) $client->getResponse()->getContent();
 
-        self::assertStringContainsString('sf-toolbar', $content);
         self::assertStringContainsString('data-ui-profiler-wdt', $content);
-        self::assertStringContainsString('sf-toolbar-block-request', $content);
+        self::assertStringContainsString('data-ui-profiler-collector="request"', $content);
         self::assertStringContainsString('_profiler', $content);
     }
 

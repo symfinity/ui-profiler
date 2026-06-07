@@ -51,7 +51,7 @@ final class ShellParityTest extends WebTestCase
 
         $content = (string) $client->getResponse()->getContent();
         self::assertStringContainsString('UiProfilerShell.boot', $content);
-        self::assertStringContainsString('ui-profiler/profiler/shell.js', $content);
+        self::assertStringContainsString('/_profiler/assets/profiler/shell.js', $content);
         self::assertStringNotContainsString('class SymfonyProfiler', $content);
         self::assertStringNotContainsString('ui-profiler/profiler/shell-chrome.css', $content);
         self::assertStringNotContainsString('ui-profiler/profiler/panel.css', $content);
@@ -71,8 +71,8 @@ final class ShellParityTest extends WebTestCase
         self::assertResponseIsSuccessful();
 
         $content = (string) $client->getResponse()->getContent();
-        self::assertStringContainsString('sf-tabs', $content);
-        self::assertStringContainsString('tab-title', $content);
+        self::assertStringContainsString('data-ui-profiler-tabs', $content);
+        self::assertStringContainsString('data-ui-role="tabs"', $content);
     }
 
     public function testRequestPanelExposesSearchableTableMarkup(): void
@@ -87,7 +87,7 @@ final class ShellParityTest extends WebTestCase
         self::assertResponseIsSuccessful();
 
         $content = (string) $client->getResponse()->getContent();
-        self::assertStringContainsString('table-with-search-field', $content);
+        self::assertStringContainsString('data-ui-profiler-table-search', $content);
     }
 
     public function testUiKernelSidebarUsesMenuRegistryPartial(): void
@@ -120,5 +120,15 @@ final class ShellParityTest extends WebTestCase
 
         self::assertStringContainsString('createCopyToClipboard', $shellJs);
         self::assertStringContainsString('[data-clipboard-text]', $shellJs);
+    }
+
+    public function testShellStylesheetDefinesProfilerGridLayout(): void
+    {
+        $shellCss = \Symfinity\UiProfiler\Asset\ShellChromeStylesheet::CSS;
+
+        self::assertStringContainsString('[data-ui-profiler-shell] #main[data-ui-role="grid"]', $shellCss);
+        self::assertStringContainsString('grid-template-columns: repeat(12', $shellCss);
+        self::assertStringContainsString('body {', $shellCss);
+        self::assertStringContainsString('background-color: var(--ui-color-surface)', $shellCss);
     }
 }

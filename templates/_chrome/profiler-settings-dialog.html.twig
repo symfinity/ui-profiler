@@ -12,8 +12,8 @@
     {% if ui_profiler_stimulus_enabled() %}data-controller="ui-profiler--dialog"{% endif %}
 >
     <div data-ui-role="stack" data-ui-gap="lg">
-        <header data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="md" style="align-items: center; justify-content: space-between;">
-            <h3 id="profiler-settings-title" style="margin: 0;">Configuration Settings</h3>
+        <header data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="md">
+            <h3 id="profiler-settings-title">Configuration Settings</h3>
             <button
                 type="button"
                 data-ui-role="button"
@@ -104,6 +104,21 @@
         return;
     }
 
+    const applyWidthClass = (settingValue) => {
+        const shell = document.querySelector('[data-ui-profiler-shell]');
+        [document.body, shell].forEach((node) => {
+            if (!(node instanceof HTMLElement)) {
+                return;
+            }
+            node.classList.forEach((cssClass) => {
+                if (cssClass.startsWith('width')) {
+                    node.classList.remove(cssClass);
+                }
+            });
+            node.classList.add(settingValue);
+        });
+    };
+
     const syncWidthVariant = () => {
         const widthSetting = localStorage.getItem('symfony/profiler/width') || 'width-normal';
         const widthValue = widthSetting.replace(/^width-/, '');
@@ -115,12 +130,16 @@
 
             const isActive = input.value === widthValue;
             input.checked = isActive;
-            const label = input.closest('[data-ui-profiler-settings-picker] label');
+            const label = input.closest('label[data-ui-role="button"]');
             if (label instanceof HTMLElement) {
                 label.dataset.uiVariant = isActive ? 'primary' : 'ghost';
             }
         });
+
+        applyWidthClass(widthSetting);
     };
+
+    syncWidthVariant();
 
     widthInputs.forEach((option) => {
         option.addEventListener('change', function (event) {
@@ -128,19 +147,25 @@
 
             const settingValue = 'width-' + option.value;
             localStorage.setItem('symfony/profiler/width', settingValue);
-            const shell = document.querySelector('[data-ui-profiler-shell]');
-            [document.body, shell].forEach((node) => {
-                if (!(node instanceof HTMLElement)) {
-                    return;
-                }
-                node.classList.forEach((cssClass) => {
-                    if (cssClass.startsWith('width')) {
-                        node.classList.remove(cssClass);
-                    }
-                });
-                node.classList.add(settingValue);
-            });
+            applyWidthClass(settingValue);
             syncWidthVariant();
+        });
+    });
+
+    document.querySelectorAll('[data-ui-profiler-settings-picker] label[data-ui-role="button"]').forEach((label) => {
+        label.addEventListener('click', (event) => {
+            const input = label.querySelector('input[type="radio"]');
+            if (!(input instanceof HTMLInputElement)) {
+                return;
+            }
+
+            if (event.target === input) {
+                return;
+            }
+
+            event.preventDefault();
+            input.checked = true;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
         });
     });
 

@@ -145,11 +145,11 @@
     </pattern>
   </defs>
 </svg>
-<script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootTimePanel}from'{{ asset('ui-profiler/panels/time-timeline.js') }}?v={{ ui_profiler_asset_version() }}';window.addEventListener('load',()=>bootTimePanel());</script>
+<script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootTimePanel}from'{{ path('ui_profiler_asset', {assetPath: 'panels/time-timeline.js', v: ui_profiler_asset_version()}) }}';window.addEventListener('load',()=>bootTimePanel());</script>
 {% endblock %}
 
 {% macro display_timeline(token, events, origin) %}
-    <div class="sf-profiler-timeline" data-ui-profiler-timeline>
+    <div data-ui-profiler-timeline>
         <script type="application/json" data-ui-profiler-timeline-data>{{ _self.dump_request_data_json(token, events, origin)|raw }}</script>
         <div id="legend-{{ token }}" class="legends"></div>
         <svg id="timeline-{{ token }}" class="timeline-graph"></svg>

@@ -46,16 +46,16 @@ final class ThemeContextTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $context = new ThemeContext($requestStack, $this->activeThemeContext, $this->resolver, true);
+        $context = new ThemeContext($requestStack, $this->activeThemeContext, $this->resolver, null);
 
         self::assertSame($lightId, $context->resolveShellThemeId());
         self::assertSame($darkId, $context->resolveToolbarThemeId());
         self::assertTrue(ThemeLineageCatalog::isDarkThemeId($context->resolveToolbarThemeId()));
     }
 
-    public function testToolbarThemeFollowsShellWhenDarkBarDisabled(): void
+    public function testToolbarThemeOverrideWhenConfigured(): void
     {
-        $lightId = ThemeLineageCatalog::pairForLineage('default')['light'];
+        $darkId = ThemeLineageCatalog::pairForLineage('default')['dark'];
 
         $request = Request::create('/');
         $request->cookies->set(ThemePreferenceCookies::SCHEME, ThemeColorScheme::Light->value);
@@ -64,16 +64,16 @@ final class ThemeContextTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $context = new ThemeContext($requestStack, $this->activeThemeContext, $this->resolver, false);
+        $context = new ThemeContext($requestStack, $this->activeThemeContext, $this->resolver, $darkId);
 
-        self::assertSame($lightId, $context->resolveToolbarThemeId());
+        self::assertSame($darkId, $context->resolveToolbarThemeId());
     }
 
     public function testToolbarThemeWithoutRequestUsesDefaultLineageDark(): void
     {
         $darkId = ThemeLineageCatalog::pairForLineage('default')['dark'];
 
-        $context = new ThemeContext(new RequestStack(), $this->activeThemeContext, $this->resolver, true);
+        $context = new ThemeContext(new RequestStack(), $this->activeThemeContext, $this->resolver, null);
 
         self::assertSame($darkId, $context->resolveToolbarThemeId());
     }

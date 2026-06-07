@@ -85,7 +85,7 @@
             {% endif %}
         {% endfor %}
 
-        <div class="sf-tabs">
+        <div data-ui-profiler-tabs data-ui-role="tabs">
             <div class="tab {{ collector.countMissings == 0 ? 'active' }}">
                 <h3 class="tab-title">Defined <twig:Badge>{{ collector.countDefines }}</twig:Badge></h3>
 
@@ -208,9 +208,18 @@
                     {% endif %}
 
                     {% if message.parameters|length > 0 %}
-                        <twig:Button as="button" variant="ghost" size="sm" class="newline text-small sf-toggle" data-toggle-selector="#parameters-{{ loop.index }}" data-toggle-alt-content="Hide parameters">Show parameters</twig:Button>
+                        <twig:Button
+                            as="button"
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            class="newline text-small"
+                            data-ui-profiler-toggle
+                            data-ui-profiler-toggle-target="#parameters-{{ loop.index }}"
+                            data-ui-profiler-toggle-alt="Hide parameters"
+                        >Show parameters</twig:Button>
 
-                        <div id="parameters-{{ loop.index }}" class="hidden">
+                        <div id="parameters-{{ loop.index }}" data-ui-profiler-toggle-panel hidden>
                             {% for parameters in message.parameters %}
                                 {{ profiler_dump(parameters, maxDepth: 1) }}
                             {% endfor %}

@@ -114,7 +114,7 @@
         {{ 'n/a' in controller_name ? 'Request / Response' : controller_name }}
     </h2>
 
-    <div class="sf-tabs" data-ui-profiler-tabs data-ui-role="tabs">
+    <div data-ui-profiler-tabs data-ui-role="tabs">
         <div class="tab">
             <h3 class="tab-title">Request</h3>
 
@@ -187,13 +187,13 @@
                         <p>Request content not available (it was retrieved as a resource).</p>
                     </div>
                 {% elseif collector.content %}
-                    <div class="sf-tabs" data-ui-profiler-tabs data-ui-role="tabs">
+                    <div data-ui-profiler-tabs data-ui-role="tabs">
                         {% set prettyJson = collector.isJsonRequest ? collector.prettyJson : null %}
                         {% if prettyJson is not null %}
                         <div class="tab">
                             <h3 class="tab-title">Pretty</h3>
                             <div class="tab-content">
-                                <div class="card" style="max-height: 500px; overflow-y: auto;">
+                                <div data-ui-role="card" data-ui-fragment="blocks.card" style="max-height: 500px; overflow-y: auto;">
                                     {{ include('@UiProfiler/_chrome/partials/code-block.html.twig', {
                                         content: '<pre class="break-long-words">' ~ prettyJson ~ '</pre>',
                                     }) }}
@@ -205,7 +205,7 @@
                         <div class="tab">
                             <h3 class="tab-title">Raw</h3>
                             <div class="tab-content">
-                                <div class="card">
+                                <div data-ui-role="card" data-ui-fragment="blocks.card">
                                     {{ include('@UiProfiler/_chrome/partials/code-block.html.twig', {
                                         content: '<pre class="break-long-words">' ~ collector.content ~ '</pre>',
                                     }) }}
@@ -258,7 +258,7 @@
         </div>
 
         <div class="tab {{ collector.sessionmetadata is empty ? 'disabled' }}">
-            <h3 class="tab-title">Session{% if collector.sessionusages is not empty %} <span class="badge">{{ collector.sessionusages|length }}</span>{% endif %}</h3>
+            <h3 class="tab-title">Session{% if collector.sessionusages is not empty %} <twig:Badge>{{ collector.sessionusages|length }}</twig:Badge>{% endif %}</h3>
 
             <div class="tab-content">
                 <h3>Session Metadata</h3>
@@ -316,9 +316,17 @@
                                     {%- if link %}</a>{% else %}</span>{% endif %}
                                     <div class="text-small font-normal">
                                         {% set usage_id = 'session-usage-trace-' ~ key %}
-                                        <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ usage_id }}" data-toggle-alt-content="Hide trace">Show trace</a>
+                                        <twig:Button
+                                            as="button"
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            data-ui-profiler-toggle
+                                            data-ui-profiler-toggle-target="#{{ usage_id }}"
+                                            data-ui-profiler-toggle-alt="Hide trace"
+                                        >Show trace</twig:Button>
                                     </div>
-                                    <div id="{{ usage_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                                    <div id="{{ usage_id }}" class="context" data-ui-profiler-toggle-panel hidden>
                                         {{ profiler_dump(usage.trace, maxDepth: 2) }}
                                     </div>
                                 </td>
@@ -379,7 +387,7 @@
 
         {% if profile.children|length %}
         <div class="tab">
-            <h3 class="tab-title">Sub Requests <span class="badge">{{ profile.children|length }}</span></h3>
+            <h3 class="tab-title">Sub Requests {% if profile.children|length %}<twig:Badge>{{ profile.children|length }}</twig:Badge>{% endif %}</h3>
 
             <div class="tab-content">
                 {% for child in profile.children %}
@@ -399,7 +407,7 @@
 
 {% macro set_handler(controller, route, method) %}
     {% if controller.class is defined -%}
-        {%- if method|default(false) %}<span class="sf-toolbar-status sf-toolbar-redirection-method">{{ method }}</span>{% endif -%}
+        {%- if method|default(false) %}<twig:Badge variant="warning">{{ method }}</twig:Badge>{% endif -%}
         {%- set link = controller.file|file_link(controller.line) %}
         {%- if link %}<a href="{{ link }}" title="{{ controller.class }}">{% else %}<span title="{{ controller.class }}">{% endif %}
 

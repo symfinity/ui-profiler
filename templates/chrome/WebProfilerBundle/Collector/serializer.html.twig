@@ -75,7 +75,7 @@
 {% block panel %}
     <div data-ui-profiler-panel="serializer">
     <h2>Serializer</h2>
-    <div class="sf-serializer sf-reset">
+    <div>
         {% if not collector.handledCount %}
             <div data-ui-role="empty" data-ui-profiler-empty-panel>
                 <p>Nothing was handled by the serializer.</p>
@@ -88,7 +88,7 @@
                 </div>
             </div>
 
-            <div class="sf-tabs">
+            <div data-ui-profiler-tabs data-ui-role="tabs">
                 {% for serializer in collector.serializerNames %}
                     {{ _self.render_serializer_tab(collector, serializer) }}
                 {% endfor %}
@@ -102,7 +102,7 @@
     <div class="tab">
         <h3 class="tab-title">{{ serializer }} <twig:Badge>{{ collector.handledCount(serializer) }}</twig:Badge></h3>
         <div class="tab-content">
-            <div class="sf-tabs">
+            <div data-ui-profiler-tabs data-ui-role="tabs">
                 {{ _self.render_serialize_tab(collector.data(serializer), true, serializer) }}
                 {{ _self.render_serialize_tab(collector.data(serializer), false, serializer) }}
 
@@ -173,10 +173,19 @@
             {% else %}
                 {{ caller.name }}
             {% endif %}
-            line <a class="text-small sf-toggle" data-toggle-selector="#{{ trace_id }}">{{ caller.line }}</a>
+            line <twig:Button
+                as="button"
+                type="button"
+                variant="ghost"
+                size="sm"
+                class="text-small"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ trace_id }}"
+                data-ui-profiler-toggle-alt="Hide excerpt"
+            >{{ caller.line }}</twig:Button>
         </span>
 
-        <div class="sf-serializer-compact hidden" id="{{ trace_id }}">
+        <div id="{{ trace_id }}" data-ui-profiler-toggle-panel hidden>
             <div class="trace">
                 {{ caller.file|file_excerpt(caller.line)|replace({
                     '#DD0000': 'var(--highlight-string)',
@@ -273,8 +282,17 @@
     <span class="nowrap">{{ item.dataType }}</span>
 
     <div>
-        <twig:Button as="a" variant="ghost" size="sm" class="text-small sf-toggle" data-toggle-selector="#{{ data_id }}" data-toggle-alt-content="Hide contents">Show contents</twig:Button>
-        <div id="{{ data_id }}" class="context sf-toggle-content sf-toggle-hidden">
+        <twig:Button
+            as="button"
+            type="button"
+            variant="ghost"
+            size="sm"
+            class="text-small"
+            data-ui-profiler-toggle
+            data-ui-profiler-toggle-target="#{{ data_id }}"
+            data-ui-profiler-toggle-alt="Hide contents"
+        >Show contents</twig:Button>
+        <div id="{{ data_id }}" class="context" data-ui-profiler-toggle-panel hidden>
             {{ profiler_dump(item.data) }}
         </div>
     </div>
@@ -291,8 +309,17 @@
     {% endif %}
 
     <div>
-        <twig:Button as="a" variant="ghost" size="sm" class="text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</twig:Button>
-        <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+        <twig:Button
+            as="button"
+            type="button"
+            variant="ghost"
+            size="sm"
+            class="text-small"
+            data-ui-profiler-toggle
+            data-ui-profiler-toggle-target="#{{ context_id }}"
+            data-ui-profiler-toggle-alt="Hide context"
+        >Show context</twig:Button>
+        <div id="{{ context_id }}" class="context" data-ui-profiler-toggle-panel hidden>
             {{ profiler_dump(item.context) }}
         </div>
     </div>
@@ -307,8 +334,17 @@
 
     {% if item.normalization|length > 1 %}
         <div>
-            <twig:Button as="a" variant="ghost" size="sm" class="text-small sf-toggle" data-toggle-selector="#{{ nested_normalizers_id }}" data-toggle-alt-content="Hide nested normalizers">Show nested normalizers</twig:Button>
-            <div id="{{ nested_normalizers_id }}" class="context sf-toggle-content sf-toggle-hidden">
+            <twig:Button
+                as="button"
+                type="button"
+                variant="ghost"
+                size="sm"
+                class="text-small"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ nested_normalizers_id }}"
+                data-ui-profiler-toggle-alt="Hide nested normalizers"
+            >Show nested normalizers</twig:Button>
+            <div id="{{ nested_normalizers_id }}" class="context" data-ui-profiler-toggle-panel hidden>
                 <ul class="text-small" style="line-height:80%;margin-top:10px">
                     {% for normalizer in item.normalization %}
                         <li><span class="nowrap">x{{ normalizer.calls }} <a href="{{ normalizer.file|file_link(normalizer.line) }}" title="{{ normalizer.file }}">{{ normalizer.class }}</a> ({{ '%.2f'|format(normalizer.time * 1000) }} ms)</span></li>
@@ -328,8 +364,17 @@
 
     {% if item.encoding|length > 1 %}
         <div>
-            <twig:Button as="a" variant="ghost" size="sm" class="text-small sf-toggle" data-toggle-selector="#{{ nested_encoders_id }}" data-toggle-alt-content="Hide nested encoders">Show nested encoders</twig:Button>
-            <div id="{{ nested_encoders_id }}" class="context sf-toggle-content sf-toggle-hidden">
+            <twig:Button
+                as="button"
+                type="button"
+                variant="ghost"
+                size="sm"
+                class="text-small"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ nested_encoders_id }}"
+                data-ui-profiler-toggle-alt="Hide nested encoders"
+            >Show nested encoders</twig:Button>
+            <div id="{{ nested_encoders_id }}" class="context" data-ui-profiler-toggle-panel hidden>
                 <ul class="text-small" style="line-height:80%;margin-top:10px">
                     {% for encoder in item.encoding %}
                         <li><span class="nowrap">x{{ encoder.calls }} <a href="{{ encoder.file|file_link(encoder.line) }}" title="{{ encoder.file }}">{{ encoder.class }}</a> ({{ '%.2f'|format(encoder.time * 1000) }} ms)</span></li>

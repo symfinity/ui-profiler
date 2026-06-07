@@ -30,7 +30,7 @@
             <p>No exception was thrown and caught.</p>
         </div>
     {% else %}
-        <div class="sf-reset">
+        <div data-ui-profiler-exception-delegate>
             {{ render(controller('web_profiler.controller.exception_panel::body', {token: token})) }}
         </div>
     {% endif %}

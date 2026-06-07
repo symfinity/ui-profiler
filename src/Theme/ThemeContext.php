@@ -8,13 +8,13 @@ use Symfinity\UiKernel\Theme\ActiveThemeContext;
 use Symfinity\UiKernel\Theme\ThemeLineageCatalog;
 use Symfinity\UiKernel\Theme\ThemePreference;
 use Symfinity\UiKernel\Theme\ThemePreferenceResolver;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Profiler theme facade — delegates persistence to ui-kernel cookies (KTB-3).
  *
- * Toolbar bar stays dark when toolbar.dark_bar is true (051 KTB-T*).
+ * Toolbar theme is invariant dark (043 KTB-T*) — independent of shell scheme.
+ * MUST NOT use session or ui_profiler_* query keys for theme preference.
  */
 final class ThemeContext
 {
@@ -22,7 +22,7 @@ final class ThemeContext
         private readonly RequestStack $requestStack,
         private readonly ActiveThemeContext $activeThemeContext,
         private readonly ThemePreferenceResolver $preferenceResolver,
-        private readonly bool $toolbarDarkBar,
+        private readonly ?string $toolbarThemeOverride,
     ) {
     }
 
@@ -41,8 +41,10 @@ final class ThemeContext
 
     public function resolveToolbarThemeId(): string
     {
-        if (!$this->toolbarDarkBar) {
-            return $this->resolveShellThemeId();
+        if ($this->toolbarThemeOverride !== null
+            && $this->toolbarThemeOverride !== ''
+            && ThemeLineageCatalog::isDarkThemeId($this->toolbarThemeOverride)) {
+            return $this->toolbarThemeOverride;
         }
 
         return ThemeLineageCatalog::pairForLineage($this->preference()->lineage)['dark'];

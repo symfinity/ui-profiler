@@ -4,13 +4,39 @@
 
 {% block head %}
     {{ parent() }}
-    {{ ui_kernel_css()|raw }}
+    {% if ui_profiler_shell_stylesheet()|trim is not empty %}
+        <style{% if csp_style_nonce is defined and csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>{{ ui_profiler_shell_stylesheet()|raw }}</style>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
+    {% set pref = ui_profiler_theme_preference() %}
+    {% set lineage_pair = ui_profiler_lineage_pairs()[pref.lineage] %}
     <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
-        document.body.classList.remove('theme-light', 'theme-dark');
-        document.body.classList.add('{{ ui_profiler_is_dark_theme() ? 'theme-dark' : 'theme-light' }}');
+        (function () {
+            const scheme = {{ pref.scheme.value|json_encode|raw }};
+            const pair = {{ lineage_pair|json_encode|raw }};
+
+            const applyTheme = (dark) => {
+                const themeId = dark ? pair.dark : pair.light;
+                document.body.classList.remove('theme-light', 'theme-dark');
+                document.body.classList.add(dark ? 'theme-dark' : 'theme-light');
+                document.documentElement.setAttribute('data-theme', themeId);
+                const shell = document.querySelector('[data-ui-profiler-shell]');
+                if (shell instanceof HTMLElement) {
+                    shell.setAttribute('data-theme', themeId);
+                }
+            };
+
+            if (scheme === 'auto') {
+                const media = window.matchMedia('(prefers-color-scheme: dark)');
+                const sync = () => applyTheme(media.matches);
+                sync();
+                media.addEventListener('change', sync);
+            } else {
+                applyTheme(scheme === 'dark');
+            }
+        })();
     </script>
     <div data-ui-profiler-shell data-ui-role="grid-container" data-theme="{{ ui_kernel_active_theme_id() }}">
         {{ include('@WebProfiler/Profiler/header.html.twig', {profile_type: profile_type}, with_context: false) }}
@@ -38,14 +64,14 @@
                         <div id="sidebar-contents" data-ui-role="card" data-ui-fragment="blocks.card">
                             <div id="sidebar-shortcuts">
                                 {% block sidebar_shortcuts_links %}
-                                    <twig:ButtonGroup class="shortcuts">
+                                    <div class="shortcuts" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="sm" data-ui-profiler-shortcuts>
                                         <twig:Button as="a" href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}" variant="ghost" size="sm">
                                             {{ source('@WebProfiler/Icon/search.svg') }} Search profiles
                                         </twig:Button>
                                         <twig:Button as="a" href="{{ path('_profiler', {token: 'latest', type: profile_type}|merge(request.query.all)) }}" variant="ghost" size="sm">
                                             Latest
                                         </twig:Button>
-                                    </twig:ButtonGroup>
+                                    </div>
                                 {% endblock sidebar_shortcuts_links %}
                             </div>
 
@@ -88,7 +114,7 @@
                 <div id="collector-wrapper" data-ui-role="grid-cell" data-ui-span-md="9" data-ui-span-lg="9">
                     <div data-ui-role="card" data-ui-fragment="blocks.card">
                         <div id="collector-content"{% if ui_profiler_stimulus_enabled() %} data-controller="ui-profiler--tabs ui-profiler--table-search"{% endif %}>
-                            {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
+                            {{ include('@UiProfiler/_chrome/shell-bootstrap.html.twig') }}
                             {% block panel %}{% endblock %}
                         </div>
                     </div>

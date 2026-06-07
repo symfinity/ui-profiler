@@ -64,7 +64,7 @@
         <h3>{{ transport ?: '<em>Empty Transport Name</em>' }}</h3>
 
         <div class="card-block">
-            <div class="sf-tabs sf-tabs-sm">
+            <div data-ui-profiler-tabs data-ui-role="tabs">
                 {% for event in events.events(transport) %}
                     {% set message = event.message %}
                     <div class="tab">
@@ -89,7 +89,7 @@
                                     </div>
                                 {% endif %}
                                     <div class="card-block">
-                                        <div class="sf-tabs sf-tabs-sm">
+                                        <div data-ui-profiler-tabs data-ui-role="tabs">
                                             {% if notification %}
                                                 <div class="tab">
                                                     <h3 class="tab-title">Notification</h3>

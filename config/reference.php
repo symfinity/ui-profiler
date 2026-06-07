@@ -1297,13 +1297,14 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type UiProfilerConfig = array{
  *     enabled?: bool|Param, // Default: true
+ *     theme?: scalar|Param|null, // Default: "default"
+ *     toolbar_theme?: scalar|Param|null, // Default: null
+ *     asset_version?: scalar|Param|null, // Default: null
  *     wdt?: array{
- *         critical_inline?: bool|Param, // Default: true
- *         bootstrap_max_bytes?: int|Param, // Default: 5120
+ *         critical_css_inline?: bool|Param, // Default: true
+ *         module_preload?: bool|Param, // Default: true
  *     },
- *     toolbar?: array{
- *         dark_bar?: bool|Param, // Default: true
- *     },
+ *     legacy_sf_shim?: bool|Param, // Default: false
  * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,

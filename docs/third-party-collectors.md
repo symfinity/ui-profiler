@@ -16,4 +16,4 @@ Symfinity-owned profiler chrome covers Symfony stock collectors (CO-01–19). Th
 2. Optional: tag `ui_profiler.menu` with label, route, icon metadata.
 3. Optional: add `templates/chrome/{VendorBundle}/Collector/{name}.html.twig` override using ux-blocks only.
 
-See [collector-compat.md](../../../../specs/symfinity/symfinity/51-ui-profiler-reboot/contracts/collector-compat.md) in spec **051**.
+See [greenfield-implement-rules.md](greenfield-implement-rules.md) for collector block compatibility and menu registry (`ui_profiler.menu` tag).

@@ -28,8 +28,8 @@ final class AjaxToolbarParityTest extends WebTestCase
         self::assertResponseIsSuccessful();
 
         $content = (string) $client->getResponse()->getContent();
-        self::assertStringContainsString('sf-toolbar-block-ajax', $content);
-        self::assertStringContainsString('sf-toolbar-ajax-requests', $content);
+        self::assertStringContainsString('data-ui-profiler-collector="ajax"', $content);
+        self::assertStringContainsString('data-ui-profiler-wdt', $content);
     }
 
     public function testAjaxFixtureRouteReturnsJson(): void

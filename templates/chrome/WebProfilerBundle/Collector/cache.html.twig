@@ -55,7 +55,7 @@
         {{ _self.render_metrics(collector.totals, true) }}
 
         <h2>Pools</h2>
-        <div class="sf-tabs">
+        <div data-ui-profiler-tabs data-ui-role="tabs">
             {# the empty merge is needed to turn the iterator into an array #}
             {% set cache_pools_with_calls = collector.calls|filter(calls => calls|length > 0)|merge([]) %}
             {% for name, calls in cache_pools_with_calls %}
@@ -64,7 +64,7 @@
 
                     <div class="tab-content">
                         <h4>Adapter</h4>
-                        <div class="card">
+                        <div data-ui-role="card" data-ui-fragment="blocks.card">
                             {% if collector.adapters[name] is defined %}
                                 <code>{{ collector.adapters[name] }}</code>
                             {% else %}

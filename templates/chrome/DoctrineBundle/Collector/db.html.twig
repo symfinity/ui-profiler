@@ -125,7 +125,7 @@
         {% endif %}
     </div>
 
-    <div class="sf-tabs" style="margin-top: 20px;">
+    <div data-ui-profiler-tabs data-ui-role="tabs" style="margin-top: 20px;">
         <div class="tab {{ collector.queries is empty ? 'disabled' }}">
             {% set group_queries = request.query.getBoolean('group') %}
             <h3 class="tab-title">
@@ -196,11 +196,11 @@
                                             </div>
 
                                             <div class="text-small font-normal">
-                                                <a href="#" class="sf-toggle link-inverse" data-toggle-selector="#formatted-query-{{ i }}-{{ loop.parent.loop.index }}" data-toggle-alt-content="Hide formatted query">View formatted query</a>
+                                                <a href="#" class="link-inverse" data-ui-profiler-toggle data-ui-profiler-toggle-target="#formatted-query-{{ i }}-{{ loop.parent.loop.index }}" data-ui-profiler-toggle-alt="Hide formatted query">View formatted query</a>
 
                                                 {% if query.runnable %}
                                                     &nbsp;&nbsp;
-                                                    <a href="#" class="sf-toggle link-inverse" data-toggle-selector="#original-query-{{ i }}-{{ loop.parent.loop.index }}" data-toggle-alt-content="Hide runnable query">View runnable query</a>
+                                                    <a href="#" class="link-inverse" data-ui-profiler-toggle data-ui-profiler-toggle-target="#original-query-{{ i }}-{{ loop.parent.loop.index }}" data-ui-profiler-toggle-alt="Hide runnable query">View runnable query</a>
                                                 {% endif %}
 
                                                 {% if query.explainable %}
@@ -210,17 +210,17 @@
 
                                                 {% if query.backtrace is defined %}
                                                     &nbsp;&nbsp;
-                                                    <a href="#" class="sf-toggle link-inverse" data-toggle-selector="#backtrace-{{ i }}-{{ loop.parent.loop.index }}" data-toggle-alt-content="Hide query backtrace">View query backtrace</a>
+                                                    <a href="#" class="link-inverse" data-ui-profiler-toggle data-ui-profiler-toggle-target="#backtrace-{{ i }}-{{ loop.parent.loop.index }}" data-ui-profiler-toggle-alt="Hide query backtrace">View query backtrace</a>
                                                 {% endif %}
                                             </div>
 
-                                            <div id="formatted-query-{{ i }}-{{ loop.parent.loop.index }}" class="sql-runnable hidden">
+                                            <div id="formatted-query-{{ i }}-{{ loop.parent.loop.index }}" class="sql-runnable" data-ui-profiler-toggle-panel hidden>
                                                 {{ query.sql|doctrine_format_sql(highlight = true) }}
                                                 <twig:Button size="sm" class="hidden" data-clipboard-text="{{ query.sql|doctrine_format_sql(highlight = false)|e('html_attr') }}">Copy</twig:Button>
                                             </div>
 
                                             {% if query.runnable %}
-                                                <div id="original-query-{{ i }}-{{ loop.parent.loop.index }}" class="sql-runnable hidden">
+                                                <div id="original-query-{{ i }}-{{ loop.parent.loop.index }}" class="sql-runnable" data-ui-profiler-toggle-panel hidden>
                                                     {% set runnable_sql = (query.sql ~ ';')|doctrine_replace_query_parameters(query.params) %}
                                                     {{ runnable_sql|doctrine_prettify_sql }}
                                                     <twig:Button size="sm" class="hidden" data-clipboard-text="{{ runnable_sql|e('html_attr') }}">Copy</twig:Button>
@@ -232,7 +232,7 @@
                                             {% endif %}
 
                                             {% if query.backtrace is defined %}
-                                                <div id="backtrace-{{ i }}-{{ loop.parent.loop.index }}" class="hidden">
+                                                <div id="backtrace-{{ i }}-{{ loop.parent.loop.index }}" data-ui-profiler-toggle-panel hidden>
                                                     <table data-ui-role="table">
                                                         <thead>
                                                         <tr>

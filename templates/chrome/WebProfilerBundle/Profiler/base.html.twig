@@ -13,12 +13,9 @@
 
         {% block head %}
             {% include '@UiKernel/_head.html.twig' %}
-            {% block stylesheets %}
-                {# Owned shell CSS loaded from layout.html.twig (044 T046 — panel.css removed). #}
-            {% endblock %}
-
-            {% block javascripts %}
-            {% endblock %}
+            {{ ui_kernel_css()|raw }}
+            {% block stylesheets %}{% endblock %}
+            {% block javascripts %}{% endblock %}
         {% endblock %}
     </head>
     <body>

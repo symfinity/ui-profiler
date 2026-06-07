@@ -9,6 +9,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Prepends ui-profiler Twig overrides ahead of stock bundle views when enabled.
+ *
+ * Overrides live under templates/chrome/{BundleName}/ — not templates/bundles/, so Symfony
+ * does not auto-register them when ui_profiler.enabled is false.
+ *
+ * Bundle dirs under templates/chrome/ are discovered automatically (no hardcoded list).
  */
 final class PrependWebProfilerTemplatesPass implements CompilerPassInterface
 {
@@ -37,7 +42,7 @@ final class PrependWebProfilerTemplatesPass implements CompilerPassInterface
     }
 
     /**
-     * @return list<string>
+     * @return list<string> Symfony-style bundle directory names (e.g. WebProfilerBundle)
      */
     public static function discoverOverrideBundles(string $packageRoot): array
     {

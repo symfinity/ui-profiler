@@ -156,7 +156,7 @@
                         if (!el.classList.contains('block')) {
                             return;
                         }
-                        const mEl = el.querySelector('.sf-mermaid');
+                        const mEl = el.querySelector('[data-ui-profiler-mermaid]');
                         if (mEl.dataset.processed) {
                             return;
                         }
@@ -169,14 +169,14 @@
             });
         </script>
 
-        <div class="sf-tabs js-tabs">
+        <div data-ui-profiler-tabs data-ui-role="tabs">
             {% for name, data in collector.workflows %}
                 <div class="tab">
                     <h2 class="tab-title">{{ name }}{% if data.calls|length %} ({{ data.calls|length }}){% endif %}</h2>
 
                     <div class="tab-content">
                         <h3>Definition</h3>
-                        <pre class="sf-mermaid">
+                        <pre class="ui-profiler-mermaid" data-ui-profiler-mermaid>
                             {{ data.dump|raw }}
                             {% for nodeId, events in data.listeners %}
                                 click {{ nodeId }} showNodeDetails{{ collector.hash(name) }}

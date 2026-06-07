@@ -29,7 +29,7 @@ final class WdtBootstrapParityTest extends WebTestCase
         self::assertStringNotContainsString('Sfjs = (function', $content);
         self::assertStringNotContainsString('typeof Sfjs === \'undefined\'', $content);
         self::assertStringContainsString('UiProfilerWdt.boot', $content);
-        self::assertStringContainsString('ui-profiler/wdt/index.js', $content);
+        self::assertStringContainsString('/_profiler/assets/wdt/index.js', $content);
 
         $bootstrap = $this->extractToolbarBootstrap($content);
         self::assertStringContainsString('position:fixed', $bootstrap, 'Critical CSS must style skeleton before toolbar.css loads.');
@@ -38,6 +38,16 @@ final class WdtBootstrapParityTest extends WebTestCase
             strlen($bootstrap),
             'WDT inline bootstrap must stay ≤ 5KB (V2-02).',
         );
+    }
+
+    public function testOwnedWdtScriptRouteReturnsJavaScript(): void
+    {
+        $client = static::createClient(['debug' => true]);
+        $client->request('GET', '/_profiler/assets/wdt/index.js?v=0');
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('text/javascript; charset=UTF-8', $client->getResponse()->headers->get('Content-Type'));
+        self::assertStringContainsString('UiProfilerWdt', (string) $client->getResponse()->getContent());
     }
 
     public function testToolbarUsesOwnedStylesheetRoute(): void

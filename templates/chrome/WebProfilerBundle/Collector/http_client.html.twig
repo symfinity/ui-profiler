@@ -52,7 +52,7 @@
             </div>
         </div>
         <h2>Clients</h2>
-        <div class="sf-tabs">
+        <div data-ui-profiler-tabs data-ui-role="tabs">
             {% for name, client in collector.clients %}
                 <div class="tab {{ client.traces|length == 0 ? 'disabled' }}">
                     <h3 class="tab-title">{{ name }} <twig:Badge>{{ client.traces|length }}</twig:Badge></h3>
@@ -76,7 +76,7 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
-                                <table data-ui-role="table" class="sf-profiler-httpclient-requests">
+                                <table data-ui-role="table">
                                     <thead>
                                     <tr>
                                         <th>

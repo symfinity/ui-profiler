@@ -124,7 +124,7 @@
     <div data-ui-profiler-panel="security">
     <h2>Security</h2>
     {% if collector.enabled %}
-        <div class="sf-tabs">
+        <div data-ui-profiler-tabs data-ui-role="tabs">
             <div class="tab {{ collector.token is empty ? 'disabled' }}">
                 <h3 class="tab-title">Token</h3>
 
@@ -308,9 +308,9 @@
                             </tr>
                             </thead>
                             {% for i, authenticator in collector.authenticators %}
-                                <tr class="sf-toggle"
-                                    data-toggle-selector="#authenticator-{{ i }}"
-                                    data-toggle-initial="{{ authenticator.authenticated is not null ? 'display' }}"
+                                <tr data-ui-profiler-toggle
+                                    data-ui-profiler-toggle-target="#authenticator-{{ i }}"
+                                    {% if authenticator.authenticated is not null %}data-ui-profiler-toggle-open{% endif %}
                                 >
                                     <td class="font-normal text-small">
                                         {% if authenticator.authenticated %}
@@ -470,7 +470,7 @@
                                         <td colspan="3">
                                         {% if decision.voter_details is not empty %}
                                             {% set voter_details_id = 'voter-details-' ~ loop.index %}
-                                            <div id="{{ voter_details_id }}" class="sf-toggle-content sf-toggle-hidden">
+                                            <div id="{{ voter_details_id }}" hidden>
                                                 <table data-ui-role="table">
                                                    <tbody>
                                                     {% for voter_detail in decision.voter_details %}
@@ -500,7 +500,7 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <twig:Button as="a" variant="ghost" size="sm" class="text-small sf-toggle" data-toggle-selector="#{{ voter_details_id }}" data-toggle-alt-content="Hide voter details">Show voter details</twig:Button>
+                                            <twig:Button as="a" variant="ghost" size="sm" class="text-small" data-ui-profiler-toggle data-ui-profiler-toggle-target="#{{ voter_details_id }}" data-ui-profiler-toggle-alt="Hide voter details">Show voter details</twig:Button>
                                         {% endif %}
                                         </td>
                                     </tr>

@@ -53,7 +53,7 @@
         <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
         {{ _self.render_bus_messages(collector.messages, true) }}
     {% else %}
-        <div class="sf-tabs message-bus">
+        <div data-ui-profiler-tabs data-ui-role="tabs" class="message-bus">
             <div class="tab">
                 {% set messages = collector.messages %}
                 {% set exceptionsCount = collector.exceptionsCount %}
@@ -89,9 +89,10 @@
     <table data-ui-role="table" class="message-item">
         <thead>
             <tr>
-                <th colspan="2" class="sf-toggle"
-                    data-toggle-selector="#message-item-{{ discr }}-{{ loop.index0 }}-details"
-                    data-toggle-initial="{{ loop.first ? 'display' }}"
+                <th colspan="2"
+                    data-ui-profiler-toggle
+                    data-ui-profiler-toggle-target="#message-item-{{ discr }}-{{ loop.index0 }}-details"
+                    {% if loop.first %}data-ui-profiler-toggle-open{% endif %}
                 >
                     <span class="dump-inline">{{ profiler_dump(dispatchCall.message.type) }}</span>
                     {% if dispatchCall.exception is defined %}
@@ -104,7 +105,7 @@
                 </th>
             </tr>
         </thead>
-        <tbody id="message-item-{{ discr }}-{{ loop.index0 }}-details" class="sf-toggle-content">
+        <tbody id="message-item-{{ discr }}-{{ loop.index0 }}-details" data-ui-profiler-toggle-panel{% if not loop.first %} hidden{% endif %}>
             <tr>
                 <th scope="row" class="font-normal">Caller</th>
                 <td class="message-bus-dispatch-caller">
@@ -120,9 +121,18 @@
                     {% else %}
                         {{ caller.name }}
                     {% endif %}
-                    line <button type="button" class="btn-link text-small sf-toggle" data-toggle-selector="#sf-trace-{{ discr }}-{{ loop.index0 }}">{{ caller.line }}</button>
+                    line <twig:Button
+                        as="button"
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        class="text-small"
+                        data-ui-profiler-toggle
+                        data-ui-profiler-toggle-target="#messenger-trace-{{ discr }}-{{ loop.index0 }}"
+                        data-ui-profiler-toggle-alt="Hide excerpt"
+                    >{{ caller.line }}</twig:Button>
 
-                    <div class="hidden" id="sf-trace-{{ discr }}-{{ loop.index0 }}">
+                    <div id="messenger-trace-{{ discr }}-{{ loop.index0 }}" data-ui-profiler-toggle-panel hidden>
                         <div class="trace">
                             {{ caller.file|file_excerpt(caller.line)|replace({
                                 '#DD0000': 'var(--highlight-string)',

@@ -345,9 +345,17 @@
                         <td class="font-normal">
                             {% set context_id = 'context-compiler-' ~ loop.index %}
 
-                            <button type="button" class="btn btn-link sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="{{ class }}">{{ class }}</button>
+                            <twig:Button
+                                as="button"
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                data-ui-profiler-toggle
+                                data-ui-profiler-toggle-target="#{{ context_id }}"
+                                data-ui-profiler-toggle-alt="{{ class }}"
+                            >{{ class }}</twig:Button>
 
-                            <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                            <div id="{{ context_id }}" class="context" data-ui-profiler-toggle-panel hidden>
                                 <ul class="break-long-words">
                                     {% for log in logs %}
                                         <li>{{ profiler_dump_log(log.message) }}</li>
@@ -385,22 +393,40 @@
 
         {% if has_context %}
             {% set context_id = 'context-' ~ category ~ '-' ~ log_index %}
-            <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</button></span>
+            <span><twig:Button
+                as="button"
+                type="button"
+                variant="ghost"
+                size="sm"
+                class="text-small"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ context_id }}"
+                data-ui-profiler-toggle-alt="Hide context"
+            >Show context</twig:Button></span>
         {% endif %}
 
         {% if has_trace %}
             {% set trace_id = 'trace-' ~ category ~ '-' ~ log_index %}
-            <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ trace_id }}" data-toggle-alt-content="Hide trace">Show trace</button></span>
+            <span><twig:Button
+                as="button"
+                type="button"
+                variant="ghost"
+                size="sm"
+                class="text-small"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ trace_id }}"
+                data-ui-profiler-toggle-alt="Hide trace"
+            >Show trace</twig:Button></span>
         {% endif %}
 
         {% if has_context %}
-            <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+            <div id="{{ context_id }}" class="context" data-ui-profiler-toggle-panel hidden>
                 {{ profiler_dump(log.context, maxDepth: 1) }}
             </div>
         {% endif %}
 
         {% if has_trace %}
-            <div id="{{ trace_id }}" class="context sf-toggle-content sf-toggle-hidden">
+            <div id="{{ trace_id }}" class="context" data-ui-profiler-toggle-panel hidden>
                 {{ profiler_dump(log.context.exception.trace, maxDepth: 1) }}
             </div>
         {% endif %}

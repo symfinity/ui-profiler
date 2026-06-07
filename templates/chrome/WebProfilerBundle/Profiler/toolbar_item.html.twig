@@ -1,4 +1,4 @@
-<div class="sf-toolbar-block sf-toolbar-block-{{ name }} sf-toolbar-status-{{ status|default('normal') }} ui-profiler-wdt__item {{ additional_classes|default('') }}" {{ block_attrs|default('')|raw }}>
+<div class="sf-toolbar-block sf-toolbar-block-{{ name }} sf-toolbar-status-{{ status|default('normal') }} ui-profiler-wdt__item {{ additional_classes|default('') }}" data-ui-profiler-collector="{{ name }}" {{ block_attrs|default('')|raw }}>
     {% if link is not defined or link %}<a class="ui-profiler-wdt__link" href="{{ url('_profiler', {token: token, panel: name}) }}">{% endif %}
         <div class="sf-toolbar-icon ui-profiler-wdt__icon">{{ icon|default('') }}</div>
     {% if link|default(false) %}</a>{% endif %}

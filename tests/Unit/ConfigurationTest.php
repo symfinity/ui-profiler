@@ -16,9 +16,9 @@ final class ConfigurationTest extends TestCase
         $config = (new Processor())->processConfiguration(new Configuration(), [[]]);
 
         self::assertTrue($config['enabled']);
-        self::assertTrue($config['wdt']['critical_inline']);
-        self::assertSame(5120, $config['wdt']['bootstrap_max_bytes']);
-        self::assertTrue($config['toolbar']['dark_bar']);
+        self::assertTrue($config['wdt']['critical_css_inline']);
+        self::assertTrue($config['wdt']['module_preload']);
+        self::assertFalse($config['legacy_sf_shim']);
     }
 
     public function testDisabledConfig(): void
@@ -30,7 +30,7 @@ final class ConfigurationTest extends TestCase
         self::assertFalse($config['enabled']);
     }
 
-    public function testLegacySfShimKeyRejected(): void
+    public function testLegacySfShimHardFailsWhenTrue(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('legacy_sf_shim');

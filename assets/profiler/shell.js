@@ -36,7 +36,9 @@ export class UiProfilerShell {
                 return;
             }
 
-            const searchField = document.querySelector('.table-with-search-field .table-search-field-input');
+            const searchField = document.querySelector(
+                '[data-ui-profiler-table-search] .table-search-field-input',
+            );
 
             if (!(searchField instanceof HTMLInputElement)) {
                 return;
@@ -48,7 +50,7 @@ export class UiProfilerShell {
     }
 
     createTabs() {
-        const tabGroups = document.querySelectorAll('.sf-tabs:not([data-processed=true])');
+        const tabGroups = document.querySelectorAll('[data-ui-profiler-tabs]:not([data-processed=true])');
 
         tabGroups.forEach((tabGroup, i) => {
             const tabs = tabGroup.querySelectorAll(':scope > .tab');
@@ -131,7 +133,7 @@ export class UiProfilerShell {
     }
 
     createTableSearchFields() {
-        document.querySelectorAll('div.table-with-search-field').forEach((tableWrapper, i) => {
+        document.querySelectorAll('[data-ui-profiler-table-search]').forEach((tableWrapper, i) => {
             const searchField = document.createElement('input');
             searchField.type = 'search';
             searchField.placeholder = 'search...';
@@ -178,6 +180,55 @@ export class UiProfilerShell {
     }
 
     createToggles() {
+        document.querySelectorAll('[data-ui-profiler-toggle]:not([data-processed=true])').forEach((toggle) => {
+            const elementSelector = toggle.getAttribute('data-ui-profiler-toggle-target')
+                ?? toggle.getAttribute('data-toggle-selector');
+            const element = elementSelector ? document.querySelector(elementSelector) : null;
+
+            if (!(element instanceof HTMLElement)) {
+                return;
+            }
+
+            if (toggle.hasAttribute('data-ui-profiler-toggle-open')
+                || toggle.hasAttribute('data-toggle-initial') && 'display' === toggle.getAttribute('data-toggle-initial')) {
+                element.hidden = false;
+                toggle.setAttribute('aria-expanded', 'true');
+            } else {
+                element.hidden = true;
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+
+            toggle.addEventListener('click', (e) => {
+                if (e.target instanceof Element && !toggle.contains(e.target)) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                if ('' !== window.getSelection().toString()) {
+                    return;
+                }
+
+                element.hidden = !element.hidden;
+                toggle.setAttribute('aria-expanded', element.hidden ? 'false' : 'true');
+
+                const altContent = toggle.getAttribute('data-ui-profiler-toggle-alt')
+                    ?? toggle.getAttribute('data-toggle-alt-content');
+                if (!altContent) {
+                    return;
+                }
+
+                if (!toggle.hasAttribute('data-toggle-original-content')) {
+                    toggle.setAttribute('data-toggle-original-content', toggle.innerHTML);
+                }
+
+                const originalContent = toggle.getAttribute('data-toggle-original-content') ?? '';
+                toggle.innerHTML = element.hidden ? originalContent : altContent;
+            });
+
+            toggle.setAttribute('data-processed', 'true');
+        });
+
         const toggles = document.querySelectorAll('.sf-toggle:not([data-processed=true])');
         toggles.forEach((toggle) => {
             const elementSelector = toggle.getAttribute('data-toggle-selector');

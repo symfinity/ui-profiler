@@ -31,7 +31,7 @@ final class ProfilerThemePreferenceController extends AbstractController
     }
 
     #[Route(
-        '/{token}/preferences/theme',
+        '/_profiler/{token}/preferences/theme',
         name: 'ui_profiler_theme_preference',
         methods: ['GET'],
     )]
