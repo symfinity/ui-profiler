@@ -6,6 +6,7 @@ namespace Symfinity\UiProfiler;
 
 use Symfinity\UiProfiler\DependencyInjection\Compiler\PrependWebProfilerTemplatesPass;
 use Symfinity\UiProfiler\DependencyInjection\Compiler\ProfilerMenuRegistryPass;
+use Symfinity\UiProfiler\DependencyInjection\Compiler\RegisterUiKernelCollectorPass;
 use Symfinity\UiProfiler\DependencyInjection\Compiler\StimulusIntegrationPass;
 use Symfinity\UiProfiler\DependencyInjection\UiProfilerExtension;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\TwigConfigurator;
@@ -26,6 +27,7 @@ final class UiProfilerBundle extends AbstractBundle
         parent::build($container);
         $container->addCompilerPass(new PrependWebProfilerTemplatesPass());
         $container->addCompilerPass(new ProfilerMenuRegistryPass());
+        $container->addCompilerPass(new RegisterUiKernelCollectorPass());
         $container->addCompilerPass(new StimulusIntegrationPass());
     }
 

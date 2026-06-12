@@ -15,9 +15,9 @@ final class WdtToolbarStylesheet
     --ui-toolbar-bg: var(--ui-color-surface);
     --ui-toolbar-fg: var(--ui-color-text);
     --ui-toolbar-muted: var(--ui-color-text-muted);
-    --ui-toolbar-icon: color-mix(in srgb, var(--ui-color-text) 75%, var(--ui-color-text-muted));
+    --ui-toolbar-icon: var(--ui-color-text);
     --ui-toolbar-hover: var(--ui-color-surface-elevated);
-    --ui-toolbar-link: var(--ui-color-info);
+    --ui-toolbar-link: var(--ui-color-primary);
     --ui-toolbar-red: var(--ui-color-danger);
     --ui-toolbar-red-fg: var(--ui-color-surface);
     --ui-toolbar-yellow: var(--ui-color-warning);
@@ -27,7 +27,7 @@ final class WdtToolbarStylesheet
     bottom: 0;
     box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ui-color-text) 12%, var(--ui-color-surface)), 0 -1px 0 color-mix(in srgb, var(--ui-color-text) 25%, transparent);
     color: var(--ui-toolbar-fg);
-    font: 11px var(--ui-toolbar-sans);
+    font: 0.75rem var(--ui-toolbar-sans);
     left: 0;
     margin: 0;
     padding: 0 36px 0 0;
@@ -42,6 +42,7 @@ final class WdtToolbarStylesheet
 .sf-toolbar-clearer { clear: both; height: 36px; }
 .sf-toolbarreset abbr { border-bottom: 1px dashed var(--ui-toolbar-muted); }
 .sf-toolbarreset svg, .sf-toolbarreset img { display: inline-block; height: 20px; vertical-align: middle; width: 20px; }
+.sf-toolbarreset .sf-toolbar-icon svg { color: inherit; }
 .sf-toolbarreset .sf-toolbar-toggle-button {
     background: var(--ui-toolbar-bg);
     border: 0;
@@ -67,12 +68,12 @@ final class WdtToolbarStylesheet
 .sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button { border-top: 2px solid var(--ui-toolbar-bg); top: -37px; }
 .sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-closed,
 .sf-toolbar.sf-toolbar-closed .sf-toolbar-toggle-button .sf-toolbar-icon-opened { display: none; }
-.sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-opened::before { content: "\00d7"; display: block; font-size: 20px; line-height: 1; }
+.sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-opened::before { content: "\00d7"; display: block; font-size: 1.25rem; line-height: 1; }
 .sf-toolbar-block { cursor: default; display: block; float: left; height: 36px; max-width: 25%; position: relative; white-space: nowrap; }
 .sf-toolbar-block > a, .sf-toolbar-block > a:hover { background: transparent; color: inherit; display: block; text-decoration: none; }
 .sf-toolbar-block .sf-toolbar-icon { align-items: center; color: var(--ui-toolbar-icon); display: flex; height: 36px; overflow: hidden; padding: 0 7px; text-overflow: ellipsis; }
-.sf-toolbar-block .sf-toolbar-value { color: var(--ui-toolbar-fg); font-size: 13px; line-height: 36px; }
-.sf-toolbar-block .sf-toolbar-label, .sf-toolbar-block .sf-toolbar-class-separator { color: var(--ui-toolbar-muted); font-size: 12px; margin-left: 2px; }
+.sf-toolbar-block .sf-toolbar-value { color: var(--ui-toolbar-fg); font-size: 0.75rem; line-height: 36px; }
+.sf-toolbar-block .sf-toolbar-label, .sf-toolbar-block .sf-toolbar-class-separator { color: var(--ui-toolbar-muted); font-size: 0.75rem; margin-left: 2px; }
 .sf-toolbar-block .sf-toolbar-status { background: var(--ui-toolbar-hover); color: var(--ui-color-surface); display: inline-block; min-width: 15px; padding: 3px 6px; text-align: center; }
 .sf-toolbar-block .sf-toolbar-status.sf-toolbar-status-green { background: var(--ui-toolbar-green); }
 .sf-toolbar-block .sf-toolbar-status.sf-toolbar-status-red,
@@ -132,8 +133,8 @@ final class WdtToolbarStylesheet
 .sf-toolbar-block .sf-toolbar-info-group:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .sf-toolbar-block .sf-toolbar-info-piece { border-bottom: 3px solid transparent; display: table-row; }
 .sf-toolbar-block .sf-toolbar-info-piece:has(table) { border-bottom: 0; display: block; }
-.sf-toolbar-block .sf-toolbar-info-piece b { color: var(--ui-toolbar-muted); display: table-cell; font-size: 11px; padding: 4px 8px 4px 0; }
-.sf-toolbar-block .sf-toolbar-info-piece span { color: var(--ui-toolbar-fg); font-size: 12px; }
+.sf-toolbar-block .sf-toolbar-info-piece b { color: var(--ui-toolbar-muted); display: table-cell; padding: 4px 8px 4px 0; }
+.sf-toolbar-block .sf-toolbar-info-piece span { color: var(--ui-toolbar-fg); }
 .sf-toolbar-block .sf-toolbar-info table { border-collapse: collapse; border-spacing: 0; }
 .sf-toolbar-block .sf-toolbar-info table th,
 .sf-toolbar-block .sf-toolbar-info table td { padding: 0; }
@@ -141,11 +142,14 @@ final class WdtToolbarStylesheet
 div.sf-toolbar .sf-toolbar-block a:hover { text-decoration: none; }
 div.sf-toolbar .sf-toolbar-block .sf-toolbar-info-piece a { color: var(--ui-toolbar-link); text-decoration: underline; }
 .sf-toolbar-block-request .sf-toolbar-icon { padding: 0 4px; }
-.sf-toolbar-block-request .sf-toolbar-status { border-radius: 6px; font-size: 13px; font-weight: 500; padding: 4px 8px; }
+.sf-toolbar-block-request .sf-toolbar-status { border-radius: 6px; flex-shrink: 0; font-size: 0.75rem; font-weight: 500; padding: 4px 8px; }
+.sf-toolbar-block-request .sf-toolbar-label,
+.sf-toolbar-block-request .sf-toolbar-value,
+.sf-toolbar-block-request .sf-toolbar-request-icon { flex-shrink: 0; }
 .sf-toolbar-block-ajax .sf-toolbar-icon { cursor: pointer; }
 .sf-toolbar-ajax-requests { border: 1px solid var(--ui-toolbar-muted); font-variant: tabular-nums; margin: 5px 0 0; width: 100%; }
-.sf-toolbar-ajax-requests th { background: var(--ui-toolbar-bg); border: 1px solid var(--ui-toolbar-muted); color: var(--ui-toolbar-fg); font-size: 11px; padding: 0; }
-.sf-toolbar-ajax-requests td { background: var(--ui-toolbar-hover); border: 1px solid var(--ui-toolbar-muted); color: var(--ui-toolbar-fg); font-size: 12px; padding: 0; vertical-align: middle; }
+.sf-toolbar-ajax-requests th { background: var(--ui-toolbar-bg); border: 1px solid var(--ui-toolbar-muted); color: var(--ui-toolbar-fg); font-size: 0.75rem; padding: 0; }
+.sf-toolbar-ajax-requests td { background: var(--ui-toolbar-hover); border: 1px solid var(--ui-toolbar-muted); color: var(--ui-toolbar-fg); font-size: 0.75rem; padding: 0; vertical-align: middle; }
 .sf-ajax-request-url { line-height: 9px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; }
 .sf-ajax-request-duration { text-align: right; }
 .sf-ajax-request-loading { animation: ui-profiler-wdt-blink 0.5s ease-in-out infinite; }

@@ -58,3 +58,8 @@ services:
     Symfinity\UiProfiler\Menu\State\TwigComponentMenuStateHandler:
         tags:
             - { name: ui_profiler.menu_state, collector: twig_component }
+
+    Symfinity\UiProfiler\DataCollector\UiKernelDataCollector:
+        tags:
+            - { name: data_collector, id: 'ui_kernel', template: '@UiProfiler/Collector/ui_kernel.html.twig' }
+            - { name: ui_profiler.menu, title: 'UI Kernel', icon: '@UiProfiler/Collector/icon.svg' }

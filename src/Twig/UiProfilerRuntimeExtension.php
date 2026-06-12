@@ -149,6 +149,7 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
         $tokens = $this->themeRegistry->resolve($themeId)->tokens()->all();
         $keys = [
             '--ui-color-surface',
+            '--ui-color-surface-elevated',
             '--ui-color-text',
             '--ui-color-text-muted',
             '--ui-font-family-sans',

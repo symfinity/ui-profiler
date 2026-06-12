@@ -1268,6 +1268,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     default_variant?: scalar|Param|null, // Default: "default"
  *     schema_version?: scalar|Param|null, // Default: "1.0"
  *     user_tokens?: list<scalar|Param|null>,
+ *     contract?: array<mixed>,
+ *     generator?: array<mixed>,
  *     system_profile?: array{
  *         id?: scalar|Param|null, // Default: "chameleon-default"
  *         columns?: int|Param, // Default: 12
