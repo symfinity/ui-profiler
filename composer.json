@@ -8,8 +8,7 @@
         "symfony-bundle",
         "web-profiler",
         "debug-toolbar",
-        "ui-kernel",
-        "chameleon"
+        "ui-kernel"
     ],
     "require": {
         "php": ">=8.2",
