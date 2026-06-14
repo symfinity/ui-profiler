@@ -1,44 +1,72 @@
 {% extends '@WebProfiler/Profiler/base.html.twig' %}
 
-{% block html_attributes %} data-theme="{{ ui_kernel_active_theme_id() }}"{% endblock %}
+{% set pref = ui_profiler_theme_preference() %}
+{% set lineage_pair = ui_profiler_lineage_pairs()[pref.lineage] %}
+{% set theme_auto = pref.scheme.value == 'auto' %}
+{% set ssr_theme_id = theme_auto ? null : ui_kernel_active_theme_id() %}
+
+{% block html_attributes %}{% if ssr_theme_id %} data-theme="{{ ssr_theme_id }}"{% endif %}{% endblock %}
 
 {% block head %}
-    {{ parent() }}
+    {{ include('@UiProfiler/_chrome/theme-paint-guard.html.twig', {pref: pref, lineage_pair: lineage_pair}) }}
+    {{ ui_profiler_theme_boot_script() }}
+    {{ ui_profiler_shell_theme_css() }}
     {% if ui_profiler_shell_stylesheet()|trim is not empty %}
         <style{% if csp_style_nonce is defined and csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>{{ ui_profiler_shell_stylesheet()|raw }}</style>
     {% endif %}
 {% endblock %}
 
+{% block body_attributes %}{% if ssr_theme_id %} data-theme="{{ ssr_theme_id }}"{% endif %}{% endblock %}
+
 {% block body %}
-    {% set pref = ui_profiler_theme_preference() %}
-    {% set lineage_pair = ui_profiler_lineage_pairs()[pref.lineage] %}
     <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
         (function () {
             const scheme = {{ pref.scheme.value|json_encode|raw }};
             const pair = {{ lineage_pair|json_encode|raw }};
 
-            const applyTheme = (dark) => {
-                const themeId = dark ? pair.dark : pair.light;
-                document.body.classList.remove('theme-light', 'theme-dark');
-                document.body.classList.add(dark ? 'theme-dark' : 'theme-light');
+            const syncThemeTargets = (themeId) => {
                 document.documentElement.setAttribute('data-theme', themeId);
+                document.body.setAttribute('data-theme', themeId);
                 const shell = document.querySelector('[data-ui-profiler-shell]');
                 if (shell instanceof HTMLElement) {
                     shell.setAttribute('data-theme', themeId);
                 }
+                const settingsDialog = document.getElementById('profiler-settings');
+                if (settingsDialog instanceof HTMLElement) {
+                    settingsDialog.setAttribute('data-theme', themeId);
+                }
             };
 
+            const applyTheme = (dark) => {
+                const themeId = dark ? pair.dark : pair.light;
+                const colorScheme = dark ? 'dark' : 'light';
+                document.documentElement.style.colorScheme = colorScheme;
+                document.body.style.colorScheme = colorScheme;
+                document.body.classList.remove('theme-light', 'theme-dark');
+                document.body.classList.add(dark ? 'theme-dark' : 'theme-light');
+                syncThemeTargets(themeId);
+            };
+
+            const resolveDark = () => {
+                if (scheme === 'auto') {
+                    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+
+                return scheme === 'dark';
+            };
+
+            const sync = () => applyTheme(resolveDark());
+
+            sync();
+
             if (scheme === 'auto') {
-                const media = window.matchMedia('(prefers-color-scheme: dark)');
-                const sync = () => applyTheme(media.matches);
-                sync();
-                media.addEventListener('change', sync);
-            } else {
-                applyTheme(scheme === 'dark');
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync);
             }
+
+            document.addEventListener('DOMContentLoaded', sync);
         })();
     </script>
-    <div data-ui-profiler-shell data-ui-role="grid-container" data-theme="{{ ui_kernel_active_theme_id() }}">
+    <div data-ui-profiler-shell data-ui-role="grid-container"{% if ssr_theme_id %} data-theme="{{ ssr_theme_id }}"{% endif %}>
         {{ include('@WebProfiler/Profiler/header.html.twig', {profile_type: profile_type}, with_context: false) }}
 
         <div id="summary">

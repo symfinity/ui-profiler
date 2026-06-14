@@ -1,0 +1,55 @@
+{# Blocking head assets — native chrome (scrollbars, form controls) before body paints. #}
+{% if pref.scheme.value == 'dark' %}
+<meta name="color-scheme" content="dark" />
+<style{% if csp_style_nonce is defined and csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
+html,
+body {
+    background-color: #0f0f10;
+    color-scheme: dark;
+}
+</style>
+{% elseif pref.scheme.value == 'light' %}
+<meta name="color-scheme" content="light" />
+<style{% if csp_style_nonce is defined and csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
+html,
+body {
+    background-color: #ffffff;
+    color-scheme: light;
+}
+</style>
+{% else %}
+<meta name="color-scheme" content="dark light" />
+<style{% if csp_style_nonce is defined and csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>
+@media (prefers-color-scheme: dark) {
+    html,
+    body {
+        background-color: #0f0f10;
+        color-scheme: dark;
+    }
+}
+@media (prefers-color-scheme: light) {
+    html,
+    body {
+        background-color: #ffffff;
+        color-scheme: light;
+    }
+}
+</style>
+{% endif %}
+<script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
+(function () {
+    var scheme = {{ pref.scheme.value|json_encode|raw }};
+    var pair = {{ lineage_pair|json_encode|raw }};
+    var dark = scheme === 'dark'
+        || (scheme === 'auto'
+            && window.matchMedia
+            && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var themeId = dark ? pair.dark : pair.light;
+    var colorScheme = dark ? 'dark' : 'light';
+    var root = document.documentElement;
+
+    root.dataset.theme = themeId;
+    root.style.colorScheme = colorScheme;
+    root.style.backgroundColor = dark ? '#0f0f10' : '#ffffff';
+})();
+</script>

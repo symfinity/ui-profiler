@@ -1,4 +1,6 @@
 {% set preference = ui_profiler_theme_preference() %}
+{% set theme_auto = preference.scheme.value == 'auto' %}
+{% set ssr_theme_id = theme_auto ? null : ui_kernel_active_theme_id() %}
 {% set theme_route_params = {token: token, type: profile_type|default('request')} %}
 {% if panel %}
     {% set theme_route_params = theme_route_params|merge({panel: panel}) %}
@@ -8,6 +10,7 @@
     id="profiler-settings"
     data-ui-role="dialog"
     data-ui-fragment="blocks.dialog"
+    {% if ssr_theme_id %}data-theme="{{ ssr_theme_id }}" {% endif %}
     aria-labelledby="profiler-settings-title"
     {% if ui_profiler_stimulus_enabled() %}data-controller="ui-profiler--dialog"{% endif %}
 >
@@ -36,7 +39,7 @@
                     data-no-turbolink
                 >
                     {{ source('@WebProfiler/Icon/settings-theme-system.svg') }}
-                    System / OS
+                    <span class="ui-profiler-settings-label">System / OS</span>
                 </a>
                 <a
                     href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'light'})) }}"
@@ -47,7 +50,7 @@
                     data-no-turbolink
                 >
                     {{ source('@WebProfiler/Icon/settings-theme-light.svg') }}
-                    Light
+                    <span class="ui-profiler-settings-label">Light</span>
                 </a>
                 <a
                     href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'dark'})) }}"
@@ -58,7 +61,7 @@
                     data-no-turbolink
                 >
                     {{ source('@WebProfiler/Icon/settings-theme-dark.svg') }}
-                    Dark
+                    <span class="ui-profiler-settings-label">Dark</span>
                 </a>
             </div>
         </div>
@@ -75,7 +78,7 @@
                         id="settings-width-normal"
                     >
                     {{ source('@WebProfiler/Icon/settings-width-fixed.svg') }}
-                    Fixed width
+                    <span class="ui-profiler-settings-label">Fixed width</span>
                 </label>
                 <label data-ui-role="button" data-ui-layout="block" data-ui-variant="ghost" for="settings-width-full">
                     <input
@@ -86,7 +89,7 @@
                         id="settings-width-full"
                     >
                     {{ source('@WebProfiler/Icon/settings-width-fitted.svg') }}
-                    Fit to window
+                    <span class="ui-profiler-settings-label">Fit to window</span>
                 </label>
             </div>
         </div>

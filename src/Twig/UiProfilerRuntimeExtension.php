@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Symfinity\UiProfiler\Twig;
 
 use Symfinity\UiKernel\Css\CssGenerator;
+use Symfinity\UiKernel\Theme\ActiveThemeContext;
+use Symfinity\UiKernel\Theme\ThemeColorScheme;
 use Symfinity\UiKernel\Theme\ThemeLineageCatalog;
 use Symfinity\UiKernel\Theme\ThemePreference;
 use Symfinity\UiKernel\Theme\ThemeRegistry;
@@ -13,6 +15,8 @@ use Symfinity\UiProfiler\Asset\WdtCriticalCss;
 use Symfinity\UiProfiler\Asset\WdtToolbarStylesheet;
 use Symfinity\UiProfiler\Menu\ProfilerMenuRenderer;
 use Symfinity\UiProfiler\Theme\ThemeContext;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -20,6 +24,9 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
 {
     public function __construct(
         private readonly ThemeContext $themeContext,
+        private readonly ActiveThemeContext $activeThemeContext,
+        private readonly RequestStack $requestStack,
+        private readonly Environment $twig,
         private readonly CssGenerator $cssGenerator,
         private readonly ThemeRegistry $themeRegistry,
         private readonly ProfilerMenuRenderer $menuRenderer,
@@ -45,6 +52,8 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
             new TwigFunction('ui_profiler_wdt_stylesheet', $this->wdtStylesheet(...)),
             new TwigFunction('ui_profiler_wdt_theme_tokens_css', $this->wdtThemeTokensCss(...)),
             new TwigFunction('ui_profiler_shell_stylesheet', $this->shellStylesheet(...)),
+            new TwigFunction('ui_profiler_theme_boot_script', $this->profilerThemeBootScript(...), ['is_safe' => ['html']]),
+            new TwigFunction('ui_profiler_shell_theme_css', $this->profilerShellThemeCss(...), ['is_safe' => ['html']]),
             new TwigFunction('ui_profiler_wdt_critical_css_inline', $this->wdtCriticalCssInline(...)),
             new TwigFunction('ui_profiler_wdt_critical_css', $this->wdtCriticalCss(...)),
             new TwigFunction('ui_profiler_wdt_module_preload', $this->wdtModulePreload(...)),
@@ -110,6 +119,51 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
     public function shellStylesheet(): string
     {
         return ShellChromeStylesheet::CSS;
+    }
+
+    public function profilerThemeBootScript(): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request === null) {
+            return '';
+        }
+
+        $config = $this->activeThemeContext->bootConfigFromRequest($request);
+        if ($config['scheme'] === ThemeColorScheme::Auto->value) {
+            // Client resolves auto via prefers-color-scheme; skip async PATCH CSS swap (flash).
+            $config['resolvedThemeId'] = null;
+            // SSR resolvedColorScheme is light without Client Hints — must not override native dark chrome.
+            $config['resolvedColorScheme'] = null;
+        }
+
+        return $this->twig->render('@UiKernel/_theme_boot_script.html.twig', [
+            'boot_config' => $config,
+        ]);
+    }
+
+    public function profilerShellThemeCss(): string
+    {
+        $preference = $this->themeContext->preference();
+        if ($preference->scheme === ThemeColorScheme::Auto) {
+            $pair = ThemeLineageCatalog::pairForLineage($preference->lineage);
+
+            return $this->wrapThemeCss(
+                $this->cssGenerator->forTheme($this->themeRegistry->resolve($pair['light']))
+                ."\n"
+                .$this->cssGenerator->forTheme($this->themeRegistry->resolve($pair['dark'])),
+            );
+        }
+
+        return $this->wrapThemeCss(
+            $this->cssGenerator->forTheme(
+                $this->themeRegistry->resolve($this->themeContext->resolveShellThemeId()),
+            ),
+        );
+    }
+
+    private function wrapThemeCss(string $css): string
+    {
+        return sprintf("<style id=\"ui-kernel-theme-css\">\n%s\n</style>", trim($css));
     }
 
     /**

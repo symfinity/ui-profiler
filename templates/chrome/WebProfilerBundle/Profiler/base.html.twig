@@ -18,7 +18,7 @@
             {% block javascripts %}{% endblock %}
         {% endblock %}
     </head>
-    <body>
+    <body{% block body_attributes %}{% endblock %}>
         <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
             (function () {
                 var widthClass = localStorage.getItem('symfony/profiler/width') || 'width-normal';
