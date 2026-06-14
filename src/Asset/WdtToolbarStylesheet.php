@@ -6,6 +6,10 @@ namespace Symfinity\UiProfiler\Asset;
 
 /**
  * WDT toolbar rules for /_wdt/styles — embedded in PHP (051 ZOC: no owned .css files).
+ *
+ * Canonical, token-driven ruleset. {@see WdtCriticalCss} mirrors a small subset of
+ * these selectors for first-paint inlining; when changing toggle-button geometry or
+ * the closed-state layout here, update WdtCriticalCss to match.
  */
 final class WdtToolbarStylesheet
 {

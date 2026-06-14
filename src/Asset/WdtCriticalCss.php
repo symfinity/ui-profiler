@@ -6,6 +6,12 @@ namespace Symfinity\UiProfiler\Asset;
 
 /**
  * First-paint WDT skeleton rules — inline in toolbar_js only (051 ZOC-3).
+ *
+ * This is a deliberate minimal subset of {@see WdtToolbarStylesheet} (the canonical
+ * full ruleset served at /_wdt/styles). Some selectors here (e.g.
+ * .sf-toolbar-toggle-button and the closed-state rules) are intentionally redefined
+ * with placeholder/transparent values so the toolbar does not flash before the full
+ * stylesheet loads. Keep the two in sync when changing toggle-button geometry.
  */
 final class WdtCriticalCss
 {

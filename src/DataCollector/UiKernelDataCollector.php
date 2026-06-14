@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Symfinity\UiProfiler\DataCollector;
 
+use Symfinity\UiKernel\Contract\Catalog\GraphVariantCatalogPort;
 use Symfinity\UiKernel\Theme\ActiveThemeContext;
 use Symfinity\UiKernel\Theme\Theme;
 use Symfinity\UiKernel\Theme\ThemePreferenceResolver;
@@ -27,6 +28,7 @@ final class UiKernelDataCollector extends DataCollector
         private readonly ThemePreferenceResolver $resolver,
         private readonly ThemeRegistry $themeRegistry,
         private readonly UrlGeneratorInterface $router,
+        private readonly GraphVariantCatalogPort $variantCatalog,
     ) {
     }
 
@@ -75,6 +77,8 @@ final class UiKernelDataCollector extends DataCollector
             'themes' => $themes,
             'themeCount' => \count($themes),
             'colorPalette' => $this->buildColorPalette($activeTheme),
+            'semantic_color_slugs' => $this->variantCatalog->semanticColorSlugs(),
+            'graph_layer_signature' => $this->variantCatalog->layerSignature(),
             'showcaseUrl' => $this->resolveShowcaseUrl(),
         ];
     }
@@ -169,6 +173,24 @@ final class UiKernelDataCollector extends DataCollector
         }
 
         return $normalized;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getSemanticColorSlugs(): array
+    {
+        $slugs = $this->data['semantic_color_slugs'] ?? [];
+        if (!\is_array($slugs)) {
+            return [];
+        }
+
+        return array_values(array_filter($slugs, static fn (mixed $slug): bool => \is_string($slug) && $slug !== ''));
+    }
+
+    public function getGraphLayerSignature(): string
+    {
+        return (string) ($this->data['graph_layer_signature'] ?? '');
     }
 
     /**

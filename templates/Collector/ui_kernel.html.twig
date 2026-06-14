@@ -184,4 +184,16 @@
     {% if collector.showcaseUrl %}
         <p><a href="{{ collector.showcaseUrl }}">Open theme showcase</a></p>
     {% endif %}
+
+    {% if collector.semanticColorSlugs is not empty %}
+        <h3>Semantic colour slugs (graph)</h3>
+        <p class="ui-kernel-profiler-palette-legend">
+            Layer signature: <code>{{ collector.graphLayerSignature }}</code>
+        </p>
+        <ul>
+            {% for slug in collector.semanticColorSlugs %}
+                <li><code>{{ slug }}</code></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endblock %}
