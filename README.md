@@ -1,6 +1,6 @@
-# symfinity/ui-profiler (051 greenfield)
+# symfinity/ui-profiler
 
-Chameleon Web Profiler — rebuilt on **UI Kernel + ux-blocks**, not a port of 043/044.
+Chameleon Web Profiler — rebuilt on **UI Kernel + ux-blocks** (051 greenfield), not a port of legacy 043/044.
 
 ## Stack
 
@@ -10,29 +10,48 @@ Chameleon Web Profiler — rebuilt on **UI Kernel + ux-blocks**, not a port of 0
 | L1 markup | ux-blocks-core + ux-blocks-extended |
 | L3 interaction | Native `shell.js` / `wdt/index.js`; optional Stimulus when `symfony/stimulus-bundle` is registered |
 
-Spec: symfinity **051** `DONE` — planning row in [ROADMAP](../../../../specs/symfinity/symfinity/ROADMAP.md) only (disposable spec removed).
+Planning: symfinity **069** stabilization — [ROADMAP](../../../../specs/symfinity/symfinity/ROADMAP.md).
 
 ## Status
 
-**DONE** (GC-6) — greenfield shell + WDT + P0 collectors on ux-blocks; dogfood `chameleon-showcase`.
+**Stabilizing** (**069**) — greenfield shell + WDT + stock collectors on ux-blocks; dogfood **`ui-lab`**.
 
-Archive inspiration only: `packages/temp/ui-profiler/` (**MUST NOT** copy Twig/JS/CSS — see [greenfield-implement-rules.md](docs/greenfield-implement-rules.md)).
+Implement rules: [docs/greenfield-implement-rules.md](docs/greenfield-implement-rules.md)
+
+## Install (Flex)
+
+```bash
+composer require symfinity/ui-profiler --dev
+```
+
+Requires `symfinity/ui-kernel`, `symfinity/ux-blocks-core`, `symfinity/ux-blocks-extended`, and `symfony/web-profiler-bundle` (recipe wires dev/test bundle + config).
+
+Org path-repo consumers: use `@dev` until R2 packages publish @ `^0.1`.
 
 ## QA
 
 ```bash
 cd src/symfinity
-./bin/php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist
+./sbin/php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist
 ```
 
 Maintainer docs: [docs/quickstart.md](docs/quickstart.md) · [docs/upstream-sync.md](docs/upstream-sync.md)
+
+## Dogfood smoke
+
+```bash
+# Org L0 — combined kernel / themer / profiler lab
+make dogfood-serve SLUG=ui-lab
+
+# Standalone profiler overlay
+make dogfood-new SLUG=symfinity-ui-profiler PACKAGE=symfinity/ui-profiler VERSION='7.4.*'
+make dogfood-serve SLUG=symfinity-ui-profiler
+```
 
 ## EXPLICIT — MUST NOT regress
 
 | Rule | Detail |
 |------|--------|
-| **No archive copy** | Do **not** `cp` templates/JS/CSS from `packages/temp/ui-profiler/` |
-| **No `sf-*` owned markup** | Owned Twig/JS uses `<twig:*>` + `data-ui-profiler-*` (ZOC — see [greenfield-implement-rules.md](docs/greenfield-implement-rules.md)) |
+| **No archive copy** | Do **not** restore or copy from removed `packages/temp/ui-profiler/` |
+| **No `sf-*` owned markup** | Owned Twig/JS uses `<twig:*>` + `data-ui-profiler-*` (ZOC) |
 | **No owned CSS files** | Exit cap **0** lines in `assets/**/*.css` and `Resources/private/**/*.css` |
-
-Implement rules: [docs/greenfield-implement-rules.md](docs/greenfield-implement-rules.md)
