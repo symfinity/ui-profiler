@@ -44,8 +44,11 @@ final class WdtToolbarStylesheet
 .sf-toolbarreset svg, .sf-toolbarreset img { display: inline-block; height: 20px; vertical-align: middle; width: 20px; }
 .sf-toolbarreset .sf-toolbar-icon svg { color: inherit; }
 .sf-toolbarreset .sf-toolbar-toggle-button {
+    -webkit-appearance: none;
+    appearance: none;
     background: var(--ui-toolbar-bg);
     border: 0;
+    border-radius: 0;
     color: var(--ui-toolbar-icon);
     cursor: pointer;
     height: 35px;
@@ -59,16 +62,21 @@ final class WdtToolbarStylesheet
     width: 36px;
 }
 .sf-toolbarreset .sf-toolbar-toggle-button:hover { background: var(--ui-toolbar-hover); }
-.sf-toolbar .sf-toolbar-toggle-button i { display: grid; height: 35px; place-content: center; width: 100%; }
+.sf-toolbar .sf-toolbar-toggle-button i { display: grid; font-style: normal; height: 35px; place-content: center; width: 100%; }
 .sf-toolbar-toggle-button .sf-toolbar-icon-closed svg { display: block; }
 .sf-toolbar.sf-toolbar-closed { min-height: 0; }
 .sf-toolbar.sf-toolbar-closed .sf-toolbar-clearer { display: none; }
 .sf-toolbar.sf-toolbar-closed .sf-toolbarreset { background: transparent; box-shadow: none; height: 0; min-height: 0; overflow: visible; padding: 0; }
 .sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-block { display: none; }
-.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button { border-top: 2px solid var(--ui-toolbar-bg); top: -37px; }
+.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button {
+    background: var(--ui-toolbar-hover);
+    border-top: 2px solid var(--ui-toolbar-hover);
+    box-shadow: inset 1px 0 0 color-mix(in srgb, var(--ui-color-text) 12%, var(--ui-color-surface)), 0 -1px 0 color-mix(in srgb, var(--ui-color-text) 25%, transparent);
+    top: -37px;
+}
 .sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-closed,
 .sf-toolbar.sf-toolbar-closed .sf-toolbar-toggle-button .sf-toolbar-icon-opened { display: none; }
-.sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-opened::before { content: "\00d7"; display: block; font-size: 1.25rem; line-height: 1; }
+.sf-toolbar.sf-toolbar-opened .sf-toolbar-toggle-button .sf-toolbar-icon-opened::before { content: "\00d7"; display: block; font-size: 1.25rem; font-style: normal; line-height: 1; }
 .sf-toolbar-block { cursor: default; display: block; float: left; height: 36px; max-width: 25%; position: relative; white-space: nowrap; }
 .sf-toolbar-block > a, .sf-toolbar-block > a:hover { background: transparent; color: inherit; display: block; text-decoration: none; }
 .sf-toolbar-block .sf-toolbar-icon { align-items: center; color: var(--ui-toolbar-icon); display: flex; height: 36px; overflow: hidden; padding: 0 7px; text-overflow: ellipsis; }

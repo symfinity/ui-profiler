@@ -72,6 +72,8 @@ final class ToolbarParityTest extends WebTestCase
         $styles = (string) $client->getResponse()->getContent();
         self::assertStringContainsString(sprintf('[data-theme="%s"]', $darkThemeId), $styles);
         self::assertStringContainsString('--ui-toolbar-bg: var(--ui-color-surface)', $styles);
+        self::assertStringContainsString('font-style: normal', $styles);
+        self::assertStringContainsString('.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button', $styles);
         self::assertStringNotContainsString('--ui-toolbar-bg: var(--ui-color-text)', $styles);
         self::assertStringNotContainsString('#262626', $styles);
     }

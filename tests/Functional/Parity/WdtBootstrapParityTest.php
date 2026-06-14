@@ -60,6 +60,7 @@ final class WdtBootstrapParityTest extends WebTestCase
 
         self::assertStringNotContainsString('ui-profiler/wdt/toolbar.css', $content);
         self::assertStringContainsString('/_wdt/styles', $content);
+        self::assertMatchesRegularExpression('#/_wdt/styles\?v=\d+#', $content);
     }
 
     private function extractToolbarBootstrap(string $html): string

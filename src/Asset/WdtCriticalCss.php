@@ -24,14 +24,23 @@ final class WdtCriticalCss
 }
 .sf-toolbar-clearer { clear: both; height: 36px; }
 .sf-toolbarreset .sf-toolbar-toggle-button {
+    -webkit-appearance: none;
+    appearance: none;
     position: absolute;
     right: 0;
     top: 1px;
     width: 36px;
     height: 35px;
     border: 0;
+    border-radius: 0;
     background: transparent;
     cursor: pointer;
+}
+.sf-toolbar .sf-toolbar-toggle-button i { font-style: normal; }
+.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button {
+    background: var(--ui-color-surface-elevated, #242424);
+    border-top: 2px solid var(--ui-color-surface-elevated, #242424);
+    top: -37px;
 }
 CSS;
 

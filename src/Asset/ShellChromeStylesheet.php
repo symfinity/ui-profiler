@@ -958,15 +958,23 @@ body.theme-light [data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-
     height: 28px;
 }
 #menu-profiler li.selected a [data-ui-profiler-menu-label],
-#menu-profiler li a:hover [data-ui-profiler-menu-label] {
+#menu-profiler li a:hover [data-ui-profiler-menu-label]:not([data-ui-profiler-menu-disabled]) {
     background: var(--menu-active-background);
     color: var(--menu-active-color);
 }
 #menu-profiler li.selected a [data-ui-profiler-menu-icon] svg,
-#menu-profiler li a:hover [data-ui-profiler-menu-icon] svg,
-#menu-profiler li.selected a [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg,
-#menu-profiler li a:hover [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg {
+#menu-profiler li a:hover [data-ui-profiler-menu-icon] svg {
     color: var(--menu-active-color);
+}
+#menu-profiler li.selected a [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg {
+    color: var(--menu-active-color);
+}
+#menu-profiler li a:hover [data-ui-profiler-menu-label][data-ui-profiler-menu-disabled] {
+    background: transparent;
+    color: var(--menu-disabled-color);
+}
+#menu-profiler li a:hover [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg {
+    color: var(--menu-icon-disabled-color);
 }
 
 [data-ui-profiler-menu-icon] img,
@@ -1475,14 +1483,15 @@ body.theme-light [data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-
     line-height: 1.2;
     margin: 0;
 }
-#header h1 [data-ui-role="link"],
-[data-ui-profiler-header] h1 [data-ui-role="link"] {
+#header h1 > a[data-ui-role="link"],
+[data-ui-profiler-header] h1 > a[data-ui-role="link"] {
+    --ui-profiler-brand-link-color: #000000;
     align-items: center;
     background: transparent;
     border: 0;
     border-radius: 0;
     box-shadow: none;
-    color: inherit;
+    color: var(--ui-profiler-brand-link-color);
     display: inline-flex;
     font: inherit;
     font-weight: inherit;
@@ -1491,20 +1500,26 @@ body.theme-light [data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-
     min-height: 0;
     padding: 0;
     text-decoration: none;
+    transition: none;
     white-space: nowrap;
 }
-#header h1 [data-ui-role="link"]:hover,
-#header h1 [data-ui-role="link"]:focus-visible,
-[data-ui-profiler-header] h1 [data-ui-role="link"]:hover,
-[data-ui-profiler-header] h1 [data-ui-role="link"]:focus-visible {
+#header h1 > a[data-ui-role="link"]:is(:link, :visited, :hover, :focus, :focus-visible, :active),
+[data-ui-profiler-header] h1 > a[data-ui-role="link"]:is(:link, :visited, :hover, :focus, :focus-visible, :active) {
     background: transparent;
     box-shadow: none;
-    color: var(--ui-color-text);
+    color: var(--ui-profiler-brand-link-color);
     text-decoration: none;
 }
-#header h1 svg,
-[data-ui-profiler-header] h1 svg {
-    color: var(--ui-color-text);
+html[data-theme$="-dark"] #header h1 > a[data-ui-role="link"],
+html[data-theme$="-dark"] [data-ui-profiler-header] h1 > a[data-ui-role="link"],
+body.theme-dark #header h1 > a[data-ui-role="link"],
+body.theme-dark [data-ui-profiler-header] h1 > a[data-ui-role="link"] {
+    --ui-profiler-brand-link-color: #ffffff;
+}
+#header h1 > a[data-ui-role="link"] svg,
+[data-ui-profiler-header] h1 > a[data-ui-role="link"] svg {
+    color: var(--ui-profiler-brand-link-color);
+    fill: currentColor;
     flex-shrink: 0;
     height: 1.75rem;
     margin: 0;
