@@ -20,6 +20,7 @@ html {
 
 body {
     background-color: var(--ui-color-surface);
+    color: var(--ui-color-text);
     margin: 0;
     min-height: 100%;
     padding: 0;
@@ -135,6 +136,8 @@ body.theme-light {
 }
 
 body.theme-light [data-ui-profiler-shell] {
+    --ui-color-text: #171717;
+    --ui-color-text-muted: #525252;
     --ui-profiler-search-text-color: #171717;
     --ui-profiler-search-placeholder-color: #525252;
 }
@@ -168,7 +171,7 @@ body.width-full [data-ui-profiler-shell][data-ui-role="grid-container"],
     background: var(--page-background);
     border-radius: 6px;
     box-shadow: var(--sidebar-shadow);
-    color: var(--ui-color-text-muted);
+    color: var(--ui-color-text);
 }
 
 #sidebar-contents[data-ui-role="card"] {
@@ -485,25 +488,25 @@ html {
     margin: 1.5em 0 0.5em;
 }
 
-#collector-content [data-ui-role="table"] tbody th,
-#collector-content [data-ui-role="table"] tbody td {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) tbody th,
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) tbody td {
     font-family: var(--font-family-monospace);
     font-size: var(--font-size-monospace);
     font-variant-ligatures: var(--font-variant-ligatures-monospace);
 }
 
-#collector-content [data-ui-role="table"] tbody th.font-normal,
-#collector-content [data-ui-role="table"] tbody td.font-normal {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) tbody th.font-normal,
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) tbody td.font-normal {
     font-family: var(--font-family-system);
     font-size: var(--font-size-body);
 }
 
-#collector-content [data-ui-role="table"],
-#collector-content table[data-ui-role="table"] {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) {
     background: var(--page-background);
     border-collapse: collapse;
     border-radius: 6px;
     box-shadow: 0 0 0 1px var(--table-border-color), 0 0 0 5px var(--page-background);
+    color: var(--ui-color-text);
     line-height: 1.5;
     margin: 1em 0;
     overflow: hidden;
@@ -511,63 +514,129 @@ html {
     width: 100%;
 }
 
-#collector-content [data-ui-role="table"] + [data-ui-role="table"],
-#collector-content table[data-ui-role="table"] + table[data-ui-role="table"] {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) + :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) {
     margin-top: 1.25rem;
 }
 
-#collector-content [data-ui-role="table"] th,
-#collector-content [data-ui-role="table"] td,
-#collector-content table[data-ui-role="table"] th,
-#collector-content table[data-ui-role="table"] td {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) th,
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) td {
     padding: 8px 10px;
     text-align: left;
     vertical-align: top;
 }
 
-#collector-content [data-ui-role="table"] th,
-#collector-content table[data-ui-role="table"] th {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) th {
     font-weight: 700;
 }
 
-#collector-content [data-ui-role="table"] thead th,
-#collector-content table[data-ui-role="table"] thead th {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) thead th {
     background-color: var(--table-header);
     border-bottom: 1px solid var(--table-header-border-color);
+    color: var(--ui-color-text);
     vertical-align: bottom;
 }
 
-#collector-content [data-ui-role="table"] thead th.key,
-#collector-content table[data-ui-role="table"] thead th.key {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) thead th.key {
     width: 19%;
 }
 
-#collector-content [data-ui-role="table"] thead.small th,
-#collector-content table[data-ui-role="table"] thead.small th {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) thead.small th {
     font-size: 12px;
     padding: 4px 10px;
 }
 
-#collector-content [data-ui-role="table"] tbody th,
-#collector-content [data-ui-role="table"] tbody td,
-#collector-content table[data-ui-role="table"] tbody th,
-#collector-content table[data-ui-role="table"] tbody td {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) tbody th,
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) tbody td {
     border: 1px solid var(--table-border-color);
     border-width: 1px 0;
 }
 
-#collector-content [data-ui-role="table"] tbody tr:last-of-type th,
-#collector-content [data-ui-role="table"] tbody tr:last-of-type td,
-#collector-content table[data-ui-role="table"] tbody tr:last-of-type th,
-#collector-content table[data-ui-role="table"] tbody tr:last-of-type td {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) tbody tr:last-of-type th,
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) tbody tr:last-of-type td {
     border-bottom: 0;
 }
 
-#collector-content [data-ui-role="table"] thead th.num-col,
-#collector-content [data-ui-role="table"] tbody td.num-col,
-#collector-content table[data-ui-role="table"] thead th.num-col,
-#collector-content table[data-ui-role="table"] tbody td.num-col {
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) thead th.num-col,
+#collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) tbody td.num-col {
     text-align: center;
+}
+
+#collector-content #router-logs thead th:first-child,
+#collector-content #router-logs tbody td:first-child {
+    text-align: center;
+    width: 3rem;
+}
+
+#collector-content #router-logs tbody tr.status-success td {
+    background: color-mix(in srgb, var(--ui-color-success) 10%, var(--page-background));
+}
+
+#collector-content #router-logs tbody tr.status-warning td {
+    background: color-mix(in srgb, var(--ui-color-warning) 12%, var(--page-background));
+}
+
+#collector-content .metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    margin: 1em 0;
+}
+
+#collector-content .metric {
+    background: var(--page-background);
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px var(--table-border-color), 0 0 0 5px var(--page-background);
+    min-width: 8rem;
+    padding: 0.625rem 0.9375rem;
+    text-align: center;
+}
+
+#collector-content .metric .value {
+    color: var(--ui-color-text);
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+#collector-content .metric .label {
+    color: var(--ui-color-primary);
+    display: block;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+#collector-content .card {
+    background: var(--page-background);
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px var(--table-border-color), 0 0 0 5px var(--page-background);
+    color: var(--ui-color-text);
+    margin: 1em 0;
+    padding: 0.75rem 1rem;
+}
+
+#collector-content code {
+    background: var(--heading-code-background);
+    border-radius: 4px;
+    color: var(--ui-color-text);
+    font-family: var(--font-family-monospace);
+    font-size: var(--font-size-monospace);
+    padding: 0.125rem 0.375rem;
+}
+
+html[data-theme]:not([data-theme$="-dark"]) #collector-content,
+body.theme-light #collector-content {
+    color: #171717;
+}
+
+html[data-theme]:not([data-theme$="-dark"]) #collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)),
+body.theme-light #collector-content :is([data-ui-role="table"], table:not(.sf-toolbar-ajax-requests)) {
+    color: #171717;
+}
+
+html[data-theme]:not([data-theme$="-dark"]) #collector-content .metric .value,
+body.theme-light #collector-content .metric .value {
+    color: #171717;
 }
 
 [data-ui-profiler-empty-panel] {
@@ -737,6 +806,7 @@ html {
     padding-bottom: 5px;
 }
 #collector-content {
+    color: var(--ui-color-text);
     margin: 0 0 1.25rem 0;
     padding: 1rem;
 }
@@ -757,6 +827,59 @@ html {
 }
 [data-ui-profiler-shell] #sidebar-shortcuts .sf-tabs .tab-navigation {
     margin: 0.3125rem 0 0.9375rem;
+}
+
+/* Sidebar shortcuts — ux-blocks Button markup without blocks-core CSS on shell pages */
+[data-ui-profiler-shell] [data-ui-profiler-shortcuts] {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--ui-space-sm, 0.5rem);
+}
+
+[data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"] {
+    align-items: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--ui-radius-sm, 4px);
+    color: var(--ui-color-text);
+    cursor: pointer;
+    display: inline-flex;
+    font-family: inherit;
+    font-size: var(--ui-font-size-sm, 0.875rem);
+    font-weight: 500;
+    gap: 0.375rem;
+    line-height: 1.25;
+    padding: 0.3125rem 0.5rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+[data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"]:hover,
+[data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"]:focus-visible {
+    background: var(--ui-color-surface-elevated);
+    color: var(--ui-color-primary);
+    outline: none;
+    text-decoration: none;
+}
+
+[data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"] svg {
+    flex-shrink: 0;
+    height: 1rem;
+    width: 1rem;
+}
+
+html[data-theme]:not([data-theme$="-dark"]) [data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"],
+body.theme-light [data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"] {
+    color: #171717;
+}
+
+html[data-theme]:not([data-theme$="-dark"]) [data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"]:hover,
+html[data-theme]:not([data-theme$="-dark"]) [data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"]:focus-visible,
+body.theme-light [data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"]:hover,
+body.theme-light [data-ui-profiler-shell] [data-ui-profiler-shortcuts] [data-ui-role="button"]:focus-visible {
+    color: var(--ui-color-primary);
 }
 
 #sidebar-search {
