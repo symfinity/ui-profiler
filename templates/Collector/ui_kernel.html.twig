@@ -11,10 +11,16 @@
             border-radius: 6px;
             display: grid;
             gap: 4px;
-            grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr));
+            grid-template-columns: repeat(8, minmax(0, 1fr));
             margin: 0.75rem 0 1.25rem;
-            max-width: 28rem;
+            max-width: 20rem;
             padding: 6px;
+        }
+        @media (min-width: 36rem) {
+            #collector-content .ui-kernel-profiler-palette {
+                grid-template-columns: repeat(16, minmax(0, 1fr));
+                max-width: 40rem;
+            }
         }
         #collector-content .ui-kernel-profiler-palette__swatch {
             aspect-ratio: 1;
