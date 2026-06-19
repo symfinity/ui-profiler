@@ -1,15 +1,14 @@
 # ui-profiler is a dev/test-only bundle (it depends on WebProfilerBundle), so its
 # configuration must only be parsed in environments where the bundle is registered.
-# Loading an unprefixed `ui_profiler:` key in prod would fail (no such extension).
 when@dev:
-    ui_profiler:
+    symfinity_ui_profiler:
         enabled: true
         wdt:
             critical_css_inline: true
             module_preload: true
 
 when@test:
-    ui_profiler:
+    symfinity_ui_profiler:
         enabled: true
         wdt:
             critical_css_inline: true

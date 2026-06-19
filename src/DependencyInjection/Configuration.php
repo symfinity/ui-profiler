@@ -11,7 +11,7 @@ final class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('ui_profiler');
+        $treeBuilder = new TreeBuilder('symfinity_ui_profiler');
 
         $treeBuilder->getRootNode()
             ->children()

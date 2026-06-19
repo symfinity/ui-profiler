@@ -1267,6 +1267,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     default_theme?: scalar|Param|null, // Default: "default"
  *     default_variant?: scalar|Param|null, // Default: "default"
  *     schema_version?: scalar|Param|null, // Default: "1.0"
+ *     themes_directory?: scalar|Param|null, // Consumer app DTCG themes root; default %kernel.project_dir%/config/themes when null in extension // Default: null
  *     user_tokens?: list<scalar|Param|null>,
  *     contract?: array<mixed>,
  *     generator?: array<mixed>,
@@ -1291,6 +1292,9 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         collect_components?: bool|Param, // Collect components instances // Default: true
  *     },
  *     controllers_json?: scalar|Param|null, // Deprecated: The "twig_component.controllers_json" config option is deprecated, and will be removed in 3.0. // Default: null
+ * }
+ * @psalm-type SymfinityUxBlocksCoreConfig = array{
+ *     fragment_ids?: bool|Param, // Emit data-ui-fragment from ux_roles.yaml (Stage B+). Stage A default: false. // Default: false
  * }
  * @psalm-type WebProfilerConfig = array{
  *     toolbar?: bool|array{ // Profiler toolbar configuration
@@ -1321,6 +1325,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     doctrine?: DoctrineConfig,
  *     symfinity_ui_kernel?: SymfinityUiKernelConfig,
  *     twig_component?: TwigComponentConfig,
+ *     symfinity_ux_blocks_core?: SymfinityUxBlocksCoreConfig,
  *     web_profiler?: WebProfilerConfig,
  *     ui_profiler?: UiProfilerConfig,
  *     "when@dev"?: array{

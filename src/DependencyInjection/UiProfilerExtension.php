@@ -78,6 +78,6 @@ final class UiProfilerExtension extends Extension implements PrependExtensionInt
 
     public function getAlias(): string
     {
-        return 'ui_profiler';
+        return 'symfinity_ui_profiler';
     }
 }

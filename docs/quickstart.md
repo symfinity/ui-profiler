@@ -31,7 +31,7 @@ After R2 packages publish on Packagist:
 composer require symfinity/ui-profiler --dev
 ```
 
-Flex recipe `symfinity/ui-profiler` 0.1 registers `UiProfilerBundle` for `dev`/`test` and copies `config/packages/ui_profiler.yaml`.
+Flex recipe `symfinity/ui-profiler` 0.1 registers `UiProfilerBundle` for `dev`/`test` and copies `config/packages/symfinity_ui_profiler.yaml`.
 
 Pre-R2 / org checkout: path-repo `@dev` with explicit requires on `symfinity/ui-kernel`, `symfinity/ux-blocks-core`, `symfinity/ux-blocks-extended`, `symfinity/ui-action`.
 
