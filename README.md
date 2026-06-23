@@ -1,57 +1,71 @@
-# symfinity/ui-profiler
+<div align="center">
 
-UI Kernel Web Profiler — rebuilt on **UI Kernel + ux-blocks** (051 greenfield), not a port of legacy 043/044.
+# UI Profiler
 
-## Stack
+### Web Profiler toolbar and panels rebuilt on UI Kernel and ux-blocks
 
-| Layer | Source |
-|-------|--------|
-| L0 look | `ui_kernel_css()` + PHP-embedded shell/WDT chrome (ZOC — no owned `.css` files) |
-| L1 markup | ux-blocks-core + ux-blocks-extended |
-| L3 interaction | Native `shell.js` / `wdt/index.js`; optional Stimulus when `symfony/stimulus-bundle` is registered |
+[![PHP Version](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat&logo=php&logoColor=white)](composer.json)
+[![Symfony](https://img.shields.io/badge/Symfony-7.4+-343434?style=flat&logo=symfony&logoColor=white)](composer.json)
+<br/>
+[![CI](https://github.com/symfinity/ui-profiler/actions/workflows/ci.yml/badge.svg)](https://github.com/symfinity/ui-profiler/actions/workflows/ci.yml)
+<br/>
+[![Release](https://img.shields.io/packagist/v/symfinity/ui-profiler.svg?style=flat&logo=packagist&logoColor=white)](https://packagist.org/packages/symfinity/ui-profiler)
+[![Downloads](https://img.shields.io/packagist/dt/symfinity/ui-profiler.svg?style=flat&logo=packagist&logoColor=white)](https://packagist.org/packages/symfinity/ui-profiler)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-Planning: symfinity **069** stabilization — [ROADMAP](../../../../specs/symfinity/symfinity/ROADMAP.md).
+</div>
 
-## Status
+> [!NOTE]
+> **Read-only mirror.**
+> See [CONTRIBUTING.md](CONTRIBUTING.md) for how to propose changes.
 
-**Stabilizing** (**069**) — greenfield shell + WDT + stock collectors on ux-blocks; dogfood **`ui-lab`**.
+## Features
 
-Implement rules: [docs/greenfield-implement-rules.md](docs/greenfield-implement-rules.md)
+- **UI Kernel chrome** — theme tokens for toolbar and WDT shell
+- **ux-blocks markup** — core and extended components for profiler panels
+- **Stock collectors** — Symfony Web Profiler data with refreshed layout
+- **Zero owned CSS** — styling via ui-kernel and inline shell scripts
+- **Dev-only** — Flex recipe registers bundle for dev and test
 
-## Install (Flex)
+## Prerequisites
+
+Add the [symfinity/recipes](https://github.com/symfinity/recipes) Flex endpoint to your project's `composer.json` (see [recipes README](https://github.com/symfinity/recipes/blob/main/README.md)) — recipes are not in Symfony's official recipe repository yet.
+
+## Installation
+
+Install with `--dev`. Requires themed ux-blocks stack.
 
 ```bash
 composer require symfinity/ui-profiler --dev
 ```
 
-Requires `symfinity/ui-kernel`, `symfinity/ux-blocks-core`, `symfinity/ux-blocks-extended`, and `symfony/web-profiler-bundle` (recipe wires dev/test bundle + config).
-
-Org path-repo consumers: use `@dev` until R2 packages publish @ `^0.1`.
-
-## QA
+## Quick Start
 
 ```bash
-cd src/symfinity
-./sbin/php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist
+composer require symfinity/ui-profiler --dev
 ```
 
-Maintainer docs: [docs/quickstart.md](docs/quickstart.md) · [docs/upstream-sync.md](docs/upstream-sync.md)
+See [Quick start](docs/quickstart.md) for the full walkthrough.
 
-## Dogfood smoke
+## Documentation
 
-```bash
-# Org L0 — combined kernel / themer / profiler lab
-make dogfood-serve SLUG=ui-lab
+- **[Quick start](docs/quickstart.md)** — minimal setup path
+- **[Third-party collectors](docs/third-party-collectors.md)** — custom profiler panels
+- **[Upstream sync](docs/upstream-sync.md)** — Symfony Web Profiler alignment
 
-# Standalone profiler overlay
-make dogfood-new SLUG=symfinity-ui-profiler PACKAGE=symfinity/ui-profiler VERSION='7.4.*'
-make dogfood-serve SLUG=symfinity-ui-profiler
-```
+## Requirements
 
-## EXPLICIT — MUST NOT regress
+- PHP 8.2 or higher
+- Symfony 7.4 or 8.x
+- symfinity/ui-kernel, symfinity/ux-blocks-core, symfinity/ux-blocks-extended
+- symfony/web-profiler-bundle
 
-| Rule | Detail |
-|------|--------|
-| **No archive copy** | Do **not** restore or copy from removed `packages/temp/ui-profiler/` |
-| **No `sf-*` owned markup** | Owned Twig/JS uses `<twig:*>` + `data-ui-profiler-*` (ZOC) |
-| **No owned CSS files** | Exit cap **0** lines in `assets/**/*.css` and `Resources/private/**/*.css` |
+## Support
+
+- [GitHub Issues](https://github.com/symfinity/ui-profiler/issues)
+- [Security](.github/SECURITY.md)
+- [Contributing](CONTRIBUTING.md)
+
+## License
+
+[MIT](LICENSE)
