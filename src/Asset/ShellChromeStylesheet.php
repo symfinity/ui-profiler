@@ -355,11 +355,11 @@ body.width-full [data-ui-profiler-shell][data-ui-role="grid-container"],
     color: var(--ui-color-primary);
 }
 
-[data-ui-profiler-settings-picker] > [data-ui-variant="ghost"] {
+[data-ui-profiler-settings-picker] > [data-ui-variant="neutral"][data-ui-appearance="ghost"] {
     color: var(--ui-color-text);
 }
 
-[data-ui-profiler-settings-picker] > [data-ui-variant="ghost"] svg {
+[data-ui-profiler-settings-picker] > [data-ui-variant="neutral"][data-ui-appearance="ghost"] svg {
     color: var(--ui-color-text-muted);
 }
 

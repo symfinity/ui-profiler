@@ -20,7 +20,8 @@
             <button
                 type="button"
                 data-ui-role="button"
-                data-ui-variant="ghost"
+                data-ui-variant="neutral"
+                data-ui-appearance="ghost"
                 data-ui-size="sm"
                 data-ui-profiler-settings-close
                 aria-label="Close"
@@ -34,7 +35,8 @@
                     href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'auto'})) }}"
                     data-ui-role="button"
                     data-ui-layout="block"
-                    data-ui-variant="{{ preference.scheme.value == 'auto' ? 'primary' : 'ghost' }}"
+                    data-ui-variant="{{ preference.scheme.value == 'auto' ? 'primary' : 'neutral' }}"
+                    {% if preference.scheme.value != 'auto' %}data-ui-appearance="ghost"{% endif %}
                     data-turbo="false"
                     data-no-turbolink
                 >
@@ -45,7 +47,8 @@
                     href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'light'})) }}"
                     data-ui-role="button"
                     data-ui-layout="block"
-                    data-ui-variant="{{ preference.scheme.value == 'light' ? 'primary' : 'ghost' }}"
+                    data-ui-variant="{{ preference.scheme.value == 'light' ? 'primary' : 'neutral' }}"
+                    {% if preference.scheme.value != 'light' %}data-ui-appearance="ghost"{% endif %}
                     data-turbo="false"
                     data-no-turbolink
                 >
@@ -56,7 +59,8 @@
                     href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'dark'})) }}"
                     data-ui-role="button"
                     data-ui-layout="block"
-                    data-ui-variant="{{ preference.scheme.value == 'dark' ? 'primary' : 'ghost' }}"
+                    data-ui-variant="{{ preference.scheme.value == 'dark' ? 'primary' : 'neutral' }}"
+                    {% if preference.scheme.value != 'dark' %}data-ui-appearance="ghost"{% endif %}
                     data-turbo="false"
                     data-no-turbolink
                 >
@@ -69,7 +73,7 @@
         <div data-ui-role="stack" data-ui-gap="sm">
             <strong>Page Width</strong>
             <div data-ui-role="grid" data-ui-columns="2" data-ui-profiler-settings-picker role="radiogroup" aria-label="Page width">
-                <label data-ui-role="button" data-ui-layout="block" data-ui-variant="ghost" for="settings-width-normal">
+                <label data-ui-role="button" data-ui-layout="block" data-ui-variant="neutral" data-ui-appearance="ghost" for="settings-width-normal">
                     <input
                         class="config-option config-option-width visually-hidden"
                         type="radio"
@@ -80,7 +84,7 @@
                     {{ source('@WebProfiler/Icon/settings-width-fixed.svg') }}
                     <span class="ui-profiler-settings-label">Fixed width</span>
                 </label>
-                <label data-ui-role="button" data-ui-layout="block" data-ui-variant="ghost" for="settings-width-full">
+                <label data-ui-role="button" data-ui-layout="block" data-ui-variant="neutral" data-ui-appearance="ghost" for="settings-width-full">
                     <input
                         class="config-option config-option-width visually-hidden"
                         type="radio"
@@ -135,7 +139,12 @@
             input.checked = isActive;
             const label = input.closest('label[data-ui-role="button"]');
             if (label instanceof HTMLElement) {
-                label.dataset.uiVariant = isActive ? 'primary' : 'ghost';
+                label.dataset.uiVariant = isActive ? 'primary' : 'neutral';
+                if (isActive) {
+                    delete label.dataset.uiAppearance;
+                } else {
+                    label.dataset.uiAppearance = 'ghost';
+                }
             }
         });
 

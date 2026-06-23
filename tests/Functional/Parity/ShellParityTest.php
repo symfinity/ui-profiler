@@ -17,7 +17,7 @@ final class ShellParityTest extends WebTestCase
         return ParityKernel::class;
     }
 
-    public function testProfilerHomeRendersChameleonShell(): void
+    public function testProfilerHomeRendersUiShell(): void
     {
         $client = static::createClient(['debug' => true]);
         $client->request('GET', '/');

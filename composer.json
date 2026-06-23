@@ -1,6 +1,6 @@
 {
     "name": "symfinity/ui-profiler",
-    "description": "Chameleon Web Profiler chrome — UI Kernel + ux-blocks greenfield (051)",
+    "description": "UI Kernel Web Profiler chrome — UI Kernel + ux-blocks greenfield (051)",
     "type": "symfony-bundle",
     "license": "MIT",
     "keywords": [

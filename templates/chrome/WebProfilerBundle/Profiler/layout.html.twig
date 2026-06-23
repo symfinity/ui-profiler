@@ -93,10 +93,10 @@
                             <div id="sidebar-shortcuts">
                                 {% block sidebar_shortcuts_links %}
                                     <div class="shortcuts" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="sm" data-ui-profiler-shortcuts>
-                                        <twig:Button as="a" href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}" variant="ghost" size="sm">
+                                        <twig:Button as="a" href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}" variant="neutral" appearance="ghost" size="sm">
                                             {{ source('@WebProfiler/Icon/search.svg') }} Search profiles
                                         </twig:Button>
-                                        <twig:Button as="a" href="{{ path('_profiler', {token: 'latest', type: profile_type}|merge(request.query.all)) }}" variant="ghost" size="sm">
+                                        <twig:Button as="a" href="{{ path('_profiler', {token: 'latest', type: profile_type}|merge(request.query.all)) }}" variant="neutral" appearance="ghost" size="sm">
                                             Latest
                                         </twig:Button>
                                     </div>

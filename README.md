@@ -1,6 +1,6 @@
 # symfinity/ui-profiler
 
-Chameleon Web Profiler — rebuilt on **UI Kernel + ux-blocks** (051 greenfield), not a port of legacy 043/044.
+UI Kernel Web Profiler — rebuilt on **UI Kernel + ux-blocks** (051 greenfield), not a port of legacy 043/044.
 
 ## Stack
 

@@ -1,6 +1,6 @@
 # symfinity/ui-profiler — maintainer quickstart
 
-Greenfield Chameleon profiler — **UI Kernel + ux-blocks**, zero owned CSS files.
+Greenfield UI Kernel profiler — **UI Kernel + ux-blocks**, zero owned CSS files.
 
 **Read first:** [greenfield-implement-rules.md](greenfield-implement-rules.md)
 

@@ -37,4 +37,4 @@ ZOC gate green after baseline: `GreenfieldMarkupTest|CssBudgetTest|AssetOwnershi
 
 - `mono recipes:validate`: **6/6 valid** including `symfinity/ui-profiler` 0.1 (2026-06-14).
 - `release:publish 0.1.0 --dry-run`: **No packages to release** (no git diff vs base in current tree).
-- Public tag **blocked:r2** until R2 Chameleon packages on Packagist @ `^0.1`.
+- Public tag **blocked:r2** until R2 UI packages on Packagist @ `^0.1`.

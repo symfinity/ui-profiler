@@ -20,4 +20,4 @@ All notable changes to `symfinity/ui-profiler` are documented here.
 
 ## 0.2.0-dev (051 greenfield)
 
-- Greenfield Chameleon profiler reboot on UI Kernel + ux-blocks (GC-6).
+- Greenfield UI Kernel profiler reboot on UI Kernel + ux-blocks (GC-6).

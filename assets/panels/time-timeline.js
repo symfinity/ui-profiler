@@ -215,7 +215,8 @@ class Legend {
         const element = document.createElement('button');
         element.className = 'timeline-category active';
         element.dataset.uiRole = 'button';
-        element.dataset.uiVariant = 'ghost';
+        element.dataset.uiVariant = 'neutral';
+        element.dataset.uiAppearance = 'ghost';
         element.style.borderLeftColor = this.theme.getCategoryColor(category);
         element.style.borderLeftWidth = '0.75em';
         element.innerText = category;

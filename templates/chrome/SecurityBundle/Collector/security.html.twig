@@ -325,7 +325,7 @@
                                     <td>
                                         <span class="authenticator-name">
                                             {{ profiler_dump(authenticator.stub) }}
-                                            <twig:Button variant="ghost" size="sm" class="toggle-button" type="button">
+                                            <twig:Button variant="neutral" appearance="ghost" size="sm" class="toggle-button" type="button">
                                                 {{ source('@WebProfiler/Icon/chevron-down.svg') }}
                                             </twig:Button>
                                         </span>
@@ -500,7 +500,7 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <twig:Button as="a" variant="ghost" size="sm" class="text-small" data-ui-profiler-toggle data-ui-profiler-toggle-target="#{{ voter_details_id }}" data-ui-profiler-toggle-alt="Hide voter details">Show voter details</twig:Button>
+                                            <twig:Button as="a" variant="neutral" appearance="ghost" size="sm" class="text-small" data-ui-profiler-toggle data-ui-profiler-toggle-target="#{{ voter_details_id }}" data-ui-profiler-toggle-alt="Hide voter details">Show voter details</twig:Button>
                                         {% endif %}
                                         </td>
                                     </tr>
