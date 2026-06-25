@@ -133,6 +133,7 @@ export class UiProfilerShell {
         document.querySelectorAll('[data-ui-profiler-table-search]').forEach((tableWrapper, i) => {
             const searchField = document.createElement('input');
             searchField.type = 'search';
+            searchField.setAttribute('data-ui-role', 'input');
             searchField.placeholder = 'search...';
             searchField.id = `table-search-field-${i}`;
             searchField.classList.add('table-search-field-input');
@@ -164,6 +165,7 @@ export class UiProfilerShell {
                     if (null === noResultsElement) {
                         const message = document.createElement('p');
                         message.textContent = 'No results found.';
+                        message.setAttribute('data-ui-part', 'no-results');
                         message.classList.add('no-results-message');
                         tableWrapper.appendChild(message);
                     } else {

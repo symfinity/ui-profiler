@@ -15,7 +15,7 @@
         {% endset %}
 
         {% set text %}
-            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
             {% if collector.impersonated %}
                 <div data-ui-profiler-wdt-info-group>
                     <div data-ui-profiler-wdt-info-piece>
@@ -35,7 +35,7 @@
 
                         <div data-ui-profiler-wdt-info-piece>
                             <b>Authenticated</b>
-                            <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.authenticated ? 'green' : 'yellow') }}">{{ collector.authenticated ? 'Yes' : 'No' }}</span>
+                            {{ status_badge(collector.authenticated ? 'green' : 'yellow', collector.authenticated ? 'Yes' : 'No') }}
                         </div>
 
                         <div data-ui-profiler-wdt-info-piece>
@@ -79,7 +79,7 @@
                     {% else %}
                         <div data-ui-profiler-wdt-info-piece>
                             <b>Authenticated</b>
-                            <span data-ui-profiler-wdt-status data-ui-variant="warning">No</span>
+                            {{ status_badge('warning', 'No') }}
                         </div>
                     {% endif %}
 

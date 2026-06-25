@@ -20,12 +20,15 @@ final class WdtSelectorScopeTest extends TestCase
     self::assertStringNotContainsString('div.sf-toolbar .sf-toolbar-block', $css);
   }
 
-    public function testWdtToolbarCssDeclaresToolbarTokenAliases(): void
+    public function testWdtToolbarCssUsesKernelTokensAndCompositionHooks(): void
     {
         $css = ProfilerCssProvider::readFile(\dirname(__DIR__, 2), 'assets/styles/wdt-toolbar.css');
 
-        self::assertStringContainsString('--ui-toolbar-bg: var(--ui-color-surface)', $css);
+        self::assertStringContainsString('var(--ui-color-surface)', $css);
+        self::assertStringContainsString('[data-ui-profiler-wdt-strip]', $css);
+        self::assertStringContainsString('[data-ui-profiler-wdt-panel]', $css);
         self::assertStringContainsString('[data-ui-profiler-wdt-root][data-ui-profiler-wdt-state=closed]', $css);
         self::assertStringContainsString('[data-ui-profiler-wdt-toggle]', $css);
+        self::assertStringNotContainsString('--ui-toolbar-bg:', $css);
     }
 }

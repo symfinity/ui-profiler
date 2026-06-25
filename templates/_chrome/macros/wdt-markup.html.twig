@@ -1,4 +1,4 @@
-{# WDT v2 vocabulary — no sf-toolbar-* classes in owned markup #}
+{# WDT v2 vocabulary — ux-blocks composition; no sf-toolbar-* classes #}
 
 {% macro wdt_variant(color) -%}
     {%- if color in ['green', 'success'] -%}success
@@ -17,5 +17,5 @@
 {%- endmacro %}
 
 {% macro status_badge(color, content) %}
-    <span data-ui-profiler-wdt-status data-ui-variant="{{ _self.wdt_variant(color) }}">{{ content }}</span>
+    <twig:Badge variant="{{ _self.wdt_variant(color) }}" size="sm">{{ content }}</twig:Badge>
 {% endmacro %}

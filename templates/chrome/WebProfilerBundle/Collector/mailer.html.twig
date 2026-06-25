@@ -45,13 +45,14 @@
         {% endset %}
 
         {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
             <div data-ui-profiler-wdt-info-piece>
                 <b>Queued messages</b>
-                <span data-ui-profiler-wdt-status>{{ events.events|filter(e => e.isQueued())|length }}</span>
+                {{ status_badge('none', events.events|filter(e => e.isQueued())|length) }}
             </div>
             <div data-ui-profiler-wdt-info-piece>
                 <b>Sent messages</b>
-                <span data-ui-profiler-wdt-status>{{ events.events|filter(e => not e.isQueued())|length }}</span>
+                {{ status_badge('none', events.events|filter(e => not e.isQueued())|length) }}
             </div>
         {% endset %}
 

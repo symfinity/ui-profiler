@@ -40,7 +40,7 @@ final class ToolbarParityTest extends WebTestCase
         self::assertResponseIsSuccessful();
         $content = (string) $client->getResponse()->getContent();
 
-        self::assertStringContainsString('ui-profiler-wdt__link', $content);
+        self::assertStringContainsString('ui-profiler-wdt__trigger', $content);
         self::assertStringContainsString('data-ui-profiler-wdt', $content);
     }
 
@@ -71,10 +71,11 @@ final class ToolbarParityTest extends WebTestCase
 
         $styles = (string) $client->getResponse()->getContent();
         self::assertStringContainsString(sprintf('[data-theme="%s"]', $darkThemeId), $styles);
-        self::assertStringContainsString('--ui-toolbar-bg: var(--ui-color-surface)', $styles);
+        self::assertStringContainsString('var(--ui-color-surface)', $styles);
+        self::assertStringContainsString('[data-ui-profiler-wdt-strip]', $styles);
+        self::assertStringContainsString('[data-ui-profiler-wdt-panel]', $styles);
         self::assertStringContainsString('font-style: normal', $styles);
         self::assertStringContainsString('[data-ui-profiler-wdt-root][data-ui-profiler-wdt-state=closed]', $styles);
-        self::assertStringNotContainsString('--ui-toolbar-bg: var(--ui-color-text)', $styles);
         self::assertStringNotContainsString('#262626', $styles);
     }
 

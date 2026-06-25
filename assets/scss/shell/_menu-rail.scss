@@ -1,28 +1,9 @@
-// ui-profiler consumer — sidebar collector menu rail
+// L2 glue — profiler sidebar menu slots on core list rail variant
 
-[data-ui-role='list'][data-ui-variant='rail'],
-[data-ui-profiler-menu] {
-  border-top: 1px solid var(--ui-color-border);
-  display: flex;
-  flex-direction: column;
-  list-style-type: none;
-  margin: 0;
-  padding: 7px;
-
+[data-ui-role='list'][data-ui-variant='rail'][data-ui-profiler-menu] {
   > li {
-    margin-bottom: 0;
-    position: relative;
-
     &:has([data-ui-profiler-menu-disabled]) {
       order: 1;
-    }
-
-    + li {
-      margin-top: 4px;
-    }
-
-    a:hover {
-      text-decoration: none;
     }
 
     &.selected {

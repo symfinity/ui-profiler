@@ -33,14 +33,14 @@
         {% endset %}
 
         {% set text %}
-            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
             <div data-ui-profiler-wdt-info-piece>
                 <b>Database Queries</b>
-                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.querycount > 50 ? 'yellow' : 'none') }}">{{ collector.querycount }}</span>
+                {{ status_badge(collector.querycount > 50 ? 'yellow' : 'none', collector.querycount) }}
             </div>
             <div data-ui-profiler-wdt-info-piece>
                 <b>Different statements</b>
-                <span data-ui-profiler-wdt-status>{{ collector.groupedQueryCount }}</span>
+                {{ status_badge('none', collector.groupedQueryCount) }}
             </div>
             <div data-ui-profiler-wdt-info-piece>
                 <b>Query time</b>
@@ -48,29 +48,29 @@
             </div>
             <div data-ui-profiler-wdt-info-piece>
                 <b>Invalid entities</b>
-                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.invalidEntityCount > 0 ? 'red' : 'none') }}">{{ collector.invalidEntityCount }}</span>
+                {{ status_badge(collector.invalidEntityCount > 0 ? 'red' : 'none', collector.invalidEntityCount) }}
             </div>
             <div data-ui-profiler-wdt-info-piece>
                 <b>Managed entities</b>
-                <span data-ui-profiler-wdt-status>{{ collector.managedEntityCount }}</span>
+                {{ status_badge('none', collector.managedEntityCount) }}
             </div>
             {% if collector.cacheEnabled %}
                 <div data-ui-profiler-wdt-info-piece>
                     <b>Cache hits</b>
-                    <span data-ui-profiler-wdt-status data-ui-variant="success">{{ collector.cacheHitsCount }}</span>
+                    {{ status_badge('success', collector.cacheHitsCount) }}
                 </div>
                 <div data-ui-profiler-wdt-info-piece>
                     <b>Cache misses</b>
-                    <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.cacheMissesCount > 0 ? 'yellow' : 'none') }}">{{ collector.cacheMissesCount }}</span>
+                    {{ status_badge(collector.cacheMissesCount > 0 ? 'yellow' : 'none', collector.cacheMissesCount) }}
                 </div>
                 <div data-ui-profiler-wdt-info-piece>
                     <b>Cache puts</b>
-                    <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.cachePutsCount > 0 ? 'yellow' : 'none') }}">{{ collector.cachePutsCount }}</span>
+                    {{ status_badge(collector.cachePutsCount > 0 ? 'yellow' : 'none', collector.cachePutsCount) }}
                 </div>
             {% else %}
                 <div data-ui-profiler-wdt-info-piece>
                     <b>Second Level Cache</b>
-                    <span data-ui-profiler-wdt-status>disabled</span>
+                    {{ status_badge('none', disabled) }}
                 </div>
             {% endif %}
         {% endset %}

@@ -7,8 +7,29 @@
     {% if align|default('') == 'end' %}data-ui-align="end"{% endif %}
     {{ block_attrs|default('')|raw }}
 >
-    {% if link is not defined or link %}<a class="ui-profiler-wdt__link" href="{{ url('_profiler', {token: token, panel: name}) }}">{% endif %}
-        <div data-ui-profiler-wdt-icon>{{ icon|default('') }}</div>
-    {% if link|default(false) %}</a>{% endif %}
-    <div data-ui-profiler-wdt-info>{{ text|default('') }}</div>
+    {% if link is not defined or link %}
+        <twig:Link
+            href="{{ url('_profiler', {token: token, panel: name}) }}"
+            appearance="ghost"
+            variant="neutral"
+            size="sm"
+            data-ui-profiler-wdt-trigger
+            class="ui-profiler-wdt__trigger"
+        >
+            <twig:Stack direction="horizontal" gap="sm" density="compact" data-ui-profiler-wdt-chip>
+                {{ icon|default('') }}
+            </twig:Stack>
+        </twig:Link>
+    {% else %}
+        <button type="button" data-ui-profiler-wdt-trigger class="ui-profiler-wdt__trigger" data-ui-role="button" data-ui-appearance="ghost" data-ui-variant="neutral" data-ui-size="sm">
+            <twig:Stack direction="horizontal" gap="sm" density="compact" data-ui-profiler-wdt-chip>
+                {{ icon|default('') }}
+            </twig:Stack>
+        </button>
+    {% endif %}
+    {% if text|default('') is not empty %}
+        <div data-ui-profiler-wdt-panel data-ui-role="card" data-ui-fragment="blocks.card">
+            {{ text }}
+        </div>
+    {% endif %}
 </div>

@@ -14,14 +14,14 @@
         {% endset %}
 
         {% set text %}
-            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
             <div data-ui-profiler-wdt-info-piece>
                 <b>Total requests</b>
                 <span>{{ collector.requestCount }}</span>
             </div>
             <div data-ui-profiler-wdt-info-piece>
                 <b>HTTP errors</b>
-                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.errorCount > 0 ? 'red' : 'none') }}">{{ collector.errorCount }}</span>
+                {{ status_badge(collector.errorCount > 0 ? 'red' : 'none', collector.errorCount) }}
             </div>
         {% endset %}
 

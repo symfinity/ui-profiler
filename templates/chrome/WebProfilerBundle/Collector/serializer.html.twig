@@ -15,9 +15,10 @@
         {% endset %}
 
         {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
             <div data-ui-profiler-wdt-info-piece>
                 <b>Total calls</b>
-                <span data-ui-profiler-wdt-status>{{ collector.handledCount }}</span>
+                {{ status_badge('none', collector.handledCount) }}
             </div>
             <div data-ui-profiler-wdt-info-piece>
                 <b>Total time</b>
@@ -30,31 +31,31 @@
                 <div>
                     <div data-ui-profiler-wdt-info-piece>
                         <b>Serialize</b>
-                        <span data-ui-profiler-wdt-status>{{ collector.data.serialize|length }}</span>
+                        {{ status_badge('none', collector.data.serialize|length) }}
                     </div>
                     <div data-ui-profiler-wdt-info-piece>
                         <b>Deserialize</b>
-                        <span data-ui-profiler-wdt-status>{{ collector.data.deserialize|length }}</span>
+                        {{ status_badge('none', collector.data.deserialize|length) }}
                     </div>
                 </div>
                 <div>
                     <div data-ui-profiler-wdt-info-piece>
                         <b>Encode</b>
-                        <span data-ui-profiler-wdt-status>{{ collector.data.encode|length }}</span>
+                        {{ status_badge('none', collector.data.encode|length) }}
                     </div>
                     <div data-ui-profiler-wdt-info-piece>
                         <b>Decode</b>
-                        <span data-ui-profiler-wdt-status>{{ collector.data.decode|length }}</span>
+                        {{ status_badge('none', collector.data.decode|length) }}
                     </div>
                 </div>
                 <div>
                     <div data-ui-profiler-wdt-info-piece>
                         <b>Normalize</b>
-                        <span data-ui-profiler-wdt-status>{{ collector.data.normalize|length }}</span>
+                        {{ status_badge('none', collector.data.normalize|length) }}
                     </div>
                     <div data-ui-profiler-wdt-info-piece>
                         <b>Denormalize</b>
-                        <span data-ui-profiler-wdt-status>{{ collector.data.denormalize|length }}</span>
+                        {{ status_badge('none', collector.data.denormalize|length) }}
                     </div>
                 </div>
             </div>

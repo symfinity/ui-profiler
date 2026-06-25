@@ -24,10 +24,10 @@
 
     {% set request_status_code_color = (collector.statuscode >= 400) ? 'red' : (collector.statuscode >= 300) ? 'yellow' : 'green' %}
 
-{% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+{% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant, status_badge %}
 
     {% set icon %}
-        <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(request_status_code_color) }}">{{ collector.statuscode }}</span>
+        {{ status_badge(request_status_code_color, collector.statuscode) }}
         {% if collector.route %}
             {% if collector.redirect %}<span data-ui-profiler-wdt-request-icon>{{ source('@WebProfiler/Icon/redirect.svg') }}</span>{% endif %}
             {% if collector.forwardtoken %}<span data-ui-profiler-wdt-request-icon>{{ source('@WebProfiler/Icon/forward.svg') }}</span>{% endif %}
@@ -75,7 +75,7 @@
             <div data-ui-profiler-wdt-info-group>
                 <div data-ui-profiler-wdt-info-piece>
                     <b>
-                        <span data-ui-profiler-wdt-status data-ui-variant="warning">{{ collector.redirect.status_code }}</span>
+                        {{ status_badge('warning', collector.redirect.status_code) }}
                         Redirect from
                     </b>
                     <span>

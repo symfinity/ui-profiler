@@ -130,20 +130,20 @@
         {% endset %}
 
         {% set text %}
-            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
             <div data-ui-profiler-wdt-info-piece>
                 <b>Errors</b>
-                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.counterrors ? 'red' : 'none') }}">{{ collector.counterrors|default(0) }}</span>
+                {{ status_badge(collector.counterrors ? 'red' : 'none', collector.counterrors|default(0)) }}
             </div>
 
             <div data-ui-profiler-wdt-info-piece>
                 <b>Warnings</b>
-                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.countwarnings ? 'yellow' : 'none') }}">{{ collector.countwarnings|default(0) }}</span>
+                {{ status_badge(collector.countwarnings ? 'yellow' : 'none', collector.countwarnings|default(0)) }}
             </div>
 
             <div data-ui-profiler-wdt-info-piece>
                 <b>Deprecations</b>
-                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.countdeprecations ? 'none' : 'none') }}">{{ collector.countdeprecations|default(0) }}</span>
+                {{ status_badge(collector.countdeprecations ? 'none' : 'none', collector.countdeprecations|default(0)) }}
             </div>
         {% endset %}
 

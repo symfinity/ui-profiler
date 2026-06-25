@@ -14,6 +14,11 @@
 }
 
 [data-ui-profiler-header] {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: space-between;
+  overflow: hidden;
   background: color-mix(in srgb, var(--ui-color-surface-elevated) 88%, var(--ui-color-primary));
   border: 1px solid color-mix(in srgb, var(--ui-color-border) 80%, var(--ui-color-primary));
   border-radius: var(--ui-radius-lg, 0.5rem);

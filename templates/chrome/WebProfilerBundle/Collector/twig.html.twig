@@ -13,6 +13,7 @@
     {% endset %}
 
     {% set text %}
+        {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
         {% set template = collector.templates|keys|first %}
         {% set file = collector.templatePaths[template]|default(false) %}
         {% set link = file ? file|file_link(1) : false %}
@@ -34,15 +35,15 @@
         </div>
         <div data-ui-profiler-wdt-info-piece>
             <b>Template Calls</b>
-            <span data-ui-profiler-wdt-status>{{ collector.templatecount }}</span>
+            {{ status_badge('none', collector.templatecount) }}
         </div>
         <div data-ui-profiler-wdt-info-piece>
             <b>Block Calls</b>
-            <span data-ui-profiler-wdt-status>{{ collector.blockcount }}</span>
+            {{ status_badge('none', collector.blockcount) }}
         </div>
         <div data-ui-profiler-wdt-info-piece>
             <b>Macro Calls</b>
-            <span data-ui-profiler-wdt-status>{{ collector.macrocount }}</span>
+            {{ status_badge('none', collector.macrocount) }}
         </div>
     {% endset %}
 

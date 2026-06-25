@@ -11,15 +11,16 @@
         {% endset %}
 
         {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
             <div data-ui-profiler-wdt-info-piece>
                 <b>Sent notifications</b>
-                <span data-ui-profiler-wdt-status>{{ events.messages|length }}</span>
+                {{ status_badge('none', events.messages|length) }}
             </div>
 
             {% for transport in events.transports %}
                 <div data-ui-profiler-wdt-info-piece>
                     <b>{{ transport ?: '<em>Empty Transport Name</em>' }}</b>
-                    <span data-ui-profiler-wdt-status>{{ events.messages(transport)|length }}</span>
+                    {{ status_badge('none', events.messages(transport)|length) }}
                 </div>
             {% endfor %}
         {% endset %}

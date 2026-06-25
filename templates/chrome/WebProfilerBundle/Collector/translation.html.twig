@@ -11,30 +11,24 @@
         {% endset %}
 
         {% set text %}
-            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
             <div data-ui-profiler-wdt-info-piece>
                 <b>Default locale</b>
-                <span data-ui-profiler-wdt-status>
-                    {{ collector.locale|default('-') }}
-                </span>
+                {{ status_badge('none', collector.locale|default('-')) }}
             </div>
             <div data-ui-profiler-wdt-info-piece>
                 <b>Missing messages</b>
-                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.countMissings ? 'red' : 'none') }}">
-                    {{ collector.countMissings }}
-                </span>
+                {{ status_badge(collector.countMissings ? 'red' : 'none', collector.countMissings) }}
             </div>
 
             <div data-ui-profiler-wdt-info-piece>
                 <b>Fallback messages</b>
-                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.countFallbacks ? 'yellow' : 'none') }}">
-                    {{ collector.countFallbacks }}
-                </span>
+                {{ status_badge(collector.countFallbacks ? 'yellow' : 'none', collector.countFallbacks) }}
             </div>
 
             <div data-ui-profiler-wdt-info-piece>
                 <b>Defined messages</b>
-                <span data-ui-profiler-wdt-status>{{ collector.countDefines }}</span>
+                {{ status_badge('none', collector.countDefines) }}
             </div>
         {% endset %}
 

@@ -1,14 +1,10 @@
 // symfinity/ui-profiler — shell chrome (L2). Author only; run bin/profiler-css-compile
 
-@use 'consumer/request-status';
-@use 'consumer/tabs-shell';
-@use 'consumer/profiler-chrome-input';
-@use 'consumer/sidebar-search';
-@use 'consumer/list-rail';
-@use 'consumer/settings-picker';
 @use 'shell/document';
 @use 'shell/shell-root';
 @use 'shell/shell-identity';
+@use 'shell/request-summary';
+@use 'shell/menu-rail';
 @use 'shell/sidebar';
 @use 'shell/settings-dialog';
 @use 'shell/collector-content';

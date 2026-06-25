@@ -11,6 +11,10 @@
   margin: 0;
 }
 
+[data-ui-profiler-shell] [data-ui-profiler-sidebar-shortcuts] {
+  padding: 0.3125rem 0.5rem;
+}
+
 [data-ui-profiler-collector-wrapper] {
   min-width: 0;
 

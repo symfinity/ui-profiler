@@ -98,7 +98,8 @@ function createAjaxRuntime(config, callbacks) {
 
         const statusCodeCell = document.createElement('td');
         const statusCode = document.createElement('span');
-        statusCode.setAttribute('data-ui-profiler-wdt-status', '');
+        statusCode.setAttribute('data-ui-role', 'badge');
+        statusCode.setAttribute('data-ui-size', 'sm');
         statusCode.setAttribute('data-ui-variant', 'neutral');
         statusCode.textContent = 'n/a';
         statusCodeCell.appendChild(statusCode);
@@ -129,7 +130,7 @@ function createAjaxRuntime(config, callbacks) {
         row.setAttribute('data-ajax-state', 'loading');
         tbody.insertBefore(row, null);
 
-        const toolbarInfo = document.querySelector('[data-ui-profiler-collector="ajax"] [data-ui-profiler-wdt-info]');
+        const toolbarInfo = document.querySelector('[data-ui-profiler-collector="ajax"] [data-ui-profiler-wdt-panel]');
         if (toolbarInfo) {
             toolbarInfo.scrollTop = toolbarInfo.scrollHeight;
         }
@@ -179,18 +180,22 @@ function createAjaxRuntime(config, callbacks) {
 
         if (request.statusCode) {
             if (request.statusCode < 300) {
-                statusCodeElem.setAttribute('data-ui-profiler-wdt-status', '');
+                statusCodeElem.setAttribute('data-ui-role', 'badge');
+                statusCodeElem.setAttribute('data-ui-size', 'sm');
                 statusCodeElem.setAttribute('data-ui-variant', 'neutral');
             } else if (request.statusCode < 400) {
-                statusCodeElem.setAttribute('data-ui-profiler-wdt-status', '');
+                statusCodeElem.setAttribute('data-ui-role', 'badge');
+                statusCodeElem.setAttribute('data-ui-size', 'sm');
                 statusCodeElem.setAttribute('data-ui-variant', 'warning');
             } else {
-                statusCodeElem.setAttribute('data-ui-profiler-wdt-status', '');
+                statusCodeElem.setAttribute('data-ui-role', 'badge');
+                statusCodeElem.setAttribute('data-ui-size', 'sm');
                 statusCodeElem.setAttribute('data-ui-variant', 'danger');
             }
             statusCodeElem.textContent = String(request.statusCode);
         } else {
-            statusCodeElem.setAttribute('data-ui-profiler-wdt-status', '');
+            statusCodeElem.setAttribute('data-ui-role', 'badge');
+            statusCodeElem.setAttribute('data-ui-size', 'sm');
             statusCodeElem.setAttribute('data-ui-variant', 'danger');
         }
 
@@ -378,12 +383,12 @@ function createAjaxRuntime(config, callbacks) {
         const ajaxBlock = document.querySelector('[data-ui-profiler-wdt-item][data-ui-profiler-collector="ajax"]');
         if (ajaxBlock) {
             addEventListener(ajaxBlock, 'mouseenter', () => {
-                const elem = document.querySelector('[data-ui-profiler-collector="ajax"] [data-ui-profiler-wdt-info]');
+                const elem = document.querySelector('[data-ui-profiler-collector="ajax"] [data-ui-profiler-wdt-panel]');
                 if (elem) {
                     elem.scrollTop = elem.scrollHeight;
                 }
             });
-            const icon = document.querySelector('[data-ui-profiler-collector="ajax"] > [data-ui-profiler-wdt-icon]');
+            const icon = document.querySelector('[data-ui-profiler-collector="ajax"] [data-ui-profiler-wdt-trigger]');
             if (icon) {
                 addEventListener(icon, 'click', (event) => {
                     event.preventDefault();
@@ -391,7 +396,7 @@ function createAjaxRuntime(config, callbacks) {
                 });
             }
         }
-        const dumpInfo = document.querySelector('[data-ui-profiler-collector="dump"] [data-ui-profiler-wdt-info]');
+        const dumpInfo = document.querySelector('[data-ui-profiler-collector="dump"] [data-ui-profiler-wdt-panel]');
         if (null !== dumpInfo) {
             addEventListener(dumpInfo, 'sfbeforedumpcollapse', () => {
                 dumpInfo.style.minHeight = `${dumpInfo.getBoundingClientRect().height}px`;
@@ -584,7 +589,7 @@ export class UiProfilerWdt {
         const toolbarBlocks = [...el.querySelectorAll('[data-ui-profiler-wdt-item]')];
         for (const block of toolbarBlocks) {
             block.onmouseover = function () {
-                const toolbarInfo = this.querySelector('[data-ui-profiler-wdt-info]');
+                const toolbarInfo = this.querySelector('[data-ui-profiler-wdt-panel]');
                 if (!toolbarInfo) {
                     return;
                 }

@@ -7,35 +7,39 @@
     data-no-turbolink
     data-turbo="false"
 >
-    {% for name, template in templates %}
-        {% if block('toolbar', template) is defined %}
-            {% with {
-                collector: profile ? profile.getcollector(name) : null,
-                profiler_url: profiler_url,
-                token: token ?? (profile ? profile.token : null),
-                name: name,
-                profiler_markup_version: profiler_markup_version,
-                csp_script_nonce: csp_script_nonce,
-                csp_style_nonce: csp_style_nonce,
-              } %}
-                {{ block('toolbar', template) }}
-            {% endwith %}
+    <twig:Stack direction="horizontal" gap="none" density="compact" data-ui-profiler-wdt-strip>
+        {% for name, template in templates %}
+            {% if block('toolbar', template) is defined %}
+                {% with {
+                    collector: profile ? profile.getcollector(name) : null,
+                    profiler_url: profiler_url,
+                    token: token ?? (profile ? profile.token : null),
+                    name: name,
+                    profiler_markup_version: profiler_markup_version,
+                    csp_script_nonce: csp_script_nonce,
+                    csp_style_nonce: csp_style_nonce,
+                  } %}
+                    {{ block('toolbar', template) }}
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+        {% if full_stack %}
+            <div data-ui-profiler-wdt-item data-ui-profiler-collector="full-stack" data-ui-status="danger" data-ui-align="end">
+                <button type="button" data-ui-profiler-wdt-trigger class="ui-profiler-wdt__trigger" data-ui-role="button" data-ui-appearance="ghost" data-ui-variant="danger" data-ui-size="sm">
+                    <twig:Stack direction="horizontal" gap="sm" density="compact" data-ui-profiler-wdt-chip>
+                        <twig:Badge variant="danger" size="sm">Using symfony/symfony is NOT supported</twig:Badge>
+                    </twig:Stack>
+                </button>
+                <div data-ui-profiler-wdt-panel data-ui-role="card" data-ui-fragment="blocks.card" data-ui-status="danger">
+                    <p>This project is using Symfony via the "symfony/symfony" package.</p>
+                    <p>This is NOT supported anymore since Symfony 4.0.</p>
+                    <p>Even if it seems to work well, it has some important limitations with no workarounds.</p>
+                    <p>Using this package also makes your project slower.</p>
+                    <strong>Please, stop using this package and replace it with individual packages instead.</strong>
+                </div>
+            </div>
         {% endif %}
-    {% endfor %}
-    {% if full_stack %}
-        <div data-ui-profiler-wdt-item data-ui-profiler-collector="full-stack" data-ui-status="danger" data-ui-align="end">
-            <div data-ui-profiler-wdt-icon>
-                <span data-ui-profiler-wdt-value>Using symfony/symfony is NOT supported</span>
-            </div>
-            <div data-ui-profiler-wdt-info data-ui-status="danger">
-                <p>This project is using Symfony via the "symfony/symfony" package.</p>
-                <p>This is NOT supported anymore since Symfony 4.0.</p>
-                <p>Even if it seems to work well, it has some important limitations with no workarounds.</p>
-                <p>Using this package also makes your project slower.</p>
-                <strong>Please, stop using this package and replace it with individual packages instead.</strong>
-            </div>
-        </div>
-    {% endif %}
+    </twig:Stack>
 
     <button data-ui-profiler-wdt-toggle type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle UI Profiler toolbar">
         <i data-ui-profiler-wdt-toggle-icon="open" title="Close Toolbar"></i>

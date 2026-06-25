@@ -13,17 +13,13 @@
         {% endset %}
 
         {% set text %}
-            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
             {% for bus in collector.buses %}
                 {% set exceptionsCount = collector.exceptionsCount(bus) %}
                 <div data-ui-profiler-wdt-info-piece>
                     <b>{{ bus }}</b>
-                    <span
-                        title="{{ exceptionsCount }} message(s) with exceptions"
-                        data-ui-profiler-wdt-status
-                        data-ui-variant="{{ wdt_variant(exceptionsCount ? 'red' : 'none') }}"
-                    >
-                        {{ collector.messages(bus)|length }}
+                    <span title="{{ exceptionsCount }} message(s) with exceptions">
+                        {{ status_badge(exceptionsCount ? 'red' : 'none', collector.messages(bus)|length) }}
                     </span>
                 </div>
             {% endfor %}
