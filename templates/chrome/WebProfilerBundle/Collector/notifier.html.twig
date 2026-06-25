@@ -54,7 +54,7 @@
         </div>
     {% endif %}
 
-    <div data-ui-profiler-metrics data-ui-role="grid">
+    <div data-ui-metrics-grid data-ui-role="grid">
         {% for transport in events.transports %}
             {{ ui.metric_cell(events.messages(transport)|length, transport) }}
         {% endfor %}

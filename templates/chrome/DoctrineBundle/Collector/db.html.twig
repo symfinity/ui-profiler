@@ -107,17 +107,17 @@
 {% block queries %}
     <h2>Query Metrics</h2>
 
-    <div data-ui-profiler-metrics data-ui-role="grid">
-        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
             {{ ui.metric_cell(collector.querycount, 'Database Queries') }}
             {{ ui.metric_cell(collector.groupedQueryCount, 'Different statements') }}
-            {{ ui.metric_cell('%.2f'|format(collector.time * 1000) ~ ' <span class="ui-profiler-metric__unit">ms</span>', 'Query time') }}
+            {{ ui.metric_cell('%.2f'|format(collector.time * 1000) ~ ' <span data-ui-part="unit">ms</span>', 'Query time') }}
             {{ ui.metric_cell(collector.invalidEntityCount, 'Invalid entities') }}
             {{ ui.metric_cell(collector.managedEntityCount, 'Managed entities') }}
         </div>
 
         {% if collector.cacheEnabled %}
-            <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+            <div data-ui-role="stat-group">
                 {{ ui.metric_cell(collector.cacheHitsCount, 'Cache hits') }}
                 {{ ui.metric_cell(collector.cacheMissesCount, 'Cache misses') }}
                 {{ ui.metric_cell(collector.cachePutsCount, 'Cache puts') }}
@@ -316,8 +316,8 @@
                             <p>Second level cache information is not available.</p>
                         </div>
                     {% else %}
-                        <div data-ui-profiler-metrics data-ui-role="grid">
-                            <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+                        <div data-ui-metrics-grid data-ui-role="grid">
+                            <div data-ui-role="stat-group">
                                 {{ ui.metric_cell(collector.cacheCounts.hits, 'Hits') }}
                                 {{ ui.metric_cell(collector.cacheCounts.misses, 'Misses') }}
                                 {{ ui.metric_cell(collector.cacheCounts.puts, 'Puts') }}

@@ -70,9 +70,9 @@
     {% else %}
         <h2>Twig Metrics</h2>
 
-        <div data-ui-profiler-metrics data-ui-role="grid">
-            {{ ui.metric_cell('%.0f'|format(collector.time) ~ ' <span class="ui-profiler-metric__unit">ms</span>', 'Render time') }}
-            <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+        <div data-ui-metrics-grid data-ui-role="grid">
+            {{ ui.metric_cell('%.0f'|format(collector.time) ~ ' <span data-ui-part="unit">ms</span>', 'Render time') }}
+            <div data-ui-role="stat-group">
                 {{ ui.metric_cell(collector.templatecount, 'Template calls') }}
                 {{ ui.metric_cell(collector.blockcount, 'Block calls') }}
                 {{ ui.metric_cell(collector.macrocount, 'Macro calls') }}

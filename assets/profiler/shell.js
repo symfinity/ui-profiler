@@ -93,14 +93,14 @@ export class UiProfilerShell {
                 const tabPanel = document.getElementById(tabId);
                 tabPanel.setAttribute('role', 'tabpanel');
                 tabPanel.setAttribute('aria-labelledby', tabId);
-                tabPanel.querySelector('.tab-title').className = 'hidden';
+                tabPanel.querySelector('.tab-title').hidden = true;
 
                 if (tab.classList.contains('active')) {
-                    tabPanel.className = 'block';
+                    tabPanel.hidden = false;
                     tab.setAttribute('aria-selected', 'true');
                     tab.removeAttribute('tabindex');
                 } else {
-                    tabPanel.className = 'hidden';
+                    tabPanel.hidden = true;
                     tab.removeAttribute('aria-selected');
                     tab.setAttribute('tabindex', '-1');
                 }
@@ -115,7 +115,8 @@ export class UiProfilerShell {
                     const siblingTabs = Array.from(activeTab.parentNode.children);
                     siblingTabs.forEach((sibling) => {
                         const siblingTabId = sibling.getAttribute('data-tab-id');
-                        document.getElementById(siblingTabId).className = 'hidden';
+                        const siblingPanel = document.getElementById(siblingTabId);
+                        siblingPanel.hidden = true;
                         sibling.classList.remove('active');
                         sibling.removeAttribute('aria-selected');
                         sibling.setAttribute('tabindex', '-1');
@@ -125,7 +126,7 @@ export class UiProfilerShell {
                     activeTab.setAttribute('aria-selected', 'true');
                     activeTab.removeAttribute('tabindex');
                     const activeTabId = activeTab.getAttribute('data-tab-id');
-                    document.getElementById(activeTabId).className = 'block';
+                    document.getElementById(activeTabId).hidden = false;
                 });
             });
 

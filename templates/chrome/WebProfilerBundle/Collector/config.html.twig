@@ -141,12 +141,12 @@
     <h2>Symfony Configuration</h2>
 
     {% if collector.runnerClass is defined and collector.runnerClass is not null %}
-        <div data-ui-profiler-metrics data-ui-role="grid">
+        <div data-ui-metrics-grid data-ui-role="grid">
             {{ ui.metric_cell(collector.runnerClass|abbr_class, 'Runner') }}
         </div>
     {% endif %}
 
-    <div data-ui-profiler-metrics data-ui-role="grid">
+    <div data-ui-metrics-grid data-ui-role="grid">
         {% set symfony_version_value %}
             {{ collector.symfonyversion }}
             {% if collector.symfonylts %}
@@ -167,8 +167,8 @@
     {% set symfony_status = {dev: 'In Development', stable: 'Maintained', eom: 'Security Fixes Only', eol: 'Unmaintained'} %}
     {% set symfony_badge_variant = {dev: 'warning', stable: 'success', eom: 'warning', eol: 'danger'} %}
 
-    <div data-ui-profiler-metrics data-ui-role="grid">
-        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
             {% set symfony_version_status_value %}
                 <twig:Badge variant="{{ symfony_badge_variant[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</twig:Badge>
             {% endset %}
@@ -186,27 +186,27 @@
 
     <h2>PHP Configuration</h2>
 
-    <div data-ui-profiler-metrics data-ui-role="grid">
-        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
             {% set php_version_value %}
-                {{ collector.phpversion }}{% if collector.phpversionextra %} <span class="ui-profiler-metric__unit">{{ collector.phpversionextra }}</span>{% endif %}
+                {{ collector.phpversion }}{% if collector.phpversionextra %} <span data-ui-part="unit">{{ collector.phpversionextra }}</span>{% endif %}
             {% endset %}
             {{ ui.metric_cell(php_version_value, 'PHP version') }}
-            {{ ui.metric_cell(collector.phparchitecture ~ ' <span class="ui-profiler-metric__unit">bits</span>', 'Architecture') }}
+            {{ ui.metric_cell(collector.phparchitecture ~ ' <span data-ui-part="unit">bits</span>', 'Architecture') }}
             {{ ui.metric_cell(collector.phpintllocale, 'Intl locale') }}
             {{ ui.metric_cell(collector.phptimezone, 'Timezone') }}
         </div>
     </div>
 
-    <div data-ui-profiler-metrics data-ui-role="grid">
-        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
             {% set opcache_icon %}
-                <span class="ui-profiler-metric__icon{{ not collector.haszendopcache ? ' is-inactive' }}" title="{{ collector.zendopcachestatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
+                <span data-ui-part="icon"{{ not collector.haszendopcache ? ' is-inactive' }}" title="{{ collector.zendopcachestatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
             {% endset %}
             {{ ui.metric_cell(opcache_icon, 'OPcache') }}
 
             {% set apcu_icon %}
-                <span class="ui-profiler-metric__icon{{ not collector.hasapcu ? ' is-inactive' }}" title="{{ collector.apcustatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
+                <span data-ui-part="icon"{{ not collector.hasapcu ? ' is-inactive' }}" title="{{ collector.apcustatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
             {% endset %}
             {{ ui.metric_cell(apcu_icon, 'APCu') }}
 
@@ -214,7 +214,7 @@
                 {% if collector.hasXdebugInfo %}
                     <a href="{{ path('_profiler_xdebug') }}" title="View xdebug_info()" class="link">
                 {% endif %}
-                <span class="ui-profiler-metric__icon{{ not collector.hasxdebug ? ' is-inactive' }}" title="{{ collector.xdebugstatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
+                <span data-ui-part="icon"{{ not collector.hasxdebug ? ' is-inactive' }}" title="{{ collector.xdebugstatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
                 {% if collector.hasXdebugInfo %}
                     </a>
                 {% endif %}

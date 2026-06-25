@@ -34,8 +34,8 @@
     <div data-ui-profiler-panel="memory">
         <h2>Memory</h2>
 
-        <div data-ui-profiler-metrics data-ui-role="grid">
-            {{ ui.metric_cell('%.1f'|format(collector.memory / 1024 / 1024) ~ ' <span class="ui-profiler-metric__unit">MiB</span>', 'Peak memory usage') }}
+        <div data-ui-metrics-grid data-ui-role="grid">
+            {{ ui.metric_cell('%.1f'|format(collector.memory / 1024 / 1024) ~ ' <span data-ui-part="unit">MiB</span>', 'Peak memory usage') }}
             {{ ui.metric_cell(
                 collector.memoryLimit == -1 ? 'Unlimited' : '%.0f MiB'|format(collector.memoryLimit / 1024 / 1024),
                 'PHP memory limit',

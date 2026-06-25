@@ -42,8 +42,8 @@
     {% set has_time_events = collector.events|length > 0 %}
     <h2>Performance metrics</h2>
 
-    <div data-ui-profiler-metrics data-ui-role="grid">
-        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
             {{ include('@UiProfiler/_chrome/partials/profiler-metric-cell.html.twig', {
                 value: '%.0f'|format(collector.duration),
                 unit: 'ms',
@@ -68,7 +68,7 @@
             {% set subrequests_time = has_time_events
                 ? profile.children|reduce((total, child) => total + child.getcollector('time').events.__section__.duration, 0)
                 : 'n/a' %}
-            <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+            <div data-ui-role="stat-group">
                 {{ include('@UiProfiler/_chrome/partials/profiler-metric-cell.html.twig', {
                     value: profile.children|length,
                     label: 'Sub-' ~ profile_type|title ~ (profile.children|length > 1 ? 's' : ''),

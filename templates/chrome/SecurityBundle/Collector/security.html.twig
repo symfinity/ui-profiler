@@ -130,8 +130,8 @@
 
                 <div class="tab-content">
                     {% if collector.token %}
-                        <div data-ui-profiler-metrics data-ui-role="grid">
-                            <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+                        <div data-ui-metrics-grid data-ui-role="grid">
+                            <div data-ui-role="stat-group">
                                 {{ ui.metric_cell(collector.user, 'Username') }}
                                 {{ ui.metric_cell(source('@WebProfiler/Icon/' ~ (collector.authenticated ? 'yes' : 'no') ~ '.svg'), 'Authenticated') }}
                                 {% if collector.authProfileToken %}
@@ -197,8 +197,8 @@
                 <h3 class="tab-title">Firewall</h3>
                 <div class="tab-content">
                     {% if collector.firewall %}
-                        <div data-ui-profiler-metrics data-ui-role="grid">
-                            <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+                        <div data-ui-metrics-grid data-ui-role="grid">
+                            <div data-ui-role="stat-group">
                                 {{ ui.metric_cell(collector.firewall.name, 'Name') }}
                                 {{ ui.metric_cell(source('@WebProfiler/Icon/' ~ (collector.firewall.security_enabled ? 'yes' : 'no') ~ '.svg'), 'Security enabled') }}
                                 {{ ui.metric_cell(source('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg'), 'Stateless') }}
@@ -395,7 +395,7 @@
                 <h3 class="tab-title">Access Decision</h3>
                 <div class="tab-content">
                     {% if collector.voters|default([]) is not empty %}
-                        <div data-ui-profiler-metrics data-ui-role="grid">
+                        <div data-ui-metrics-grid data-ui-role="grid">
                             {{ ui.metric_cell(collector.voterStrategy|default('unknown'), 'Strategy') }}
                         </div>
 
