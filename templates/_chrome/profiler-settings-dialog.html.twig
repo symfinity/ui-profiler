@@ -14,90 +14,84 @@
     aria-labelledby="profiler-settings-title"
     {% if ui_profiler_stimulus_enabled() %}data-controller="ui-profiler--dialog"{% endif %}
 >
-    <div data-ui-role="stack" data-ui-gap="lg">
-        <header data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="md">
-            <h3 id="profiler-settings-title">Configuration Settings</h3>
-            <button
-                type="button"
-                data-ui-role="button"
-                data-ui-variant="neutral"
-                data-ui-appearance="ghost"
-                data-ui-size="sm"
-                data-ui-profiler-settings-close
-                aria-label="Close"
-            >&times;</button>
+    <twig:Stack gap="lg">
+        <header>
+            <twig:Stack direction="horizontal" gap="md" class="profiler-settings-header">
+                <h3 id="profiler-settings-title">Configuration Settings</h3>
+                <twig:Button type="button" variant="neutral" appearance="ghost" size="sm" data-ui-profiler-settings-close aria-label="Close">&times;</twig:Button>
+            </twig:Stack>
         </header>
 
-        <div data-ui-role="stack" data-ui-gap="sm">
+        <twig:Stack gap="sm">
             <strong>Theme</strong>
-            <div data-ui-role="grid" data-ui-columns="3" data-ui-profiler-settings-picker role="group" aria-label="Theme">
-                <a
+            <div data-ui-profiler-settings-picker role="group" aria-label="Theme">
+                <twig:Button
+                    as="a"
                     href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'auto'})) }}"
-                    data-ui-role="button"
-                    data-ui-layout="block"
-                    data-ui-variant="{{ preference.scheme.value == 'auto' ? 'primary' : 'neutral' }}"
-                    {% if preference.scheme.value != 'auto' %}data-ui-appearance="ghost"{% endif %}
+                    layout="block"
+                    variant="{{ preference.scheme.value == 'auto' ? 'primary' : 'neutral' }}"
+                    appearance="{{ preference.scheme.value == 'auto' ? 'solid' : 'ghost' }}"
                     data-turbo="false"
                     data-no-turbolink
                 >
                     {{ source('@WebProfiler/Icon/settings-theme-system.svg') }}
                     <span class="ui-profiler-settings-label">System / OS</span>
-                </a>
-                <a
+                </twig:Button>
+                <twig:Button
+                    as="a"
                     href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'light'})) }}"
-                    data-ui-role="button"
-                    data-ui-layout="block"
-                    data-ui-variant="{{ preference.scheme.value == 'light' ? 'primary' : 'neutral' }}"
-                    {% if preference.scheme.value != 'light' %}data-ui-appearance="ghost"{% endif %}
+                    layout="block"
+                    variant="{{ preference.scheme.value == 'light' ? 'primary' : 'neutral' }}"
+                    appearance="{{ preference.scheme.value == 'light' ? 'solid' : 'ghost' }}"
                     data-turbo="false"
                     data-no-turbolink
                 >
                     {{ source('@WebProfiler/Icon/settings-theme-light.svg') }}
                     <span class="ui-profiler-settings-label">Light</span>
-                </a>
-                <a
+                </twig:Button>
+                <twig:Button
+                    as="a"
                     href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'dark'})) }}"
-                    data-ui-role="button"
-                    data-ui-layout="block"
-                    data-ui-variant="{{ preference.scheme.value == 'dark' ? 'primary' : 'neutral' }}"
-                    {% if preference.scheme.value != 'dark' %}data-ui-appearance="ghost"{% endif %}
+                    layout="block"
+                    variant="{{ preference.scheme.value == 'dark' ? 'primary' : 'neutral' }}"
+                    appearance="{{ preference.scheme.value == 'dark' ? 'solid' : 'ghost' }}"
                     data-turbo="false"
                     data-no-turbolink
                 >
                     {{ source('@WebProfiler/Icon/settings-theme-dark.svg') }}
                     <span class="ui-profiler-settings-label">Dark</span>
-                </a>
+                </twig:Button>
             </div>
-        </div>
+        </twig:Stack>
 
-        <div data-ui-role="stack" data-ui-gap="sm">
+        <twig:Stack gap="sm">
             <strong>Page Width</strong>
-            <div data-ui-role="grid" data-ui-columns="2" data-ui-profiler-settings-picker role="radiogroup" aria-label="Page width">
-                <label data-ui-role="button" data-ui-layout="block" data-ui-variant="neutral" data-ui-appearance="ghost" for="settings-width-normal">
-                    <input
-                        class="config-option config-option-width visually-hidden"
-                        type="radio"
-                        name="width"
-                        value="normal"
-                        id="settings-width-normal"
-                    >
+            <div data-ui-profiler-settings-picker role="radiogroup" aria-label="Page width">
+                <twig:Button
+                    type="button"
+                    layout="block"
+                    variant="neutral"
+                    appearance="ghost"
+                    data-ui-profiler-width="normal"
+                    aria-pressed="false"
+                >
                     {{ source('@WebProfiler/Icon/settings-width-fixed.svg') }}
                     <span class="ui-profiler-settings-label">Fixed width</span>
-                </label>
-                <label data-ui-role="button" data-ui-layout="block" data-ui-variant="neutral" data-ui-appearance="ghost" for="settings-width-full">
-                    <input
-                        class="config-option config-option-width visually-hidden"
-                        type="radio"
-                        name="width"
-                        value="full"
-                        id="settings-width-full"
-                    >
+                </twig:Button>
+                <twig:Button
+                    type="button"
+                    layout="block"
+                    variant="neutral"
+                    appearance="ghost"
+                    data-ui-profiler-width="full"
+                    aria-pressed="false"
+                >
                     {{ source('@WebProfiler/Icon/settings-width-fitted.svg') }}
                     <span class="ui-profiler-settings-label">Fit to window</span>
-                </label>
+                </twig:Button>
             </div>
-        </div>
-    </div>
+        </twig:Stack>
+    </twig:Stack>
 </dialog>
 
 <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
@@ -105,7 +99,7 @@
     const dialog = document.getElementById('profiler-settings');
     const openButton = document.getElementById('open-settings');
     const closeButton = dialog?.querySelector('[data-ui-profiler-settings-close]');
-    const widthInputs = document.querySelectorAll('.config-option-width');
+    const widthButtons = dialog.querySelectorAll('[data-ui-profiler-width]');
 
     if (!dialog || !openButton) {
         return;
@@ -130,21 +124,18 @@
         const widthSetting = localStorage.getItem('symfony/profiler/width') || 'width-normal';
         const widthValue = widthSetting.replace(/^width-/, '');
 
-        widthInputs.forEach((input) => {
-            if (!(input instanceof HTMLInputElement)) {
+        widthButtons.forEach((button) => {
+            if (!(button instanceof HTMLElement)) {
                 return;
             }
 
-            const isActive = input.value === widthValue;
-            input.checked = isActive;
-            const label = input.closest('label[data-ui-role="button"]');
-            if (label instanceof HTMLElement) {
-                label.dataset.uiVariant = isActive ? 'primary' : 'neutral';
-                if (isActive) {
-                    delete label.dataset.uiAppearance;
-                } else {
-                    label.dataset.uiAppearance = 'ghost';
-                }
+            const isActive = button.dataset.uiProfilerWidth === widthValue;
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            button.dataset.uiVariant = isActive ? 'primary' : 'neutral';
+            if (isActive) {
+                delete button.dataset.uiAppearance;
+            } else {
+                button.dataset.uiAppearance = 'ghost';
             }
         });
 
@@ -153,31 +144,19 @@
 
     syncWidthVariant();
 
-    widthInputs.forEach((option) => {
-        option.addEventListener('change', function (event) {
+    widthButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
             event.stopPropagation();
 
-            const settingValue = 'width-' + option.value;
+            if (!(button instanceof HTMLElement)) {
+                return;
+            }
+
+            const settingValue = 'width-' + button.dataset.uiProfilerWidth;
             localStorage.setItem('symfony/profiler/width', settingValue);
             applyWidthClass(settingValue);
             syncWidthVariant();
-        });
-    });
-
-    document.querySelectorAll('[data-ui-profiler-settings-picker] label[data-ui-role="button"]').forEach((label) => {
-        label.addEventListener('click', (event) => {
-            const input = label.querySelector('input[type="radio"]');
-            if (!(input instanceof HTMLInputElement)) {
-                return;
-            }
-
-            if (event.target === input) {
-                return;
-            }
-
-            event.preventDefault();
-            input.checked = true;
-            input.dispatchEvent(new Event('change', { bubbles: true }));
         });
     });
 

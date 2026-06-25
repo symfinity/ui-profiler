@@ -11,15 +11,15 @@
 
 ## MUST
 
-1. **Look:** `ui_kernel_css()` only (L0).
-2. **Markup:** ux-blocks-core + ux-blocks-extended Twig components (L1).
+1. **Look:** `ui_kernel_css()` (L0) + `ux_blocks_core_stylesheet()` (L1 role CSS inline).
+2. **Markup:** ux-blocks-core Twig components (L1).
 3. **Hooks:** `data-ui-profiler-wdt`, `data-ui-profiler-shell`, `data-ui-profiler-collector="{id}"`, etc.
 4. **Archive use:** open a collector in temp **only** to list data fields and behaviors — then close and write fresh Twig.
-5. **Gate:** `GreenfieldMarkupTest` + `CssBudgetTest` + `@group ui-profiler-parity` (PI-3 assertions — no stock class names).
+5. **Gate:** `GreenfieldMarkupTest` + `CssBudgetTest` + `ShellLineBudgetTest` + `@group ui-profiler-parity` (PI-3 assertions — no stock class names).
 
 ## Stack (composer-stack)
 
-`symfinity/ui-kernel` · `symfinity/ux-blocks-core` · `symfinity/ux-blocks-extended` · `symfinity/ui-action` · suggest `symfinity/ux-runtime`
+`symfinity/ui-kernel` · `symfinity/ux-blocks-core` · suggest `symfinity/ux-runtime`
 
 ## Verification
 

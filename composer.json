@@ -1,8 +1,20 @@
 {
     "name": "symfinity/ui-profiler",
-    "description": "UI Kernel Web Profiler chrome — UI Kernel + ux-blocks greenfield (051)",
+    "description": "Web Profiler toolbar and panels rebuilt with UI Kernel and UX Blocks",
     "type": "symfony-bundle",
     "license": "MIT",
+    "homepage": "https://github.com/symfinity/ui-profiler",
+    "support": {
+        "issues": "https://github.com/symfinity/ui-profiler/issues",
+        "source": "https://github.com/symfinity/ui-profiler"
+    },
+    "authors": [
+        {
+            "name": "Symfinity",
+            "email": "dev@symfinity.net",
+            "homepage": "https://symfinity.net/"
+        }
+    ],
     "keywords": [
         "symfony",
         "symfony-bundle",
@@ -18,10 +30,8 @@
         "symfony/http-kernel": "^7.4||^8.0",
         "symfony/twig-bundle": "^7.4||^8.0",
         "symfony/web-profiler-bundle": "^7.4||^8.0",
-        "symfinity/ui-kernel": "@dev",
-        "symfinity/ui-action": "@dev",
-        "symfinity/ux-blocks-core": "@dev",
-        "symfinity/ux-blocks-extended": "@dev",
+        "symfinity/ui-kernel": "^0.2",
+        "symfinity/ux-blocks-core": "^0.1",
         "twig/twig": "^3.0"
     },
     "require-dev": {
@@ -63,21 +73,7 @@
         },
         {
             "type": "path",
-            "url": "../ui-action",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
             "url": "../ux-blocks-core",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "../ux-blocks-extended",
             "options": {
                 "symlink": true
             }

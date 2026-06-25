@@ -14,6 +14,9 @@
         {% block head %}
             {% include '@UiKernel/_head.html.twig' %}
             {{ ui_kernel_css()|raw }}
+            {% if ux_blocks_core_stylesheet is defined %}
+                <style{% if csp_style_nonce is defined and csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>{{ ux_blocks_core_stylesheet()|raw }}</style>
+            {% endif %}
             {% block stylesheets %}{% endblock %}
             {% block javascripts %}{% endblock %}
         {% endblock %}

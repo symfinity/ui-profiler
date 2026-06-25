@@ -7,6 +7,7 @@ namespace Symfinity\UiProfiler\Tests\Unit\DataCollector;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfinity\UiKernel\Contract\Catalog\GraphVariantCatalogPort;
 use Symfinity\UiKernel\Theme\ActiveThemeContext;
 use Symfinity\UiKernel\Theme\ThemePreferenceCookies;
 use Symfinity\UiKernel\Theme\ThemePreferenceResolver;
@@ -24,6 +25,7 @@ final class UiKernelDataCollectorTest extends TestCase
     private ThemePreferenceResolver $resolver;
     private ThemeRegistry $themeRegistry;
     private UrlGeneratorInterface&MockObject $router;
+    private GraphVariantCatalogPort&MockObject $variantCatalog;
 
     protected function setUp(): void
     {
@@ -35,6 +37,9 @@ final class UiKernelDataCollectorTest extends TestCase
             $this->themeRegistry,
         );
         $this->router = $this->createMock(UrlGeneratorInterface::class);
+        $this->variantCatalog = $this->createMock(GraphVariantCatalogPort::class);
+        $this->variantCatalog->method('semanticColorSlugs')->willReturn([]);
+        $this->variantCatalog->method('layerSignature')->willReturn('test');
     }
 
     #[Test]
@@ -146,6 +151,7 @@ final class UiKernelDataCollectorTest extends TestCase
             $this->resolver,
             $this->themeRegistry,
             $this->router,
+            $this->variantCatalog,
         );
     }
 }

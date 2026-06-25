@@ -11,6 +11,7 @@ All notable changes to `symfinity/ui-profiler` are documented here.
 
 ### Changed
 
+- **122** shell delegation (in progress): **820** CSS-body lines (`active_wave` 6, baseline 1908); waves 1–6 budget met via ux-blocks-core injection + selector compression (settings, menu, tabs, filter-bar, header/search, logger/events/time panels); parity 86/86 green.
 - Stabilization pass (**069**): docs aligned to `ui-lab` dogfood; archive `packages/temp/ui-profiler/` removed.
 - Semver branch-alias target `0.1.x-dev` (tag `v0.1.0` at release).
 

@@ -179,7 +179,7 @@
         {% set level_initial_value = initially_selected_priorities == priority_values|length ? 'All' : initially_selected_priorities %}
         {% set initially_selected_channels = filters.channel|filter(value => 'event' != value)|length %}
         {% set channel_initial_value = initially_selected_channels == filters.channel|length ? 'All' : initially_selected_channels %}
-        <div class="log-filters">
+        <div class="log-filters" data-ui-profiler-filter-bar>
             <details id="log-filter-type" class="log-filter">
                 <summary>
                     <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
