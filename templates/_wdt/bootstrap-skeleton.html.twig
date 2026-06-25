@@ -4,8 +4,8 @@
     <div data-ui-profiler-wdt-item data-ui-profiler-collector="request">
         <a class="ui-profiler-wdt__link" href="{{ profiler_url }}"><div data-ui-profiler-wdt-icon><span data-ui-profiler-wdt-ajax-counter>Loading&hellip;</span></div></a>
     </div>
-    <button data-ui-profiler-wdt-toggle type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle Symfony Toolbar">
+    <button data-ui-profiler-wdt-toggle type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle UI Profiler toolbar">
         <i data-ui-profiler-wdt-toggle-icon="open" title="Close Toolbar"></i>
-        <i data-ui-profiler-wdt-toggle-icon="closed" title="Open Toolbar">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
+        <i data-ui-profiler-wdt-toggle-icon="closed" title="Open Toolbar">{{ source('@UiProfiler/Collector/icon.svg') }}</i>
     </button>
 </div>

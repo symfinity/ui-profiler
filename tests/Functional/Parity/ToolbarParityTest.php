@@ -91,6 +91,7 @@ final class ToolbarParityTest extends WebTestCase
         $content = (string) $client->getResponse()->getContent();
 
         self::assertStringContainsString(sprintf('data-theme="%s"', $darkThemeId), $content);
-        self::assertStringContainsString('background:var(--ui-color-surface)', preg_replace('/\s+/', '', $content) ?? $content);
+        $normalized = preg_replace('/\s+/', '', $content) ?? $content;
+        self::assertStringContainsString('var(--ui-color-surface)', $normalized);
     }
 }

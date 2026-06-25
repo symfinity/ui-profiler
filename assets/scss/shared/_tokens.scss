@@ -13,4 +13,6 @@ $profiler-grid-max-width: 75rem;
 
 $profiler-wdt-height: 36px;
 $profiler-wdt-toggle-width: 36px;
-$profiler-wdt-toggle-top-closed: -37px;
+$profiler-wdt-dock-inset: var(--ui-space-md, 1rem);
+$profiler-wdt-dock-bottom: var(--ui-space-sm, 0.5rem);
+$profiler-wdt-toggle-top-closed: -($profiler-wdt-height + 4px);

@@ -2,14 +2,15 @@
 
 [data-ui-profiler-wdt].ui-profiler-wdt {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: $profiler-wdt-dock-inset;
+  right: $profiler-wdt-dock-inset;
+  bottom: $profiler-wdt-dock-bottom;
   z-index: $profiler-z-wdt;
-  background: var(--ui-color-surface);
+  background: color-mix(in srgb, var(--ui-color-surface) 92%, transparent);
   color: var(--ui-color-text);
   font: 11px var(--ui-font-family-sans, system-ui, sans-serif);
   min-height: $profiler-wdt-height;
+  border-radius: var(--ui-radius-lg, 0.5rem) var(--ui-radius-lg, 0.5rem) 0 0;
   box-sizing: border-box;
 
   [data-ui-profiler-wdt-toggle] {
@@ -20,8 +21,8 @@
     width: $profiler-wdt-toggle-width;
     height: $profiler-wdt-height - 1px;
     border: 0;
-    border-radius: 0;
-    background: transparent;
+    border-radius: 0 var(--ui-radius-lg, 0.5rem) 0 0;
+    background: color-mix(in srgb, var(--ui-color-primary) 12%, transparent);
     cursor: pointer;
   }
 }
@@ -37,8 +38,9 @@
   }
 
   &[data-ui-profiler-wdt-state='closed'] [data-ui-profiler-wdt] [data-ui-profiler-wdt-toggle] {
-    background: var(--ui-color-surface-elevated);
-    border-top: 2px solid var(--ui-color-surface-elevated);
+    background: var(--ui-color-primary);
+    border-radius: var(--ui-radius-md, 0.375rem);
+    color: var(--ui-color-surface);
     top: $profiler-wdt-toggle-top-closed;
   }
 }

@@ -1,16 +1,24 @@
 <header data-ui-profiler-header>
     <h1>
-        <twig:Link href="{{ path('_profiler_home') }}" variant="neutral" appearance="ghost">
-            {{ source('@WebProfiler/Icon/symfony.svg') }} Symfony Profiler
-        </twig:Link>
+        <span data-ui-profiler-header-brand>
+            <span data-ui-profiler-header-mark aria-hidden="true">{{ source('@UiProfiler/Collector/icon.svg') }}</span>
+            <span>
+                <span data-ui-profiler-header-eyebrow>Symfinity</span>
+                <twig:Link href="{{ path('_profiler_home') }}" variant="neutral" appearance="ghost">UI Profiler</twig:Link>
+            </span>
+        </span>
     </h1>
 
-    <div class="search" data-ui-role="search-field">
-        <form method="get" action="https://symfony.com/search" target="_blank">
-            <div class="form-row">
-                <input name="q" id="search-id" type="search" data-ui-role="input" placeholder="search on symfony.com" aria-label="Search on symfony.com">
-                <button type="submit" data-ui-sr-only>Search</button>
-            </div>
-        </form>
+    <div data-ui-profiler-header-actions>
+        <twig:Button
+            as="a"
+            href="{{ path('_profiler_search', {limit: 10, type: profile_type|default('request')}) }}"
+            variant="neutral"
+            appearance="outline"
+            size="sm"
+        >
+            {{ source('@WebProfiler/Icon/search.svg') }}
+            Search profiles
+        </twig:Button>
     </div>
 </header>

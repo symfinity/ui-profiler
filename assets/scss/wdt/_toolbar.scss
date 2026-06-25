@@ -55,16 +55,22 @@
 
 [data-ui-profiler-wdt].ui-profiler-wdt {
   @include wdt-toolbar-tokens;
-  background: var(--ui-toolbar-bg);
-  bottom: 0;
-  @include wdt-toolbar-edge-shadow;
+  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--ui-toolbar-bg) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ui-color-border) 75%, var(--ui-color-primary));
+  border-bottom: 0;
+  border-radius: var(--ui-radius-lg, 0.5rem) var(--ui-radius-lg, 0.5rem) 0 0;
+  bottom: $profiler-wdt-dock-bottom;
+  box-shadow:
+    0 -8px 28px color-mix(in srgb, var(--ui-color-text) 10%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--ui-color-primary) 16%, var(--ui-color-surface));
   color: var(--ui-toolbar-fg);
   font: 0.75rem var(--ui-font-family-sans);
-  left: 0;
+  left: $profiler-wdt-dock-inset;
   margin: 0;
   padding: 0 $profiler-wdt-toggle-width 0 0;
   position: fixed;
-  right: 0;
+  right: $profiler-wdt-dock-inset;
   text-align: left;
   z-index: $profiler-z-wdt;
   user-select: none;
@@ -94,10 +100,10 @@
 
   [data-ui-profiler-wdt-toggle] {
     appearance: none;
-    background: var(--ui-toolbar-bg);
+    background: color-mix(in srgb, var(--ui-color-primary) 12%, var(--ui-toolbar-bg));
     border: 0;
-    border-radius: 0;
-    color: var(--ui-toolbar-icon);
+    border-radius: 0 var(--ui-radius-lg, 0.5rem) 0 0;
+    color: var(--ui-color-primary);
     cursor: pointer;
     height: $profiler-wdt-height - 1px;
     margin: 0;
@@ -110,7 +116,7 @@
     width: $profiler-wdt-toggle-width;
 
     &:hover {
-      background: var(--ui-toolbar-hover);
+      background: color-mix(in srgb, var(--ui-color-primary) 20%, var(--ui-toolbar-hover));
     }
   }
 }
@@ -149,11 +155,11 @@
       }
 
       [data-ui-profiler-wdt-toggle] {
-        background: var(--ui-toolbar-hover);
-        border-top: 2px solid var(--ui-toolbar-hover);
-        box-shadow:
-          inset 1px 0 0 color-mix(in srgb, var(--ui-color-text) 12%, var(--ui-color-surface)),
-          0 -1px 0 color-mix(in srgb, var(--ui-color-text) 25%, transparent);
+        background: var(--ui-color-primary);
+        border: 1px solid color-mix(in srgb, var(--ui-color-primary) 70%, var(--ui-color-border));
+        border-radius: var(--ui-radius-md, 0.375rem);
+        box-shadow: 0 6px 18px color-mix(in srgb, var(--ui-color-primary) 35%, transparent);
+        color: var(--ui-color-surface);
         top: $profiler-wdt-toggle-top-closed;
       }
     }
@@ -210,6 +216,7 @@
 
       [data-ui-profiler-wdt-icon] {
         background: var(--ui-toolbar-hover);
+        border-radius: var(--ui-radius-md, 0.375rem);
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
         @include wdt-icon-hover-shadow(true);
@@ -302,9 +309,11 @@
   }
 
   [data-ui-profiler-wdt-status] {
-    background: var(--ui-toolbar-hover);
+    background: color-mix(in srgb, var(--ui-toolbar-hover) 80%, var(--ui-color-surface));
+    border-radius: var(--ui-radius-sm, 0.25rem);
     color: var(--ui-color-surface);
     display: inline-block;
+    font-weight: 600;
     min-width: 15px;
     padding: 3px 6px;
     text-align: center;
