@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# symfinity/ui-profiler — compile author SCSS to committed CSS (114-style pipeline).
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+CHECK=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --check) CHECK=1; shift ;;
+    *) echo "Unknown option: $1" >&2; exit 2 ;;
+  esac
+done
+
+compile_pair() {
+  local scss="$1"
+  local css="$2"
+  if [[ ! -f "$scss" ]]; then
+    echo "Missing author file: $scss" >&2
+    exit 1
+  fi
+  if [[ "$CHECK" -eq 1 ]]; then
+    if [[ ! -f "$css" ]]; then
+      echo "Missing compiled CSS: $css (run bin/profiler-css-compile)" >&2
+      exit 1
+    fi
+    if [[ "$scss" -nt "$css" ]]; then
+      echo "Stale CSS: $css is older than $scss (run bin/profiler-css-compile)" >&2
+      exit 1
+    fi
+    return 0
+  fi
+  npx --yes sass "$scss" "$css" --no-source-map --style=expanded
+  echo "compiled $(basename "$scss") -> $(basename "$css")"
+}
+
+cd "$ROOT"
+
+compile_pair "$ROOT/assets/scss/shell-chrome.scss" "$ROOT/assets/styles/shell-chrome.css"
+compile_pair "$ROOT/assets/scss/wdt-toolbar.scss" "$ROOT/assets/styles/wdt-toolbar.css"
+compile_pair "$ROOT/assets/scss/wdt-critical.scss" "$ROOT/assets/styles/wdt-critical.css"
+
+if [[ "$CHECK" -eq 0 ]]; then
+  echo "profiler-css-compile: OK"
+fi

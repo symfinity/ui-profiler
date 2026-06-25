@@ -80,7 +80,9 @@
         }
     ],
     "scripts": {
-        "test": "phpunit -c phpunit.xml.dist"
+        "test": "phpunit -c phpunit.xml.dist",
+        "scss:compile": "bin/profiler-css-compile",
+        "scss:check": "bin/profiler-css-compile --check"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

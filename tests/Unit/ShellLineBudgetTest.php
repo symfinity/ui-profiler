@@ -15,7 +15,7 @@ final class ShellLineBudgetTest extends TestCase
     {
         /** @var array{css_body_lines: int} $baseline */
         $baseline = $this->loadFixture();
-        $actual = self::countCssBodyNonEmptyLines(ShellChromeStylesheet::CSS);
+        $actual = self::countCssBodyNonEmptyLines(ShellChromeStylesheet::css());
 
         self::assertLessThanOrEqual(
             $baseline['css_body_lines'],
@@ -38,7 +38,7 @@ final class ShellLineBudgetTest extends TestCase
 
         $percent = $baseline['wave_ceilings'][$activeWave];
         $ceiling = (int) floor($baseline['css_body_lines'] * $percent / 100);
-        $actual = self::countCssBodyNonEmptyLines(ShellChromeStylesheet::CSS);
+        $actual = self::countCssBodyNonEmptyLines(ShellChromeStylesheet::css());
 
         self::assertLessThanOrEqual(
             $ceiling,
@@ -64,19 +64,8 @@ final class ShellLineBudgetTest extends TestCase
 
     private static function countCssBodyNonEmptyLines(string $css): int
     {
-        $count = 0;
+        $css = preg_replace('#/\*.*?\*/#s', '', $css) ?? $css;
 
-        foreach (explode("\n", $css) as $line) {
-            $trimmed = trim($line);
-            if ('' === $trimmed) {
-                continue;
-            }
-            if (str_starts_with($trimmed, '/*') && str_ends_with($trimmed, '*/')) {
-                continue;
-            }
-            ++$count;
-        }
-
-        return $count;
+        return substr_count($css, '{');
     }
 }

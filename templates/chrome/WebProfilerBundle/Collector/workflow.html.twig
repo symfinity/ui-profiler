@@ -8,10 +8,10 @@
     {% if collector.callsCount > 0 %}
         {% set icon %}
             {{ source('@WebProfiler/Icon/workflow.svg') }}
-            <span class="sf-toolbar-value">{{ collector.callsCount }}</span>
+            <span data-ui-profiler-wdt-value>{{ collector.callsCount }}</span>
         {% endset %}
         {% set text %}
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Workflow Calls</b>
                 <span>{{ collector.callsCount }}</span>
             </div>
@@ -31,8 +31,7 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="workflow">
-    <h2>Workflow</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Workflow' }) }}
     {% if collector.workflows|length == 0 %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>There are no workflows configured.</p>
@@ -172,10 +171,10 @@
         <div data-ui-profiler-tabs data-ui-role="tabs">
             {% for name, data in collector.workflows %}
                 <div class="tab">
-                    <h2 class="tab-title">{{ name }}{% if data.calls|length %} ({{ data.calls|length }}){% endif %}</h2>
+                    <h2 class="tab-title" data-ui-role="typography" data-ui-variant="h2">{{ name }}{% if data.calls|length %} ({{ data.calls|length }}){% endif %}</h2>
 
                     <div class="tab-content">
-                        <h3>Definition</h3>
+                        <h3 data-ui-role="typography" data-ui-variant="h3">Definition</h3>
                         <pre class="ui-profiler-mermaid" data-ui-profiler-mermaid>
                             {{ data.dump|raw }}
                             {% for nodeId, events in data.listeners %}
@@ -184,7 +183,7 @@
                         </pre>
                         <a href="{{ collector.buildMermaidLiveLink(name) }}">View on mermaid.live</a>
 
-                        <h3>Calls</h3>
+                        <h3 data-ui-role="typography" data-ui-variant="h3">Calls</h3>
                         <table data-ui-role="table">
                             <thead>
                                 <tr>
@@ -199,7 +198,7 @@
                             <tbody>
                                 {% for call in data.calls %}
                                     <tr>
-                                        <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                                        <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-variant="muted" data-ui-wrap="nowrap">{{ loop.index }}</td>
                                         <td>
                                             <code>{{ call.method }}()</code>
                                             {% if call.previousMarking ?? null %}

@@ -1,8 +1,8 @@
-<div id="sfToolbarClearer-{{ token }}" class="sf-toolbar-clearer"></div>
+<div id="sfToolbarClearer-{{ token }}" data-ui-profiler-wdt-clearer></div>
 <div
     id="sfToolbarMainContent-{{ token }}"
-    class="sf-toolbarreset ui-profiler-wdt notranslate clear-fix"
     data-ui-profiler-wdt
+    class="ui-profiler-wdt notranslate"
     data-theme="{{ ui_profiler_toolbar_theme() }}"
     data-no-turbolink
     data-turbo="false"
@@ -23,24 +23,22 @@
         {% endif %}
     {% endfor %}
     {% if full_stack %}
-        <div class="sf-full-stack sf-toolbar-block sf-toolbar-block-full-stack sf-toolbar-status-red sf-toolbar-block-right">
-            <div class="sf-toolbar-icon">
-                <span class="sf-toolbar-value">Using symfony/symfony is NOT supported</span>
+        <div data-ui-profiler-wdt-item data-ui-profiler-collector="full-stack" data-ui-status="danger" data-ui-align="end">
+            <div data-ui-profiler-wdt-icon>
+                <span data-ui-profiler-wdt-value>Using symfony/symfony is NOT supported</span>
             </div>
-            <div class="sf-toolbar-info sf-toolbar-status-red">
+            <div data-ui-profiler-wdt-info data-ui-status="danger">
                 <p>This project is using Symfony via the "symfony/symfony" package.</p>
                 <p>This is NOT supported anymore since Symfony 4.0.</p>
                 <p>Even if it seems to work well, it has some important limitations with no workarounds.</p>
                 <p>Using this package also makes your project slower.</p>
-
                 <strong>Please, stop using this package and replace it with individual packages instead.</strong>
             </div>
-            <div></div>
         </div>
     {% endif %}
 
-    <button class="sf-toolbar-toggle-button" type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle Symfony Toolbar">
-        <i class="sf-toolbar-icon-opened" title="Close Toolbar"></i>
-        <i class="sf-toolbar-icon-closed" title="Open Toolbar">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
+    <button data-ui-profiler-wdt-toggle type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle Symfony Toolbar">
+        <i data-ui-profiler-wdt-toggle-icon="open" title="Close Toolbar"></i>
+        <i data-ui-profiler-wdt-toggle-icon="closed" title="Open Toolbar">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
     </button>
 </div>

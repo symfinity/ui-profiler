@@ -29,10 +29,14 @@ final class WdtBootstrapParityTest extends WebTestCase
         self::assertStringNotContainsString('Sfjs = (function', $content);
         self::assertStringNotContainsString('typeof Sfjs === \'undefined\'', $content);
         self::assertStringContainsString('UiProfilerWdt.boot', $content);
-        self::assertStringContainsString('/_profiler/assets/wdt/index.js', $content);
+        self::assertStringContainsString('/_profiler/assets/js/wdt.js', $content);
 
         $bootstrap = $this->extractToolbarBootstrap($content);
-        self::assertStringContainsString('position:fixed', $bootstrap, 'Critical CSS must style skeleton before toolbar.css loads.');
+        self::assertMatchesRegularExpression(
+            '/position\s*:\s*fixed/',
+            $bootstrap,
+            'Critical CSS must style skeleton before toolbar.css loads.',
+        );
         self::assertLessThanOrEqual(
             self::MAX_BOOTSTRAP_BYTES,
             strlen($bootstrap),
@@ -43,7 +47,7 @@ final class WdtBootstrapParityTest extends WebTestCase
     public function testOwnedWdtScriptRouteReturnsJavaScript(): void
     {
         $client = static::createClient(['debug' => true]);
-        $client->request('GET', '/_profiler/assets/wdt/index.js?v=0');
+        $client->request('GET', '/_profiler/assets/js/wdt.js?v=0');
 
         self::assertResponseIsSuccessful();
         self::assertSame('text/javascript; charset=UTF-8', $client->getResponse()->headers->get('Content-Type'));

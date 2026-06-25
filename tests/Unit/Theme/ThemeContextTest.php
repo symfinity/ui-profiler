@@ -46,7 +46,7 @@ final class ThemeContextTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $context = new ThemeContext($requestStack, $this->activeThemeContext, $this->resolver, null);
+        $context = new ThemeContext($requestStack, $this->activeThemeContext, $this->resolver, $this->registry, null);
 
         self::assertSame($lightId, $context->resolveShellThemeId());
         self::assertSame($darkId, $context->resolveToolbarThemeId());
@@ -64,7 +64,7 @@ final class ThemeContextTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        $context = new ThemeContext($requestStack, $this->activeThemeContext, $this->resolver, $darkId);
+        $context = new ThemeContext($requestStack, $this->activeThemeContext, $this->resolver, $this->registry, $darkId);
 
         self::assertSame($darkId, $context->resolveToolbarThemeId());
     }
@@ -73,8 +73,23 @@ final class ThemeContextTest extends TestCase
     {
         $darkId = ThemeLineageCatalog::pairForLineage('default')['dark'];
 
-        $context = new ThemeContext(new RequestStack(), $this->activeThemeContext, $this->resolver, null);
+        $context = new ThemeContext(new RequestStack(), $this->activeThemeContext, $this->resolver, $this->registry, null);
 
         self::assertSame($darkId, $context->resolveToolbarThemeId());
+    }
+
+    public function testPaintGuardSurfacesResolveKernelSurfaceTokens(): void
+    {
+        $pair = ThemeLineageCatalog::pairForLineage('default');
+        $lightSurface = $this->registry->resolve($pair['light'])->tokens()->all()['--ui-color-surface'];
+        $darkSurface = $this->registry->resolve($pair['dark'])->tokens()->all()['--ui-color-surface'];
+
+        $context = new ThemeContext(new RequestStack(), $this->activeThemeContext, $this->resolver, $this->registry, null);
+
+        self::assertSame(
+            ['light' => $lightSurface, 'dark' => $darkSurface],
+            $context->paintGuardSurfaces('default'),
+        );
+        self::assertNotSame($lightSurface, $darkSurface);
     }
 }

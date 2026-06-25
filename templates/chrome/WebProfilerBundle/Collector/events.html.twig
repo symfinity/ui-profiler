@@ -2,7 +2,7 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootEventsPanel}from'{{ path('ui_profiler_asset', {assetPath: 'panels/events-panel.js', v: ui_profiler_asset_version()}) }}';bootEventsPanel();</script>
+    <script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootEventsPanel}from'{{ path('ui_profiler_asset', {assetPath: 'js/panels/events-panel.js', v: ui_profiler_asset_version()}) }}';bootEventsPanel();</script>
 {% endblock %}
 
 {% block menu %}
@@ -14,8 +14,7 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="events">
-    <h2>Dispatched Events</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Dispatched Events' }) }}
     {% if collector.data is empty %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
@@ -146,7 +145,7 @@
                                 <tbody>
                                     {% for event in dispatcherData.orphaned_events %}
                                         <tr>
-                                            <td class="font-normal">{{ event }}</td>
+                                            <td data-ui-font="sans">{{ event }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -164,7 +163,7 @@
     <table data-ui-role="table">
         <thead>
             <tr>
-                <th class="text-right">Priority</th>
+                <th data-ui-role="typography" data-ui-align="end">Priority</th>
                 <th>Listener</th>
             </tr>
         </thead>
@@ -178,15 +177,15 @@
 
                 <tbody>
                     <tr>
-                        <th colspan="2" class="colored font-normal">{{ listener.event }}</th>
+                        <th colspan="2" class="colored" data-ui-font="sans">{{ listener.event }}</th>
                     </tr>
 
                 {% set previous_event = listener.event %}
             {% endif %}
 
             <tr>
-                <td class="text-right nowrap">{{ listener.priority|default('-') }}</td>
-                <td class="font-normal"><code class="events-listener-name">{{ listener.pretty|trim('"') }}</code></td>
+                <td data-ui-role="typography" data-ui-align="end" data-ui-wrap="nowrap">{{ listener.priority|default('-') }}</td>
+                <td data-ui-font="sans"><code class="events-listener-name">{{ listener.pretty|trim('"') }}</code></td>
             </tr>
 
             {% if loop.last %}

@@ -5,11 +5,11 @@
         </twig:Link>
     </h1>
 
-    <div class="search">
+    <div class="search" data-ui-role="search-field">
         <form method="get" action="https://symfony.com/search" target="_blank">
             <div class="form-row">
-                <input name="q" id="search-id" type="search" placeholder="search on symfony.com" aria-label="Search on symfony.com">
-                <button type="submit" class="visually-hidden">Search</button>
+                <input name="q" id="search-id" type="search" data-ui-role="input" placeholder="search on symfony.com" aria-label="Search on symfony.com">
+                <button type="submit" data-ui-sr-only>Search</button>
             </div>
         </form>
     </div>

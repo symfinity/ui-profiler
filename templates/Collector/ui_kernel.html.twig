@@ -45,19 +45,19 @@
 {% block toolbar %}
     {% set icon %}
         {{ source('@UiProfiler/Collector/icon.svg') }}
-        <span class="sf-toolbar-value">{{ collector.themeId|default('n/a') }}</span>
+        <span data-ui-profiler-wdt-value>{{ collector.themeId|default('n/a') }}</span>
     {% endset %}
 
     {% set text %}
-        <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-piece>
             <b>Theme</b>
             <span>{{ collector.themeId|default('n/a') }}</span>
         </div>
-        <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-piece>
             <b>Lineage</b>
             <span>{{ collector.lineage|default('n/a') }}</span>
         </div>
-        <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-piece>
             <b>Scheme</b>
             <span>{{ collector.scheme|default('n/a') }}</span>
         </div>

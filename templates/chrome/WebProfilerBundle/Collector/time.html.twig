@@ -12,16 +12,16 @@
 
     {% set icon %}
         {{ source('@WebProfiler/Icon/time.svg') }}
-        <span class="sf-toolbar-value">{{ total_time }}</span>
-        <span class="sf-toolbar-label">ms</span>
+        <span data-ui-profiler-wdt-value>{{ total_time }}</span>
+        <span data-ui-profiler-wdt-label>ms</span>
     {% endset %}
 
     {% set text %}
-        <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-piece>
             <b>Total time</b>
             <span>{{ total_time }} ms</span>
         </div>
-        <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-piece>
             <b>Initialization time</b>
             <span>{{ initialization_time }} ms</span>
         </div>
@@ -40,8 +40,7 @@
 {% block panel %}
     <div data-ui-profiler-panel="time">
     {% set has_time_events = collector.events|length > 0 %}
-    <h2>Performance metrics</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Performance metrics' }) }}
     <div data-ui-metrics-grid data-ui-role="grid">
         <div data-ui-role="stat-group">
             {{ include('@UiProfiler/_chrome/partials/profiler-metric-cell.html.twig', {
@@ -82,8 +81,7 @@
         {% endif %}
     </div>
 
-    <h2>Execution timeline</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Execution timeline' }) }}
     {% if not collector.isStopwatchInstalled() %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>The Stopwatch component is not installed. If you want to see timing events, run: <code>composer require symfony/stopwatch</code>.</p>
@@ -103,19 +101,19 @@
         <input type="hidden" name="panel" value="time">
         <label for="threshold">Threshold</label>
         <input type="number" name="threshold" id="threshold" value="1" min="0" placeholder="1.1" data-ui-role="input"> ms
-        <span class="help">(timeline only displays events with a duration longer than this threshold)</span>
+        <span data-ui-role="typography" data-ui-variant="help">(timeline only displays events with a duration longer than this threshold)</span>
     </form>
 
     {% if profile.parent %}
-        <h3 class="dump-inline">
+        <h3 data-ui-role="typography" data-ui-variant="h3" class="dump-inline">
             Sub-{{ profile_type|title }} {{ profiler_dump(profile.getcollector('request').requestattributes.get('_controller')) }}
             <small>
                 {{ collector.events.__section__.duration }} ms
-                <a class="newline" href="{{ path('_profiler', {token: profile.parent.token, panel: 'time'}) }}">Return to parent {{ profile_type }}</a>
+                <a data-ui-display="block" href="{{ path('_profiler', {token: profile.parent.token, panel: 'time'}) }}">Return to parent {{ profile_type }}</a>
             </small>
         </h3>
     {% elseif profile.children|length > 0 %}
-        <h3>
+        <h3 data-ui-role="typography" data-ui-variant="h3">
             Main {{ profile_type|title }} <small>{{ collector.events.__section__.duration }} ms</small>
         </h3>
     {% endif %}
@@ -123,13 +121,13 @@
     {{ _self.display_timeline(token, collector.events, collector.events.__section__.origin) }}
 
     {% if profile.children|length %}
-        <p class="help">Note: sections with a striped background correspond to sub-{{ profile_type }}s.</p>
+        <p data-ui-role="typography" data-ui-variant="help">Note: sections with a striped background correspond to sub-{{ profile_type }}s.</p>
 
-        <h3>Sub-{{ profile_type }}s <small>({{ profile.children|length }})</small></h3>
+        <h3 data-ui-role="typography" data-ui-variant="h3">Sub-{{ profile_type }}s <small>({{ profile.children|length }})</small></h3>
 
         {% for child in profile.children %}
             {% set events = child.getcollector('time').events %}
-            <h4>
+            <h4 data-ui-role="typography" data-ui-variant="h4">
                 <a href="{{ path('_profiler', {token: child.token, panel: 'time'}) }}">{{ child.getcollector('request').identifier }}</a>
                 <small>{{ events.__section__.duration }} ms</small>
             </h4>
@@ -145,7 +143,7 @@
     </pattern>
   </defs>
 </svg>
-<script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootTimePanel}from'{{ path('ui_profiler_asset', {assetPath: 'panels/time-timeline.js', v: ui_profiler_asset_version()}) }}';window.addEventListener('load',()=>bootTimePanel());</script>
+<script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootTimePanel}from'{{ path('ui_profiler_asset', {assetPath: 'js/panels/time-timeline.js', v: ui_profiler_asset_version()}) }}';window.addEventListener('load',()=>bootTimePanel());</script>
 {% endblock %}
 
 {% macro display_timeline(token, events, origin) %}

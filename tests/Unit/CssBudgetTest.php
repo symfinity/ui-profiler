@@ -12,7 +12,7 @@ final class CssBudgetTest extends TestCase
 {
     private const BASELINE_PATH = __DIR__.'/../Fixtures/css-budget-baseline.json';
 
-    public function testDeprecatedCssInventoryDoesNotExceedBaseline(): void
+    public function testCompiledCssInventoryDoesNotExceedBaseline(): void
     {
         /** @var array{files: array<string, int>} $baseline */
         $baseline = json_decode((string) file_get_contents(self::BASELINE_PATH), true, 512, \JSON_THROW_ON_ERROR);
@@ -26,7 +26,7 @@ final class CssBudgetTest extends TestCase
             $lineCount = self::countNonEmptyLines($absolutePath);
             if ($lineCount > $maxLines) {
                 $violations[] = sprintf(
-                    '%s: %d lines (baseline max %d) — shrink or lower baseline in css-budget-baseline.json per css-strangler-migration.md',
+                    '%s: %d lines (baseline max %d) — shrink or lower baseline in css-budget-baseline.json',
                     $relativePath,
                     $lineCount,
                     $maxLines,
@@ -37,56 +37,24 @@ final class CssBudgetTest extends TestCase
         self::assertSame([], $violations);
     }
 
-    public function testExitCapsDocumentedInBaselineFixture(): void
+    public function testExitPolicyIsSassAuthorPipeline(): void
     {
-        /** @var array{exit_caps: array<string, int>, exit_policy?: string} $baseline */
+        /** @var array{exit_policy?: string} $baseline */
         $baseline = json_decode((string) file_get_contents(self::BASELINE_PATH), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertSame('zero_owned_css', $baseline['exit_policy'] ?? null);
-
-        foreach ($baseline['exit_caps'] as $relativePath => $exitCap) {
-            self::assertSame(
-                0,
-                $exitCap,
-                sprintf('Exit cap for %s must be 0 — SC-007 zero owned CSS', $relativePath),
-            );
-        }
+        self::assertSame('sass_author_pipeline', $baseline['exit_policy'] ?? null);
     }
 
-    public function testDeprecatedCssInventoryDoesNotExceedExitCaps(): void
+    public function testOnlyAllowlistedCssExistsUnderAssets(): void
     {
-        /** @var array{exit_caps: array<string, int>} $baseline */
+        /** @var array{files: array<string, int>} $baseline */
         $baseline = json_decode((string) file_get_contents(self::BASELINE_PATH), true, 512, \JSON_THROW_ON_ERROR);
         $packageDir = \dirname(__DIR__, 2);
-        $violations = [];
-
-        foreach ($baseline['exit_caps'] as $relativePath => $exitCap) {
-            $absolutePath = $packageDir.'/'.$relativePath;
-            if (!is_file($absolutePath)) {
-                continue;
-            }
-
-            $lineCount = self::countNonEmptyLines($absolutePath);
-            if ($lineCount > $exitCap) {
-                $violations[] = sprintf(
-                    '%s: %d lines (exit cap %d) — css-strangler-migration SC-007 not met',
-                    $relativePath,
-                    $lineCount,
-                    $exitCap,
-                );
-            }
-        }
-
-        self::assertSame([], $violations);
-    }
-
-    public function testAllAssetsCssFilesMeetZeroExitCap(): void
-    {
-        $assetsDir = \dirname(__DIR__, 2).'/assets';
+        $allowed = array_keys($baseline['files']);
         $violations = [];
 
         $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($assetsDir, \FilesystemIterator::SKIP_DOTS),
+            new \RecursiveDirectoryIterator($packageDir.'/assets', \FilesystemIterator::SKIP_DOTS),
         );
 
         /** @var \SplFileInfo $file */
@@ -95,13 +63,11 @@ final class CssBudgetTest extends TestCase
                 continue;
             }
 
-            $relativePath = 'assets/'.str_replace('\\', '/', substr($file->getPathname(), strlen($assetsDir) + 1));
-            $lineCount = self::countNonEmptyLines($file->getPathname());
-            if ($lineCount > 0) {
+            $relativePath = 'assets/'.str_replace('\\', '/', substr($file->getPathname(), strlen($packageDir.'/assets') + 1));
+            if (!\in_array($relativePath, $allowed, true)) {
                 $violations[] = sprintf(
-                    '%s: %d lines (exit cap 0) — delete file or move styling to UI Kernel + ux-blocks',
+                    '%s: unexpected owned CSS — add to css-budget-baseline.json or remove file',
                     $relativePath,
-                    $lineCount,
                 );
             }
         }
@@ -111,26 +77,41 @@ final class CssBudgetTest extends TestCase
 
     public function testOwnedCssDoesNotDeclareSfPrefixedCustomProperties(): void
     {
-        $packageDir = \dirname(__DIR__, 2).'/assets';
+        $stylesDir = \dirname(__DIR__, 2).'/assets/styles';
         $violations = [];
 
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($packageDir, \FilesystemIterator::SKIP_DOTS),
-        );
-
-        /** @var \SplFileInfo $file */
-        foreach ($iterator as $file) {
-            if (!$file->isFile() || !str_ends_with($file->getPathname(), '.css')) {
-                continue;
-            }
-
-            $contents = (string) file_get_contents($file->getPathname());
+        foreach (glob($stylesDir.'/*.css') ?: [] as $path) {
+            $contents = (string) file_get_contents($path);
             if (preg_match('/--sf-[a-z0-9-]+/i', $contents, $matches)) {
-                $violations[] = str_replace($packageDir.'/', 'assets/', $file->getPathname()).': '.$matches[0];
+                $violations[] = 'assets/styles/'.basename($path).': '.$matches[0];
             }
         }
 
         self::assertSame([], $violations, 'Use --ui-toolbar-* or --ui-profiler-* tokens in owned CSS — not --sf-*.');
+    }
+
+    public function testAuthorScssIsFreshAgainstCompiledCss(): void
+    {
+        /** @var array{author_scss: list<string>} $baseline */
+        $baseline = json_decode((string) file_get_contents(self::BASELINE_PATH), true, 512, \JSON_THROW_ON_ERROR);
+        $packageDir = \dirname(__DIR__, 2);
+        $violations = [];
+
+        foreach ($baseline['author_scss'] as $scssRelative) {
+            $scssPath = $packageDir.'/'.$scssRelative;
+            $cssRelative = preg_replace('#^assets/scss/#', 'assets/styles/', $scssRelative);
+            $cssRelative = preg_replace('#\.scss$#', '.css', (string) $cssRelative);
+            $cssPath = $packageDir.'/'.$cssRelative;
+
+            self::assertFileExists($scssPath, $scssRelative);
+            self::assertFileExists($cssPath, $cssRelative.' — run bin/profiler-css-compile');
+
+            if (filemtime($scssPath) > filemtime($cssPath)) {
+                $violations[] = sprintf('%s is newer than %s', $scssRelative, $cssRelative);
+            }
+        }
+
+        self::assertSame([], $violations, 'Stale compiled CSS — run packages/ui-profiler/bin/profiler-css-compile');
     }
 
     private static function countNonEmptyLines(string $path): int

@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block toolbar %}
+    {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
     {% if 'unknown' == collector.symfonyState %}
         {% set block_status = '' %}
         {% set symfony_version_status = 'Unable to retrieve information about the Symfony version.' %}
@@ -24,23 +25,23 @@
     {% endif %}
 
     {% set icon %}
-        <span class="sf-toolbar-label">
+        <span data-ui-profiler-wdt-label>
             {{ source('@WebProfiler/Icon/symfony.svg') }}
         </span>
-        <span class="sf-toolbar-value">{{ collector.symfonyState is defined ? collector.symfonyversion : 'n/a' }}</span>
+        <span data-ui-profiler-wdt-value>{{ collector.symfonyState is defined ? collector.symfonyversion : 'n/a' }}</span>
     {% endset %}
 
     {% set text %}
         {% if symfony_version_status %}
-            <div class="sf-toolbar-info-group">
-                <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-group>
+                <div data-ui-profiler-wdt-info-piece>
                     <span>{{ symfony_version_status }}</span>
                 </div>
             </div>
         {% endif %}
 
-        <div class="sf-toolbar-info-group">
-            <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-group>
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Profiler token</b>
                 <span>
                     {% if profiler_url %}
@@ -52,29 +53,29 @@
             </div>
 
             {% if collector.runnerClass is defined and collector.runnerClass is not null %}
-                <div class="sf-toolbar-info-piece sf-toolbar-info-runner">
+                <div data-ui-profiler-wdt-info-piece data-ui-profiler-wdt-info-runner>
                     <b>Runner</b>
                     <span>{{ collector.runnerClass|abbr_class }}</span>
                 </div>
             {% endif %}
 
             {% if 'n/a' is not same as(collector.env) %}
-                <div class="sf-toolbar-info-piece">
+                <div data-ui-profiler-wdt-info-piece>
                     <b>Environment</b>
                     <span>{{ collector.env }}</span>
                 </div>
             {% endif %}
 
             {% if 'n/a' is not same as(collector.debug) %}
-                <div class="sf-toolbar-info-piece">
+                <div data-ui-profiler-wdt-info-piece>
                     <b>Debug</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-{{ collector.debug ? 'green' : 'red' }}">{{ collector.debug ? 'enabled' : 'disabled' }}</span>
+                    <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.debug ? 'green' : 'red') }}">{{ collector.debug ? 'enabled' : 'disabled' }}</span>
                 </div>
             {% endif %}
         </div>
 
-        <div class="sf-toolbar-info-group">
-            <div class="sf-toolbar-info-piece sf-toolbar-info-php">
+        <div data-ui-profiler-wdt-info-group>
+            <div data-ui-profiler-wdt-info-piece data-ui-profiler-wdt-info-php>
                 <b>PHP version</b>
                 <span{% if collector.phpversionextra %} title="{{ collector.phpversion ~ collector.phpversionextra }}"{% endif %}>
                     {{ collector.phpversion }}
@@ -82,9 +83,9 @@
                 </span>
             </div>
 
-            <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
+            <div data-ui-profiler-wdt-info-piece data-ui-profiler-wdt-info-php-ext>
                 <b>PHP Extensions</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasXdebug ? 'green' : 'gray' }}">
+                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.hasXdebug ? 'green' : 'gray') }}">
                     {% if collector.hasXdebugInfo %}
                         <a href="{{ path('_profiler_xdebug') }}" title="View xdebug_info()">
                     {% endif %}
@@ -93,19 +94,19 @@
                         </a>
                     {% endif %}
                 </span>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasapcu ? 'green' : 'gray' }}">APCu {{ collector.hasapcu ? '✓' : '✗' }}</span>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.haszendopcache ? 'green' : 'red' }}">OPcache {{ collector.haszendopcache ? '✓' : '✗' }}</span>
+                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.hasapcu ? 'green' : 'gray') }}">APCu {{ collector.hasapcu ? '✓' : '✗' }}</span>
+                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.haszendopcache ? 'green' : 'red') }}">OPcache {{ collector.haszendopcache ? '✓' : '✗' }}</span>
             </div>
 
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>PHP SAPI</b>
                 <span>{{ collector.sapiName }}</span>
             </div>
         </div>
 
-        <div class="sf-toolbar-info-group">
+        <div data-ui-profiler-wdt-info-group>
             {% if collector.symfonyversion is defined %}
-                <div class="sf-toolbar-info-piece">
+                <div data-ui-profiler-wdt-info-piece>
                     <b>Resources</b>
                     <span>
                         <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
@@ -113,7 +114,7 @@
                         </a>
                     </span>
                 </div>
-                <div class="sf-toolbar-info-piece">
+                <div data-ui-profiler-wdt-info-piece>
                     <b>Help</b>
                     <span>
                         <a href="https://symfony.com/support">
@@ -125,7 +126,7 @@
         </div>
     {% endset %}
 
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: true, name: 'config', status: block_status, additional_classes: 'sf-toolbar-block-right'}) }}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: true, name: 'config', status: block_status, align: 'end'}) }}
 {% endblock %}
 
 {% block menu %}
@@ -138,8 +139,7 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="config">
-    <h2>Symfony Configuration</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Symfony Configuration' }) }}
     {% if collector.runnerClass is defined and collector.runnerClass is not null %}
         <div data-ui-metrics-grid data-ui-role="grid">
             {{ ui.metric_cell(collector.runnerClass|abbr_class, 'Runner') }}
@@ -184,8 +184,7 @@
 
     <a class="config-symfony-version-roadmap-link" href="https://symfony.com/releases/{{ collector.symfonyminorversion }}">View Symfony {{ collector.symfonyversion }} release details</a>
 
-    <h2>PHP Configuration</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'PHP Configuration' }) }}
     <div data-ui-metrics-grid data-ui-role="grid">
         <div data-ui-role="stat-group">
             {% set php_version_value %}
@@ -228,7 +227,7 @@
     </p>
 
     {% if collector.bundles %}
-        <h2>Enabled Bundles <small>({{ collector.bundles|length }})</small></h2>
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Enabled Bundles <small>(' ~ collector.bundles|length ~ ')</small>' }) }}
         <table data-ui-role="table">
             <thead>
                 <tr>
@@ -239,8 +238,8 @@
             <tbody>
                 {% for name in collector.bundles|keys|sort %}
                 <tr>
-                    <th scope="row" class="font-normal">{{ name }}</th>
-                    <td class="font-normal">{{ profiler_dump(collector.bundles[name]) }}</td>
+                    <th scope="row" data-ui-font="sans">{{ name }}</th>
+                    <td data-ui-font="sans">{{ profiler_dump(collector.bundles[name]) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

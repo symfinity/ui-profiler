@@ -1,0 +1,44 @@
+@use '../shared/tokens' as *;
+
+[data-ui-profiler-wdt].ui-profiler-wdt {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: $profiler-z-wdt;
+  background: var(--ui-color-surface);
+  color: var(--ui-color-text);
+  font: 11px var(--ui-font-family-sans, system-ui, sans-serif);
+  min-height: $profiler-wdt-height;
+  box-sizing: border-box;
+
+  [data-ui-profiler-wdt-toggle] {
+    appearance: none;
+    position: absolute;
+    right: 0;
+    top: 1px;
+    width: $profiler-wdt-toggle-width;
+    height: $profiler-wdt-height - 1px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+}
+
+[data-ui-profiler-wdt-clearer] {
+  clear: both;
+  height: $profiler-wdt-height;
+}
+
+[data-ui-profiler-wdt-root] {
+  [data-ui-profiler-wdt-toggle] i {
+    font-style: normal;
+  }
+
+  &[data-ui-profiler-wdt-state='closed'] [data-ui-profiler-wdt] [data-ui-profiler-wdt-toggle] {
+    background: var(--ui-color-surface-elevated);
+    border-top: 2px solid var(--ui-color-surface-elevated);
+    top: $profiler-wdt-toggle-top-closed;
+  }
+}

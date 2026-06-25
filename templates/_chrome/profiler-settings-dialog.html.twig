@@ -24,7 +24,7 @@
 
         <twig:Stack gap="sm">
             <strong>Theme</strong>
-            <div data-ui-profiler-settings-picker role="group" aria-label="Theme">
+            <div data-ui-role="button-group" data-ui-variant="picker" data-ui-profiler-settings-picker role="group" aria-label="Theme">
                 <twig:Button
                     as="a"
                     href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'auto'})) }}"
@@ -66,7 +66,7 @@
 
         <twig:Stack gap="sm">
             <strong>Page Width</strong>
-            <div data-ui-profiler-settings-picker role="radiogroup" aria-label="Page width">
+            <div data-ui-role="button-group" data-ui-variant="picker" data-ui-profiler-settings-picker role="radiogroup" aria-label="Page width">
                 <twig:Button
                     type="button"
                     layout="block"

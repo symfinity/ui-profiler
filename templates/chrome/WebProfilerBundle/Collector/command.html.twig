@@ -10,8 +10,8 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="command">
-    <h2>
-        {% set command = collector.command %}
+    {% set command = collector.command %}
+    {% set command_heading %}
         <a href="{{ command.file|file_link(command.line) }}">
             {% if command.executor is defined %}
                 {{ command.executor|abbr_method }}
@@ -19,11 +19,12 @@
                 {{ command.class|abbr_class }}
             {% endif %}
         </a>
-    </h2>
+    {% endset %}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: command_heading }) }}
 
     <div data-ui-profiler-tabs data-ui-role="tabs">
         <div class="tab">
-            <h3 class="tab-title">Command</h3>
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Command</h3>
 
             <div class="tab-content">
                 <div data-ui-metrics-grid data-ui-role="grid">
@@ -44,7 +45,7 @@
                     </div>
                 </div>
 
-                <h3>Arguments</h3>
+                <h3 data-ui-role="typography" data-ui-variant="h3">Arguments</h3>
 
                 {% if collector.arguments is empty %}
                     <div data-ui-role="empty">
@@ -54,7 +55,7 @@
                     {{ include('@WebProfiler/Profiler/table.html.twig', {data: collector.arguments, labels: ['Argument', 'Value'], maxDepth: 2}, with_context: false) }}
                 {% endif %}
 
-                <h3>Options</h3>
+                <h3 data-ui-role="typography" data-ui-variant="h3">Options</h3>
 
                 {% if collector.options is empty %}
                     <div data-ui-role="empty">
@@ -65,9 +66,9 @@
                 {% endif %}
 
                 {% if collector.interactive %}
-                    <h3>Interactive Inputs</h3>
+                    <h3 data-ui-role="typography" data-ui-variant="h3">Interactive Inputs</h3>
 
-                    <p class="help">
+                    <p data-ui-role="typography" data-ui-variant="help">
                         The values which have been set interactively.
                     </p>
 
@@ -80,7 +81,7 @@
                     {% endif %}
                 {% endif %}
 
-                <h3>Application inputs</h3>
+                <h3 data-ui-role="typography" data-ui-variant="h3">Application inputs</h3>
 
                 {% if collector.applicationInputs is empty %}
                     <div data-ui-role="empty">
@@ -93,24 +94,24 @@
         </div>
 
         <div class="tab">
-            <h3 class="tab-title">Input / Output</h3>
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Input / Output</h3>
 
             <div class="tab-content">
                 <table data-ui-role="table">
                     <tr>
-                        <td class="font-normal">Input</td>
-                        <td class="font-normal">{{ profiler_dump(collector.input) }}</td>
+                        <td data-ui-font="sans">Input</td>
+                        <td data-ui-font="sans">{{ profiler_dump(collector.input) }}</td>
                     </tr>
                     <tr>
-                        <td class="font-normal">Output</td>
-                        <td class="font-normal">{{ profiler_dump(collector.output) }}</td>
+                        <td data-ui-font="sans">Output</td>
+                        <td data-ui-font="sans">{{ profiler_dump(collector.output) }}</td>
                     </tr>
                 </table>
             </div>
         </div>
 
         <div class="tab">
-            <h3 class="tab-title">Helper Set</h3>
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Helper Set</h3>
 
             <div class="tab-content">
                 {% if collector.helperSet is empty %}
@@ -138,13 +139,13 @@
 
         <div class="tab">
             {% set request_collector = profile.collectors.request %}
-            <h3 class="tab-title">Server Parameters</h3>
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Server Parameters</h3>
             <div class="tab-content">
-                <h3>Server Parameters</h3>
-                <h4>Defined in .env</h4>
+                <h3 data-ui-role="typography" data-ui-variant="h3">Server Parameters</h3>
+                <h4 data-ui-role="typography" data-ui-variant="h4">Defined in .env</h4>
                 {{ include('@WebProfiler/Profiler/bag.html.twig', {bag: request_collector.dotenvvars}, with_context: false) }}
 
-                <h4>Defined as regular env variables</h4>
+                <h4 data-ui-role="typography" data-ui-variant="h4">Defined as regular env variables</h4>
                 {% set requestserver = [] %}
                 {% for key, value in request_collector.requestserver|filter((_, key) => key not in request_collector.dotenvvars.keys) %}
                     {% set requestserver = requestserver|merge({(key): value}) %}
@@ -155,13 +156,13 @@
 
         {% if collector.signalable is not empty %}
             <div class="tab">
-                <h3 class="tab-title">Signals</h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Signals</h3>
 
                 <div class="tab-content">
-                    <h3>Subscribed signals</h3>
+                    <h3 data-ui-role="typography" data-ui-variant="h3">Subscribed signals</h3>
                     {{ collector.signalable|join(', ') }}
 
-                    <h3>Handled signals</h3>
+                    <h3 data-ui-role="typography" data-ui-variant="h3">Handled signals</h3>
                     {% if collector.handledSignals is empty %}
                         <div data-ui-role="empty">
                             <p>No signals handled</p>
@@ -194,10 +195,10 @@
 
         {% if profile.parent %}
             <div class="tab">
-                <h3 class="tab-title">Parent Command</h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Parent Command</h3>
 
                 <div class="tab-content">
-                    <h3>
+                    <h3 data-ui-role="typography" data-ui-variant="h3">
                         <a href="{{ path('_profiler', {token: profile.parent.token}) }}">Return to parent command</a>
                         <small>(token = {{ profile.parent.token }})</small>
                     </h3>
@@ -209,11 +210,11 @@
 
         {% if profile.children|length %}
             <div class="tab">
-                <h3 class="tab-title">Sub Commands <twig:Badge>{{ profile.children|length }}</twig:Badge></h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Sub Commands <twig:Badge>{{ profile.children|length }}</twig:Badge></h3>
 
                 <div class="tab-content">
                     {% for child in profile.children %}
-                        <h3>
+                        <h3 data-ui-role="typography" data-ui-variant="h3">
                             {{ child.url }}
                             <small>(token = <a href="{{ path('_profiler', {token: child.token}) }}">{{ child.token }}</a>)</small>
                         </h3>

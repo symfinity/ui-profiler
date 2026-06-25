@@ -1,0 +1,20 @@
+@use '../shared/mixins' as *;
+
+[data-ui-profiler-collector-content] {
+  color: var(--ui-color-text);
+  margin: 0 0 1.25rem 0;
+  padding: 1rem;
+
+  [data-ui-role='table'] :is(td, th) :is(.sf-dump, pre.sf-dump, .sf-dump pre.sf-dump) {
+    margin-bottom: 0;
+  }
+}
+
+[data-ui-profiler-empty-panel] {
+  min-height: 400px;
+}
+
+.sf-serializer,
+.sf-validator {
+  margin-bottom: 2em;
+}

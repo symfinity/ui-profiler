@@ -1,0 +1,113 @@
+// ui-profiler consumer — sidebar collector menu rail
+
+[data-ui-role='list'][data-ui-variant='rail'],
+[data-ui-profiler-menu] {
+  border-top: 1px solid var(--ui-color-border);
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  margin: 0;
+  padding: 7px;
+
+  > li {
+    margin-bottom: 0;
+    position: relative;
+
+    &:has([data-ui-profiler-menu-disabled]) {
+      order: 1;
+    }
+
+    + li {
+      margin-top: 4px;
+    }
+
+    a:hover {
+      text-decoration: none;
+    }
+
+    &.selected {
+      &::before {
+        background: var(--ui-color-primary);
+        border-radius: 6px;
+        content: '';
+        height: 28px;
+        left: -8px;
+        position: absolute;
+        top: calc(50% - 14px);
+        width: 4px;
+      }
+
+      a [data-ui-profiler-menu-label] {
+        background: var(--ui-color-surface-elevated);
+        color: var(--ui-color-primary);
+      }
+
+      a [data-ui-profiler-menu-icon] svg,
+      a [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg {
+        color: var(--ui-color-primary);
+      }
+    }
+
+    a:hover {
+      [data-ui-profiler-menu-label]:not([data-ui-profiler-menu-disabled]) {
+        background: var(--ui-color-surface-elevated);
+        color: var(--ui-color-primary);
+      }
+
+      [data-ui-profiler-menu-icon] svg {
+        color: var(--ui-color-primary);
+      }
+
+      [data-ui-profiler-menu-label][data-ui-profiler-menu-disabled] {
+        background: transparent;
+        color: var(--ui-color-text-muted);
+      }
+
+      [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg {
+        color: var(--ui-color-border);
+      }
+    }
+  }
+}
+
+[data-ui-profiler-menu-icon] {
+  color: var(--ui-color-text-muted);
+  display: flex;
+  margin-right: 0.25rem;
+  text-align: center;
+
+  :is(img, svg) {
+    height: 24px;
+    max-width: 24px;
+  }
+}
+
+[data-ui-profiler-menu-label] {
+  align-items: center;
+  background: transparent;
+  border-radius: 4px;
+  color: var(--ui-color-text);
+  display: flex;
+  gap: 0.5rem;
+  overflow: hidden;
+  padding: 5px 7px;
+
+  strong {
+    flex: 1;
+    font-size: var(--ui-font-size-md);
+    font-weight: 500;
+  }
+
+  &[data-ui-profiler-menu-disabled] {
+    &,
+    strong,
+    [data-ui-profiler-menu-icon] {
+      color: var(--ui-color-text-muted);
+      font-weight: normal;
+    }
+
+    [data-ui-profiler-menu-icon] {
+      color: var(--ui-color-border);
+    }
+  }
+}

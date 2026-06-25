@@ -104,7 +104,7 @@
                             </div>
 
                             {% if templates is defined %}
-                                <ul id="menu-profiler" data-ui-profiler-menu data-ui-role="list" data-ui-fragment="blocks.list">
+                                <ul id="menu-profiler" data-ui-profiler-menu data-ui-role="list" data-ui-variant="rail" data-ui-fragment="blocks.list">
                                     {% if 'request' is same as(profile_type) %}
                                         {% set excludes = ['command'] %}
                                     {% elseif 'command' is same as(profile_type) %}

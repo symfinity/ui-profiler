@@ -1,5 +1,5 @@
 {# Shared toolbar metric row for collector badges. #}
-<div class="ui-profiler-wdt__metric" data-ui-profiler-metric>
+<div data-ui-profiler-wdt-info-piece>
     <b>{{ label }}</b>
-    <span{% if status_class is defined %} class="{{ status_class }}"{% endif %}>{{ value }}</span>
+    <span data-ui-profiler-wdt-status{% if variant is defined %} data-ui-variant="{{ variant }}"{% endif %}>{{ value }}</span>
 </div>

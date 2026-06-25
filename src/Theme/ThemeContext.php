@@ -8,6 +8,7 @@ use Symfinity\UiKernel\Theme\ActiveThemeContext;
 use Symfinity\UiKernel\Theme\ThemeLineageCatalog;
 use Symfinity\UiKernel\Theme\ThemePreference;
 use Symfinity\UiKernel\Theme\ThemePreferenceResolver;
+use Symfinity\UiKernel\Theme\ThemeRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -22,6 +23,7 @@ final class ThemeContext
         private readonly RequestStack $requestStack,
         private readonly ActiveThemeContext $activeThemeContext,
         private readonly ThemePreferenceResolver $preferenceResolver,
+        private readonly ThemeRegistry $themeRegistry,
         private readonly ?string $toolbarThemeOverride,
     ) {
     }
@@ -66,5 +68,28 @@ final class ThemeContext
     public function lineagePairs(): array
     {
         return ThemeLineageCatalog::pairs();
+    }
+
+    /**
+     * Blocking paint-guard colors — resolved from ui-kernel --ui-color-surface per lineage pair.
+     *
+     * @return array{light: string, dark: string}
+     */
+    public function paintGuardSurfaces(?string $lineage = null): array
+    {
+        $lineage ??= $this->preference()->lineage;
+        $pair = ThemeLineageCatalog::pairForLineage($lineage);
+
+        return [
+            'light' => $this->surfaceColorForThemeId($pair['light']),
+            'dark' => $this->surfaceColorForThemeId($pair['dark']),
+        ];
+    }
+
+    private function surfaceColorForThemeId(string $themeId): string
+    {
+        $tokens = $this->themeRegistry->resolve($themeId)->tokens()->all();
+
+        return $tokens['--ui-color-surface'];
     }
 }

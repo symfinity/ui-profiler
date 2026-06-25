@@ -10,17 +10,18 @@
         {% set icon %}
             {{ source('@WebProfiler/Icon/http-client.svg') }}
             {% set status_color = '' %}
-            <span class="sf-toolbar-value">{{ collector.requestCount }}</span>
+            <span data-ui-profiler-wdt-value>{{ collector.requestCount }}</span>
         {% endset %}
 
         {% set text %}
-            <div class="sf-toolbar-info-piece">
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Total requests</b>
                 <span>{{ collector.requestCount }}</span>
             </div>
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>HTTP errors</b>
-                <span class="sf-toolbar-status {{ collector.errorCount > 0 ? 'sf-toolbar-status-red' }}">{{ collector.errorCount }}</span>
+                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.errorCount > 0 ? 'red' : 'none') }}">{{ collector.errorCount }}</span>
             </div>
         {% endset %}
 
@@ -39,7 +40,7 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="http_client">
-    <h2>HTTP Client</h2>
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'HTTP Client' }) }}
     {% if collector.requestCount == 0 %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>No HTTP requests were made.</p>
@@ -51,18 +52,18 @@
                 {{ ui.metric_cell(collector.errorCount, 'HTTP errors') }}
             </div>
         </div>
-        <h2>Clients</h2>
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Clients' }) }}
         <div data-ui-profiler-tabs data-ui-role="tabs">
             {% for name, client in collector.clients %}
                 <div class="tab {{ client.traces|length == 0 ? 'disabled' }}">
-                    <h3 class="tab-title">{{ name }} <twig:Badge>{{ client.traces|length }}</twig:Badge></h3>
+                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ name }} <twig:Badge>{{ client.traces|length }}</twig:Badge></h3>
                     <div class="tab-content">
                         {% if client.traces|length == 0 %}
                             <div data-ui-role="empty">
                                 <p>No requests were made with the "{{ name }}" service.</p>
                             </div>
                         {% else %}
-                            <h4>Requests</h4>
+                            <h4 data-ui-role="typography" data-ui-variant="h4">Requests</h4>
                             {% for trace in client.traces %}
                                 {% set profiler_token = '' %}
                                 {% set profiler_link = '' %}
@@ -82,7 +83,7 @@
                                         <th>
                                             <span class="http-method">{{ trace.method }}</span>
                                         </th>
-                                        <th class="full-width">
+                                        <th data-ui-width="full">
                                             {{ trace.url }}
                                         </th>
                                         {% if profiler_token and profiler_link %}
@@ -92,7 +93,7 @@
                                         {% endif %}
                                         {% if trace.curlCommand is defined and trace.curlCommand %}
                                             <th>
-                                                <twig:Button size="sm" class="hidden" title="Copy as cURL" data-clipboard-text="{{ trace.curlCommand }}">Copy as cURL</twig:Button>
+                                                <twig:Button size="sm" hidden title="Copy as cURL" data-clipboard-text="{{ trace.curlCommand }}">Copy as cURL</twig:Button>
                                             </th>
                                         {% endif %}
                                     </tr>
@@ -100,12 +101,12 @@
                                     <tbody>
                                     {% if trace.options is not empty %}
                                         <tr>
-                                            <th class="font-normal">Request options</th>
+                                            <th data-ui-font="sans">Request options</th>
                                             <td>{{ profiler_dump(trace.options, maxDepth: 1) }}</td>
                                         </tr>
                                     {% endif %}
                                     <tr>
-                                        <th class="font-normal">Response</th>
+                                        <th data-ui-font="sans">Response</th>
                                         <td{% if trace.curlCommand is defined and trace.curlCommand %} colspan="2"{% endif %}>
                                             {% if trace.http_code >= 500 %}
                                                 {% set responseStatus = 'error' %}
@@ -114,9 +115,7 @@
                                             {% else %}
                                                 {% set responseStatus = 'success' %}
                                             {% endif %}
-                                            <span class="font-normal status-response-status-code status-{{ responseStatus }}">
-                                                {{ trace.http_code }}
-                                            </span>
+                                            <twig:Badge variant="{{ responseStatus == 'error' ? 'danger' : (responseStatus == 'warning' ? 'warning' : 'success') }}">{{ trace.http_code }}</twig:Badge>
 
                                             {{ profiler_dump(trace.info, maxDepth: 1) }}
                                         </td>

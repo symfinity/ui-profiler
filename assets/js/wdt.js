@@ -32,18 +32,18 @@ function createAjaxRuntime(config, callbacks) {
     const excludedPattern = new RegExp(config.excludedAjaxPaths);
 
     const renderAjaxRequests = () => {
-        const requestCounter = document.querySelector('.sf-toolbar-ajax-request-counter');
+        const requestCounter = document.querySelector('[data-ui-profiler-wdt-ajax-counter]');
         if (!requestCounter) {
             return;
         }
         requestCounter.textContent = String(requestStack.length);
 
-        const infoSpan = document.querySelector('.sf-toolbar-ajax-info');
+        const infoSpan = document.querySelector('[data-ui-profiler-wdt-ajax-info]');
         if (infoSpan) {
             infoSpan.textContent = requestStack.length + ' AJAX request' + (1 !== requestStack.length ? 's' : '');
         }
 
-        const ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
+        const ajaxToolbarPanel = document.querySelector('[data-ui-profiler-wdt-item][data-ui-profiler-collector="ajax"]');
         if (!ajaxToolbarPanel) {
             return;
         }
@@ -55,18 +55,18 @@ function createAjaxRuntime(config, callbacks) {
         }
 
         if (pendingRequests > 0) {
-            addClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
+            ajaxToolbarPanel.setAttribute('data-ajax-state', 'loading');
         } else if (successStreak < 4) {
-            addClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
-            removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
+            ajaxToolbarPanel.setAttribute('data-ui-status', 'danger');
+            ajaxToolbarPanel.removeAttribute('data-ajax-state');
         } else {
-            removeClass(ajaxToolbarPanel, 'sf-ajax-request-loading');
-            removeClass(ajaxToolbarPanel, 'sf-toolbar-status-red');
+            ajaxToolbarPanel.removeAttribute('data-ajax-state');
+            ajaxToolbarPanel.removeAttribute('data-ui-status');
         }
     };
 
     const startAjaxRequest = (index) => {
-        const tbody = document.querySelector('.sf-toolbar-ajax-request-list');
+        const tbody = document.querySelector('[data-ui-profiler-wdt-ajax-list]');
         if (!tbody) {
             return;
         }
@@ -98,12 +98,14 @@ function createAjaxRuntime(config, callbacks) {
 
         const statusCodeCell = document.createElement('td');
         const statusCode = document.createElement('span');
+        statusCode.setAttribute('data-ui-profiler-wdt-status', '');
+        statusCode.setAttribute('data-ui-variant', 'neutral');
         statusCode.textContent = 'n/a';
         statusCodeCell.appendChild(statusCode);
         row.appendChild(statusCodeCell);
 
         const pathCell = document.createElement('td');
-        pathCell.className = 'sf-ajax-request-url';
+        pathCell.setAttribute('data-ui-profiler-wdt-ajax-url', '');
         if ('GET' === request.method) {
             const pathLink = document.createElement('a');
             pathLink.setAttribute('href', request.url);
@@ -116,7 +118,7 @@ function createAjaxRuntime(config, callbacks) {
         row.appendChild(pathCell);
 
         const durationCell = document.createElement('td');
-        durationCell.className = 'sf-ajax-request-duration';
+        durationCell.setAttribute('data-ui-profiler-wdt-ajax-duration', '');
         durationCell.textContent = 'n/a';
         row.appendChild(durationCell);
 
@@ -124,10 +126,10 @@ function createAjaxRuntime(config, callbacks) {
             durationCell.textContent = `${new Date() - request.start} ms`;
         }, 100);
 
-        row.className = 'sf-ajax-request sf-ajax-request-loading';
+        row.setAttribute('data-ajax-state', 'loading');
         tbody.insertBefore(row, null);
 
-        const toolbarInfo = document.querySelector('.sf-toolbar-block-ajax .sf-toolbar-info');
+        const toolbarInfo = document.querySelector('[data-ui-profiler-collector="ajax"] [data-ui-profiler-wdt-info]');
         if (toolbarInfo) {
             toolbarInfo.scrollTop = toolbarInfo.scrollHeight;
         }
@@ -167,25 +169,29 @@ function createAjaxRuntime(config, callbacks) {
         const durationCell = row.children[6];
 
         if (request.error) {
-            row.className = 'sf-ajax-request sf-ajax-request-error';
-            methodCell.className = 'sf-ajax-request-error';
+            row.setAttribute('data-ajax-state', 'error');
+            methodCell.setAttribute('data-ajax-state', 'error');
             successStreak = 0;
         } else {
-            row.className = 'sf-ajax-request sf-ajax-request-ok';
+            row.setAttribute('data-ajax-state', 'ok');
             successStreak++;
         }
 
         if (request.statusCode) {
             if (request.statusCode < 300) {
-                statusCodeElem.setAttribute('class', 'sf-toolbar-status');
+                statusCodeElem.setAttribute('data-ui-profiler-wdt-status', '');
+                statusCodeElem.setAttribute('data-ui-variant', 'neutral');
             } else if (request.statusCode < 400) {
-                statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-yellow');
+                statusCodeElem.setAttribute('data-ui-profiler-wdt-status', '');
+                statusCodeElem.setAttribute('data-ui-variant', 'warning');
             } else {
-                statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
+                statusCodeElem.setAttribute('data-ui-profiler-wdt-status', '');
+                statusCodeElem.setAttribute('data-ui-variant', 'danger');
             }
             statusCodeElem.textContent = String(request.statusCode);
         } else {
-            statusCodeElem.setAttribute('class', 'sf-toolbar-status sf-toolbar-status-red');
+            statusCodeElem.setAttribute('data-ui-profiler-wdt-status', '');
+            statusCodeElem.setAttribute('data-ui-variant', 'danger');
         }
 
         if (request.duration) {
@@ -357,35 +363,35 @@ function createAjaxRuntime(config, callbacks) {
 
     const wireToolbarAjaxUi = (token) => {
         renderAjaxRequests();
-        const clearButton = document.querySelector('.sf-toolbar-ajax-clear');
+        const clearButton = document.querySelector('[data-ui-profiler-wdt-ajax-clear]');
         if (clearButton) {
             addEventListener(clearButton, 'click', () => {
                 requestStack.length = 0;
                 renderAjaxRequests();
                 successStreak = 4;
-                const list = document.querySelector('.sf-toolbar-ajax-request-list');
+                const list = document.querySelector('[data-ui-profiler-wdt-ajax-list]');
                 if (list) {
                     list.innerHTML = '';
                 }
             });
         }
-        const ajaxBlock = document.querySelector('.sf-toolbar-block-ajax');
+        const ajaxBlock = document.querySelector('[data-ui-profiler-wdt-item][data-ui-profiler-collector="ajax"]');
         if (ajaxBlock) {
             addEventListener(ajaxBlock, 'mouseenter', () => {
-                const elem = document.querySelector('.sf-toolbar-block-ajax .sf-toolbar-info');
+                const elem = document.querySelector('[data-ui-profiler-collector="ajax"] [data-ui-profiler-wdt-info]');
                 if (elem) {
                     elem.scrollTop = elem.scrollHeight;
                 }
             });
-            const icon = document.querySelector('.sf-toolbar-block-ajax > .sf-toolbar-icon');
+            const icon = document.querySelector('[data-ui-profiler-collector="ajax"] > [data-ui-profiler-wdt-icon]');
             if (icon) {
                 addEventListener(icon, 'click', (event) => {
                     event.preventDefault();
-                    icon.parentNode.classList.toggle('hover');
+                    ajaxBlock.toggleAttribute('data-ui-hover');
                 });
             }
         }
-        const dumpInfo = document.querySelector('.sf-toolbar-block-dump .sf-toolbar-info');
+        const dumpInfo = document.querySelector('[data-ui-profiler-collector="dump"] [data-ui-profiler-wdt-info]');
         if (null !== dumpInfo) {
             addEventListener(dumpInfo, 'sfbeforedumpcollapse', () => {
                 dumpInfo.style.minHeight = `${dumpInfo.getBoundingClientRect().height}px`;
@@ -520,20 +526,23 @@ export class UiProfilerWdt {
 
     showToolbar(token) {
         const sfwdt = this.getSfwdt(token);
+        const root = document.getElementById(`sfTB-${token}`);
         const toggleButton = document.querySelector(`#sfToolbarToggleButton-${token}`);
         if (!sfwdt || !sfwdt.parentNode) {
             return;
         }
 
         if ('closed' === this.getPreference('toolbar/displayState')) {
-            addClass(sfwdt.parentNode, 'sf-toolbar-closed');
-            removeClass(sfwdt.parentNode, 'sf-toolbar-opened');
+            if (root) {
+                root.setAttribute('data-ui-profiler-wdt-state', 'closed');
+            }
             if (toggleButton) {
                 toggleButton.setAttribute('aria-expanded', 'false');
             }
         } else {
-            addClass(sfwdt.parentNode, 'sf-toolbar-opened');
-            removeClass(sfwdt.parentNode, 'sf-toolbar-closed');
+            if (root) {
+                root.setAttribute('data-ui-profiler-wdt-state', 'open');
+            }
             if (toggleButton) {
                 toggleButton.setAttribute('aria-expanded', 'true');
             }
@@ -542,12 +551,14 @@ export class UiProfilerWdt {
 
     hideToolbar(token) {
         const sfwdt = this.getSfwdt(token);
+        const root = document.getElementById(`sfTB-${token}`);
         const toggleButton = document.querySelector(`#sfToolbarToggleButton-${token}`);
         if (!sfwdt || !sfwdt.parentNode) {
             return;
         }
-        addClass(sfwdt.parentNode, 'sf-toolbar-closed');
-        removeClass(sfwdt.parentNode, 'sf-toolbar-opened');
+        if (root) {
+            root.setAttribute('data-ui-profiler-wdt-state', 'closed');
+        }
         if (toggleButton) {
             toggleButton.setAttribute('aria-expanded', 'false');
         }
@@ -570,10 +581,10 @@ export class UiProfilerWdt {
     }
 
     positionToolbarBlocks(el) {
-        const toolbarBlocks = [...el.querySelectorAll('.sf-toolbar-block')];
+        const toolbarBlocks = [...el.querySelectorAll('[data-ui-profiler-wdt-item]')];
         for (const block of toolbarBlocks) {
             block.onmouseover = function () {
-                const toolbarInfo = this.querySelectorAll('.sf-toolbar-info')[0];
+                const toolbarInfo = this.querySelector('[data-ui-profiler-wdt-info]');
                 if (!toolbarInfo) {
                     return;
                 }
@@ -623,12 +634,15 @@ export class UiProfilerWdt {
             return;
         }
         sfwdt.innerHTML = `
-            <div class="sf-toolbarreset notranslate">
-                <div class="sf-toolbar-icon"><svg width="26" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 26 28" enable-background="new 0 0 26 28" xml:space="preserve"><path fill="currentColor" d="M13 0C5.8 0 0 5.8 0 13c0 7.2 5.8 13 13 13c7.2 0 13-5.8 13-13C26 5.8 20.2 0 13 0z M20 7.5 c-0.6 0-1-0.3-1-0.9c0-0.2 0-0.4 0.2-0.6c0.1-0.3 0.2-0.3 0.2-0.4c0-0.3-0.5-0.4-0.7-0.4c-2 0.1-2.5 2.7-2.9 4.8l-0.2 1.1 c1.1 0.2 1.9 0 2.4-0.3c0.6-0.4-0.2-0.8-0.1-1.3C18 9.2 18.4 9 18.7 8.9c0.5 0 0.8 0.5 0.8 1c0 0.8-1.1 2-3.3 1.9 c-0.3 0-0.5 0-0.7-0.1L15 14.1c-0.4 1.7-0.9 4.1-2.6 6.2c-1.5 1.8-3.1 2.1-3.8 2.1c-1.3 0-2.1-0.6-2.2-1.6c0-0.9 0.8-1.4 1.3-1.4 c0.7 0 1.2 0.5 1.2 1.1c0 0.5-0.2 0.6-0.4 0.7c-0.1 0.1-0.3 0.2-0.3 0.4c0 0.1 0.1 0.3 0.4 0.3c0.5 0 0.9-0.3 1.2-0.5 c1.3-1 1.7-2.9 2.4-6.2l0.1-0.8c0.2-1.1 0.5-2.3 0.8-3.5c-0.9-0.7-1.4-1.5-2.6-1.8c-0.8-0.2-1.3 0-1.7 0.4C8.4 10 8.6 10.7 9 11.1 l0.7 0.7c0.8 0.9 1.3 1.7 1.1 2.7c-0.3 1.6-2.1 2.8-4.3 2.1c-1.9-0.6-2.2-1.9-2-2.7c0.2-0.6 0.7-0.8 1.2-0.6 c0.5 0.2 0.7 0.8 0.6 1.3c0 0.1 0 0.1-0.1 0.3C6 15 5.9 15.2 5.9 15.3c-0.1 0.4 0.4 0.7 0.8 0.8c0.8 0.3 1.7-0.2 1.9-0.9 c0.2-0.6-0.2-1.1-0.4-1.2l-0.8-0.9c-0.4-0.4-1.2-1.5-0.8-2.8c0.2-0.5 0.5-1 0.9-1.4c1-0.7 2-0.8 3-0.6c1.3 0.4 1.9 1.2 2.8 1.9 c0.5-1.3 1.1-2.6 2-3.8c0.9-1 2-1.7 3.3-1.8C20 4.8 21 5.4 21 6.3C21 6.7 20.8 7.5 20 7.5z"/></svg></div>
+            <div data-ui-profiler-wdt class="ui-profiler-wdt notranslate">
+                <div data-ui-profiler-wdt-icon><svg width="26" height="28" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 26 28" enable-background="new 0 0 26 28" xml:space="preserve"><path fill="currentColor" d="M13 0C5.8 0 0 5.8 0 13c0 7.2 5.8 13 13 13c7.2 0 13-5.8 13-13C26 5.8 20.2 0 13 0z M20 7.5 c-0.6 0-1-0.3-1-0.9c0-0.2 0-0.4 0.2-0.6c0.1-0.3 0.2-0.3 0.2-0.4c0-0.3-0.5-0.4-0.7-0.4c-2 0.1-2.5 2.7-2.9 4.8l-0.2 1.1 c1.1 0.2 1.9 0 2.4-0.3c0.6-0.4-0.2-0.8-0.1-1.3C18 9.2 18.4 9 18.7 8.9c0.5 0 0.8 0.5 0.8 1c0 0.8-1.1 2-3.3 1.9 c-0.3 0-0.5 0-0.7-0.1L15 14.1c-0.4 1.7-0.9 4.1-2.6 6.2c-1.5 1.8-3.1 2.1-3.8 2.1c-1.3 0-2.1-0.6-2.2-1.6c0-0.9 0.8-1.4 1.3-1.4 c0.7 0 1.2 0.5 1.2 1.1c0 0.5-0.2 0.6-0.4 0.7c-0.1 0.1-0.3 0.2-0.3 0.4c0 0.1 0.1 0.3 0.4 0.3c0.5 0 0.9-0.3 1.2-0.5 c1.3-1 1.7-2.9 2.4-6.2l0.1-0.8c0.2-1.1 0.5-2.3 0.8-3.5c-0.9-0.7-1.4-1.5-2.6-1.8c-0.8-0.2-1.3 0-1.7 0.4C8.4 10 8.6 10.7 9 11.1 l0.7 0.7c0.8 0.9 1.3 1.7 1.1 2.7c-0.3 1.6-2.1 2.8-4.3 2.1c-1.9-0.6-2.2-1.9-2-2.7c0.2-0.6 0.7-0.8 1.2-0.6 c0.5 0.2 0.7 0.8 0.6 1.3c0 0.1 0 0.1-0.1 0.3C6 15 5.9 15.2 5.9 15.3c-0.1 0.4 0.4 0.7 0.8 0.8c0.8 0.3 1.7-0.2 1.9-0.9 c0.2-0.6-0.2-1.1-0.4-1.2l-0.8-0.9c-0.4-0.4-1.2-1.5-0.8-2.8c0.2-0.5 0.5-1 0.9-1.4c1-0.7 2-0.8 3-0.6c1.3 0.4 1.9 1.2 2.8 1.9 c0.5-1.3 1.1-2.6 2-3.8c0.9-1 2-1.7 3.3-1.8C20 4.8 21 5.4 21 6.3C21 6.7 20.8 7.5 20 7.5z"/></svg></div>
                 An error occurred while loading the web debug toolbar. <a href="${this.config.profilerHomeUrl}${newToken}">Open the web profiler.</a>
             </div>
         `;
-        sfwdt.parentElement.setAttribute('class', 'sf-toolbar sf-error-toolbar');
+        const root = sfwdt.parentElement;
+        if (root) {
+            root.classList.add('ui-profiler-wdt--error');
+        }
     }
 
     loadToolbar(token, newToken) {
@@ -672,7 +686,7 @@ export class UiProfilerWdt {
                     toolbarContent.parentElement.id = `sfwdt${newToken}`;
                 }
 
-                el.style.display = -1 !== xhr.responseText.indexOf('sf-toolbarreset') ? 'block' : 'none';
+                el.style.display = -1 !== xhr.responseText.indexOf('data-ui-profiler-wdt') ? 'block' : 'none';
                 if ('none' === el.style.display) {
                     return;
                 }

@@ -73,7 +73,7 @@ final class ToolbarParityTest extends WebTestCase
         self::assertStringContainsString(sprintf('[data-theme="%s"]', $darkThemeId), $styles);
         self::assertStringContainsString('--ui-toolbar-bg: var(--ui-color-surface)', $styles);
         self::assertStringContainsString('font-style: normal', $styles);
-        self::assertStringContainsString('.sf-toolbar.sf-toolbar-closed .sf-toolbarreset .sf-toolbar-toggle-button', $styles);
+        self::assertStringContainsString('[data-ui-profiler-wdt-root][data-ui-profiler-wdt-state=closed]', $styles);
         self::assertStringNotContainsString('--ui-toolbar-bg: var(--ui-color-text)', $styles);
         self::assertStringNotContainsString('#262626', $styles);
     }

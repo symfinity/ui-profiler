@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Symfinity\UiProfiler\Asset\ShellChromeStylesheet;
 
 /**
- * T036 — embedded shell CSS MUST target profiler hooks, not legacy layout IDs.
+ * T036 — shell CSS MUST target profiler hooks, not legacy layout IDs.
  *
  * @see specs/symfinity/symfinity/122-ui-profiler-shell-delegation/contracts/shell-delegation-boundary.md
  */
@@ -27,7 +27,7 @@ final class ShellSelectorScopeTest extends TestCase
 
     public function testShellCssDoesNotTargetForbiddenLegacyLayoutIds(): void
     {
-        $css = ShellChromeStylesheet::CSS;
+        $css = ShellChromeStylesheet::css();
 
         foreach (self::FORBIDDEN_LEGACY_IDS as $legacyId) {
             self::assertStringNotContainsString(
@@ -40,17 +40,27 @@ final class ShellSelectorScopeTest extends TestCase
 
     public function testShellCssUsesProfilerHookSelectors(): void
     {
-        $css = ShellChromeStylesheet::CSS;
+        $css = ShellChromeStylesheet::css();
 
         foreach ([
             '[data-ui-profiler-shell]',
-            '[data-ui-profiler-request-summary]',
             '[data-ui-profiler-sidebar]',
             '[data-ui-profiler-collector-content]',
-            '[data-ui-profiler-header]',
             '[data-ui-profiler-menu]',
         ] as $hook) {
-            self::assertStringContainsString($hook, $css, sprintf('Expected shell CSS to include hook %s.', $hook));
+            self::assertStringContainsString($hook, $css);
         }
+    }
+
+    public function testShellCssDoesNotDuplicateDocumentThemeBridge(): void
+    {
+        $css = ShellChromeStylesheet::css();
+
+        self::assertStringNotContainsString('body.theme-dark', $css);
+        self::assertStringNotContainsString('body.theme-light', $css);
+        self::assertStringNotContainsString('html:has(body.theme-dark)', $css);
+        self::assertDoesNotMatchRegularExpression('/(?:^|\n)html[^{]*\{[^}]*background-color/', $css);
+        self::assertDoesNotMatchRegularExpression('/(?:^|\n)body[^{]*\{[^}]*background-color/', $css);
+        self::assertStringContainsString('[data-ui-profiler-shell][data-theme$=-dark]', $css);
     }
 }

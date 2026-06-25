@@ -25,6 +25,10 @@ services:
         tags:
             - { name: twig.extension }
 
+    Symfinity\UiProfiler\Css\ProfilerCssProvider:
+        arguments:
+            $packageDir: '%ui_profiler.bundle_path%'
+
     Symfinity\UiProfiler\Menu\ProfilerMenuRegistry:
         arguments:
             $entries: []

@@ -10,19 +10,19 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Serves owned profiler JS under /_profiler/assets/* — avoids AssetMapper 404 in dogfood/dev.
+ * Serves owned profiler ES modules under /_profiler/assets/* — avoids AssetMapper 404 in dogfood/dev.
  *
- * CSS stays on /_wdt/styles (toolbar.css.twig override). Modules mirror assets/ layout.
+ * CSS stays on /_wdt/styles (toolbar.css.twig override). JS lives under assets/js/; Stimulus under assets/controllers/.
  */
 final class ProfilerAssetController extends AbstractController
 {
     /** @var array<string, true> */
     private const ALLOWED = [
-        'wdt/index.js' => true,
-        'profiler/shell.js' => true,
-        'panels/time-timeline.js' => true,
-        'panels/form-panel.js' => true,
-        'panels/events-panel.js' => true,
+        'js/wdt.js' => true,
+        'js/shell.js' => true,
+        'js/panels/time-timeline.js' => true,
+        'js/panels/form-panel.js' => true,
+        'js/panels/events-panel.js' => true,
     ];
 
     public function __construct(
@@ -33,7 +33,7 @@ final class ProfilerAssetController extends AbstractController
     #[Route(
         '/_profiler/assets/{assetPath}',
         name: 'ui_profiler_asset',
-        requirements: ['assetPath' => 'wdt/index\.js|profiler/shell\.js|panels/(time-timeline|form-panel|events-panel)\.js'],
+        requirements: ['assetPath' => 'js/wdt\.js|js/shell\.js|js/panels/(time-timeline|form-panel|events-panel)\.js'],
         methods: ['GET'],
     )]
     public function __invoke(string $assetPath): Response

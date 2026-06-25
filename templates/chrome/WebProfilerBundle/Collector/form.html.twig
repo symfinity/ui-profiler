@@ -5,19 +5,20 @@
         {% set status_color = collector.data.nb_errors ? 'red' %}
         {% set icon %}
             {{ source('@WebProfiler/Icon/form.svg') }}
-            <span class="sf-toolbar-value">
+            <span data-ui-profiler-wdt-value>
                 {{ collector.data.nb_errors ?: collector.data.forms|length }}
             </span>
         {% endset %}
 
         {% set text %}
-            <div class="sf-toolbar-info-piece">
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Number of forms</b>
-                <span class="sf-toolbar-status">{{ collector.data.forms|length }}</span>
+                <span data-ui-profiler-wdt-status>{{ collector.data.forms|length }}</span>
             </div>
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Number of errors</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.data.nb_errors > 0 ? 'red' }}">{{ collector.data.nb_errors }}</span>
+                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.data.nb_errors > 0 ? 'red' : 'none') }}">{{ collector.data.nb_errors }}</span>
             </div>
         {% endset %}
 
@@ -41,13 +42,12 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootFormPanel}from'{{ path('ui_profiler_asset', {assetPath: 'panels/form-panel.js', v: ui_profiler_asset_version()}) }}';bootFormPanel();</script>
+    <script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootFormPanel}from'{{ path('ui_profiler_asset', {assetPath: 'js/panels/form-panel.js', v: ui_profiler_asset_version()}) }}';bootFormPanel();</script>
 {% endblock %}
 
 {% block panel %}
     <div data-ui-profiler-panel="form">
-    <h2>Forms</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Forms' }) }}
     {% if collector.data.forms|length %}
         <div id="tree-menu" class="tree">
             <ul>
@@ -92,7 +92,7 @@
         </div>
 
         {% if data.children is not empty %}
-            <ul id="{{ data.id }}-children" {% if not is_root and not data.has_children_error|default(false) %}class="hidden"{% endif %}>
+            <ul id="{{ data.id }}-children" {% if not is_root and not data.has_children_error|default(false) %}hidden{% endif %}>
                 {% for childName, childData in data.children %}
                     {{ _self.form_tree_entry(childName, childData, false) }}
                 {% endfor %}
@@ -103,7 +103,7 @@
 
 {% macro form_tree_details(name, data, forms_by_hash, show) %}
     <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
-        <h2>{{ name|default('(no name)') }}</h2>
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: name|default('(no name)') }) }}
         {% if data.type_class is defined %}
             <div class="form-type-class">
                 <span class="form-type-class-label">Form type:</span>
@@ -114,7 +114,7 @@
         {% set form_has_errors = data.errors ?? [] is not empty %}
         <div data-ui-profiler-tabs data-ui-role="tabs">
             <div class="tab {{ form_has_errors ? 'active' : 'disabled' }}">
-                <h3 class="tab-title">Errors</h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Errors</h3>
 
                 <div class="tab-content">
                     {{ _self.render_form_errors(data) }}
@@ -122,7 +122,7 @@
             </div>
 
             <div class="tab {{ not form_has_errors ? 'active' }}">
-                <h3 class="tab-title">Default Data</h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Default Data</h3>
 
                 <div class="tab-content">
                     {{ _self.render_form_default_data(data) }}
@@ -130,7 +130,7 @@
             </div>
 
             <div class="tab {{ (data.submitted_data ?? []) is empty ? 'disabled' }}">
-                <h3 class="tab-title">Submitted Data</h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Submitted Data</h3>
 
                 <div class="tab-content">
                     {{ _self.render_form_submitted_data(data) }}
@@ -138,7 +138,7 @@
             </div>
 
             <div class="tab {{ (data.passed_options ?? []) is empty ? 'disabled' }}">
-                <h3 class="tab-title">Passed Options</h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Passed Options</h3>
 
                 <div class="tab-content">
                     {{ _self.render_form_passed_options(data) }}
@@ -146,7 +146,7 @@
             </div>
 
             <div class="tab {{ (data.resolved_options ?? []) is empty ? 'disabled' }}">
-                <h3 class="tab-title">Resolved Options</h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Resolved Options</h3>
 
                 <div class="tab-content">
                     {{ _self.render_form_resolved_options(data) }}
@@ -154,7 +154,7 @@
             </div>
 
             <div class="tab {{ (data.view_vars ?? []) is empty ? 'disabled' }}">
-                <h3 class="tab-title">View Vars</h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">View Vars</h3>
 
                 <div class="tab-content">
                     {{ _self.render_form_view_variables(data) }}
@@ -194,7 +194,7 @@
                         </td>
                         <td>
                             {% if error.trace %}
-                                <span class="newline">Caused by:</span>
+                                <span data-ui-display="block">Caused by:</span>
                                 {% for stacked in error.trace %}
                                     {{ profiler_dump(stacked) }}
                                 {% endfor %}
@@ -225,26 +225,26 @@
             </thead>
             <tbody>
             <tr>
-                <th class="font-normal" scope="row">Model Format</th>
+                <th data-ui-font="sans" scope="row">Model Format</th>
                 <td>
                     {% if data.default_data.model is defined %}
                         {{ profiler_dump(data.default_data.seek('model')) }}
                     {% else %}
-                        <em class="font-normal text-muted">same as normalized format</em>
+                        <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as normalized format</em>
                     {% endif %}
                 </td>
             </tr>
             <tr>
-                <th class="font-normal" scope="row">Normalized Format</th>
+                <th data-ui-font="sans" scope="row">Normalized Format</th>
                 <td>{{ profiler_dump(data.default_data.seek('norm')) }}</td>
             </tr>
             <tr>
-                <th class="font-normal" scope="row">View Format</th>
+                <th data-ui-font="sans" scope="row">View Format</th>
                 <td>
                     {% if data.default_data.view is defined %}
                         {{ profiler_dump(data.default_data.seek('view')) }}
                     {% else %}
-                        <em class="font-normal text-muted">same as normalized format</em>
+                        <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as normalized format</em>
                     {% endif %}
                 </td>
             </tr>
@@ -268,26 +268,26 @@
             </thead>
             <tbody>
             <tr>
-                <th class="font-normal" scope="row">View Format</th>
+                <th data-ui-font="sans" scope="row">View Format</th>
                 <td>
                     {% if data.submitted_data.view is defined %}
                         {{ profiler_dump(data.submitted_data.seek('view')) }}
                     {% else %}
-                        <em class="font-normal text-muted">same as normalized format</em>
+                        <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as normalized format</em>
                     {% endif %}
                 </td>
             </tr>
             <tr>
-                <th class="font-normal" scope="row">Normalized Format</th>
+                <th data-ui-font="sans" scope="row">Normalized Format</th>
                 <td>{{ profiler_dump(data.submitted_data.seek('norm')) }}</td>
             </tr>
             <tr>
-                <th class="font-normal" scope="row">Model Format</th>
+                <th data-ui-font="sans" scope="row">Model Format</th>
                 <td>
                     {% if data.submitted_data.model is defined %}
                         {{ profiler_dump(data.submitted_data.seek('model')) }}
                     {% else %}
-                        <em class="font-normal text-muted">same as normalized format</em>
+                        <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as normalized format</em>
                     {% endif %}
                 </td>
             </tr>
@@ -322,7 +322,7 @@
                             ? data.resolved_options[option].value
                             : data.resolved_options[option] %}
                         {% if resolved_option_value == option_value %}
-                            <em class="font-normal text-muted">same as passed value</em>
+                            <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as passed value</em>
                         {% else %}
                             {{ profiler_dump(data.resolved_options.seek(option)) }}
                         {% endif %}

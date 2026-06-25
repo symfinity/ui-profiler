@@ -18,22 +18,12 @@ use SplFileInfo;
 #[Group('ui-profiler-parity')]
 final class GreenfieldMarkupTest extends TestCase
 {
-    /** WDT chrome still bridges stock toolbar DOM until hook migration completes. */
-    private const DEFERRED_TWIG_PREFIXES = [
-        'templates/_wdt/',
-        'templates/chrome/WebProfilerBundle/Profiler/toolbar',
-    ];
+    /** WDT v2 — owned hooks; no sf-toolbar bridge in deferred paths. */
+    private const DEFERRED_TWIG_PREFIXES = [];
 
-    /** WDT-only collector override — no panel block. */
-    private const DEFERRED_TWIG_FILES = [
-        'templates/chrome/WebProfilerBundle/Collector/ajax.html.twig',
-    ];
+    private const DEFERRED_TWIG_FILES = [];
 
-    /** WDT AJAX runtime still targets stock toolbar DOM until data-ui-profiler hook migration. */
-    private const DEFERRED_JS_FILES = [
-        'assets/wdt/index.js',
-        'assets/profiler/shell.js',
-    ];
+    private const DEFERRED_JS_FILES = [];
 
     /** @var list<string> */
     private const FORBIDDEN_PANEL_PATTERNS = [

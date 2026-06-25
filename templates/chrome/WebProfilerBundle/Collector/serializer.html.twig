@@ -9,17 +9,17 @@
     {% if collector.handledCount > 0 %}
         {% set icon %}
             {{ source('@WebProfiler/Icon/serializer.svg') }}
-            <span class="sf-toolbar-value">
+            <span data-ui-profiler-wdt-value>
                 {{ collector.handledCount }}
             </span>
         {% endset %}
 
         {% set text %}
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Total calls</b>
-                <span class="sf-toolbar-status">{{ collector.handledCount }}</span>
+                <span data-ui-profiler-wdt-status>{{ collector.handledCount }}</span>
             </div>
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Total time</b>
                 <span>
                     {{ '%.2f'|format(collector.totalTime * 1000) }} <span class="unit">ms</span>
@@ -28,33 +28,33 @@
 
             <div class="detailed-metrics">
                 <div>
-                    <div class="sf-toolbar-info-piece">
+                    <div data-ui-profiler-wdt-info-piece>
                         <b>Serialize</b>
-                        <span class="sf-toolbar-status">{{ collector.data.serialize|length }}</span>
+                        <span data-ui-profiler-wdt-status>{{ collector.data.serialize|length }}</span>
                     </div>
-                    <div class="sf-toolbar-info-piece">
+                    <div data-ui-profiler-wdt-info-piece>
                         <b>Deserialize</b>
-                        <span class="sf-toolbar-status">{{ collector.data.deserialize|length }}</span>
+                        <span data-ui-profiler-wdt-status>{{ collector.data.deserialize|length }}</span>
                     </div>
                 </div>
                 <div>
-                    <div class="sf-toolbar-info-piece">
+                    <div data-ui-profiler-wdt-info-piece>
                         <b>Encode</b>
-                        <span class="sf-toolbar-status">{{ collector.data.encode|length }}</span>
+                        <span data-ui-profiler-wdt-status>{{ collector.data.encode|length }}</span>
                     </div>
-                    <div class="sf-toolbar-info-piece">
+                    <div data-ui-profiler-wdt-info-piece>
                         <b>Decode</b>
-                        <span class="sf-toolbar-status">{{ collector.data.decode|length }}</span>
+                        <span data-ui-profiler-wdt-status>{{ collector.data.decode|length }}</span>
                     </div>
                 </div>
                 <div>
-                    <div class="sf-toolbar-info-piece">
+                    <div data-ui-profiler-wdt-info-piece>
                         <b>Normalize</b>
-                        <span class="sf-toolbar-status">{{ collector.data.normalize|length }}</span>
+                        <span data-ui-profiler-wdt-status>{{ collector.data.normalize|length }}</span>
                     </div>
-                    <div class="sf-toolbar-info-piece">
+                    <div data-ui-profiler-wdt-info-piece>
                         <b>Denormalize</b>
-                        <span class="sf-toolbar-status">{{ collector.data.denormalize|length }}</span>
+                        <span data-ui-profiler-wdt-status>{{ collector.data.denormalize|length }}</span>
                     </div>
                 </div>
             </div>
@@ -74,7 +74,7 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="serializer">
-    <h2>Serializer</h2>
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Serializer' }) }}
     <div>
         {% if not collector.handledCount %}
             <div data-ui-role="empty" data-ui-profiler-empty-panel>
@@ -100,7 +100,7 @@
 
 {% macro render_serializer_tab(collector, serializer) %}
     <div class="tab">
-        <h3 class="tab-title">{{ serializer }} <twig:Badge>{{ collector.handledCount(serializer) }}</twig:Badge></h3>
+        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ serializer }} <twig:Badge>{{ collector.handledCount(serializer) }}</twig:Badge></h3>
         <div class="tab-content">
             <div data-ui-profiler-tabs data-ui-role="tabs">
                 {{ _self.render_serialize_tab(collector.data(serializer), true, serializer) }}
@@ -121,7 +121,7 @@
     {% set cellPrefix = serialize ? 'serialize' : 'deserialize' %}
 
     <div class="tab {{ not data ? 'disabled' }}">
-        <h3 class="tab-title">{{ serialize ? 'serialize' : 'deserialize' }} <twig:Badge>{{ data|length }}</twig:Badge></h3>
+        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ serialize ? 'serialize' : 'deserialize' }} <twig:Badge>{{ data|length }}</twig:Badge></h3>
         <div class="tab-content">
             {% if not data|length %}
                 <div data-ui-role="empty">
@@ -178,7 +178,7 @@
                 type="button"
                 variant="neutral" appearance="ghost"
                 size="sm"
-                class="text-small"
+                data-ui-role="typography" data-ui-density="compact"
                 data-ui-profiler-toggle
                 data-ui-profiler-toggle-target="#{{ trace_id }}"
                 data-ui-profiler-toggle-alt="Hide excerpt"
@@ -203,7 +203,7 @@
     {% set cellPrefix = normalize ? 'normalize' : 'denormalize' %}
 
     <div class="tab {{ not data ? 'disabled' }}">
-        <h3 class="tab-title">{{ normalize ? 'normalize' : 'denormalize' }} <twig:Badge>{{ data|length }}</twig:Badge></h3>
+        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ normalize ? 'normalize' : 'denormalize' }} <twig:Badge>{{ data|length }}</twig:Badge></h3>
         <div class="tab-content">
             {% if not data|length %}
                 <div data-ui-role="empty">
@@ -242,7 +242,7 @@
     {% set cellPrefix = encode ? 'encode' : 'decode' %}
 
     <div class="tab {{ not data ? 'disabled' }}">
-        <h3 class="tab-title">{{ encode ? 'encode' : 'decode' }} <twig:Badge>{{ data|length }}</twig:Badge></h3>
+        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ encode ? 'encode' : 'decode' }} <twig:Badge>{{ data|length }}</twig:Badge></h3>
         <div class="tab-content">
             {% if not data|length %}
                 <div data-ui-role="empty">
@@ -279,7 +279,7 @@
 {% macro render_data_cell(item, index, method, serializer) %}
     {% set data_id = 'data-' ~ serializer ~ '-' ~ method ~ '-' ~ index %}
 
-    <span class="nowrap">{{ item.dataType }}</span>
+    <span data-ui-wrap="nowrap">{{ item.dataType }}</span>
 
     <div>
         <twig:Button
@@ -287,7 +287,7 @@
             type="button"
             variant="neutral" appearance="ghost"
             size="sm"
-            class="text-small"
+            data-ui-role="typography" data-ui-density="compact"
             data-ui-profiler-toggle
             data-ui-profiler-toggle-target="#{{ data_id }}"
             data-ui-profiler-toggle-alt="Hide contents"
@@ -302,10 +302,10 @@
     {% set context_id = 'context-' ~ serializer ~ '-' ~ method ~ '-' ~ index %}
 
     {% if item.type %}
-        <span class="nowrap">Type: {{ item.type }}</span>
-        <div class="nowrap">Format: {{ item.format ? item.format : 'none' }}</div>
+        <span data-ui-wrap="nowrap">Type: {{ item.type }}</span>
+        <div data-ui-wrap="nowrap">Format: {{ item.format ? item.format : 'none' }}</div>
     {% else %}
-        <span class="nowrap">Format: {{ item.format ? item.format : 'none' }}</span>
+        <span data-ui-wrap="nowrap">Format: {{ item.format ? item.format : 'none' }}</span>
     {% endif %}
 
     <div>
@@ -314,7 +314,7 @@
             type="button"
             variant="neutral" appearance="ghost"
             size="sm"
-            class="text-small"
+            data-ui-role="typography" data-ui-density="compact"
             data-ui-profiler-toggle
             data-ui-profiler-toggle-target="#{{ context_id }}"
             data-ui-profiler-toggle-alt="Hide context"
@@ -329,7 +329,7 @@
     {% set nested_normalizers_id = 'nested-normalizers-' ~ serializer ~ '-' ~ method ~ '-' ~ index %}
 
     {% if item.normalizer is defined %}
-        <span class="nowrap"><a href="{{ item.normalizer.file|file_link(item.normalizer.line) }}" title="{{ item.normalizer.file }}">{{ item.normalizer.class }}</a> ({{ '%.2f'|format(item.normalizer.time * 1000) }} ms)</span>
+        <span data-ui-wrap="nowrap"><a href="{{ item.normalizer.file|file_link(item.normalizer.line) }}" title="{{ item.normalizer.file }}">{{ item.normalizer.class }}</a> ({{ '%.2f'|format(item.normalizer.time * 1000) }} ms)</span>
     {% endif %}
 
     {% if item.normalization|length > 1 %}
@@ -339,15 +339,15 @@
                 type="button"
                 variant="neutral" appearance="ghost"
                 size="sm"
-                class="text-small"
+                data-ui-role="typography" data-ui-density="compact"
                 data-ui-profiler-toggle
                 data-ui-profiler-toggle-target="#{{ nested_normalizers_id }}"
                 data-ui-profiler-toggle-alt="Hide nested normalizers"
             >Show nested normalizers</twig:Button>
             <div id="{{ nested_normalizers_id }}" class="context" data-ui-profiler-toggle-panel hidden>
-                <ul class="text-small" style="line-height:80%;margin-top:10px">
+                <ul data-ui-role="typography" data-ui-density="compact" style="line-height:80%;margin-top:10px">
                     {% for normalizer in item.normalization %}
-                        <li><span class="nowrap">x{{ normalizer.calls }} <a href="{{ normalizer.file|file_link(normalizer.line) }}" title="{{ normalizer.file }}">{{ normalizer.class }}</a> ({{ '%.2f'|format(normalizer.time * 1000) }} ms)</span></li>
+                        <li><span data-ui-wrap="nowrap">x{{ normalizer.calls }} <a href="{{ normalizer.file|file_link(normalizer.line) }}" title="{{ normalizer.file }}">{{ normalizer.class }}</a> ({{ '%.2f'|format(normalizer.time * 1000) }} ms)</span></li>
                     {% endfor %}
                 </ul>
             </div>
@@ -359,7 +359,7 @@
     {% set nested_encoders_id = 'nested-encoders-' ~ serializer ~ '-' ~ method ~ '-' ~ index %}
 
     {% if item.encoder is defined %}
-        <span class="nowrap"><a href="{{ item.encoder.file|file_link(item.encoder.line) }}" title="{{ item.encoder.file }}">{{ item.encoder.class }}</a> ({{ '%.2f'|format(item.encoder.time * 1000) }} ms)</span>
+        <span data-ui-wrap="nowrap"><a href="{{ item.encoder.file|file_link(item.encoder.line) }}" title="{{ item.encoder.file }}">{{ item.encoder.class }}</a> ({{ '%.2f'|format(item.encoder.time * 1000) }} ms)</span>
     {% endif %}
 
     {% if item.encoding|length > 1 %}
@@ -369,15 +369,15 @@
                 type="button"
                 variant="neutral" appearance="ghost"
                 size="sm"
-                class="text-small"
+                data-ui-role="typography" data-ui-density="compact"
                 data-ui-profiler-toggle
                 data-ui-profiler-toggle-target="#{{ nested_encoders_id }}"
                 data-ui-profiler-toggle-alt="Hide nested encoders"
             >Show nested encoders</twig:Button>
             <div id="{{ nested_encoders_id }}" class="context" data-ui-profiler-toggle-panel hidden>
-                <ul class="text-small" style="line-height:80%;margin-top:10px">
+                <ul data-ui-role="typography" data-ui-density="compact" style="line-height:80%;margin-top:10px">
                     {% for encoder in item.encoding %}
-                        <li><span class="nowrap">x{{ encoder.calls }} <a href="{{ encoder.file|file_link(encoder.line) }}" title="{{ encoder.file }}">{{ encoder.class }}</a> ({{ '%.2f'|format(encoder.time * 1000) }} ms)</span></li>
+                        <li><span data-ui-wrap="nowrap">x{{ encoder.calls }} <a href="{{ encoder.file|file_link(encoder.line) }}" title="{{ encoder.file }}">{{ encoder.class }}</a> ({{ '%.2f'|format(encoder.time * 1000) }} ms)</span></li>
                     {% endfor %}
                 </ul>
             </div>
@@ -386,5 +386,5 @@
 {% endmacro %}
 
 {% macro render_time_cell(item) %}
-    <span class="nowrap">{{ '%.2f'|format(item.time * 1000) }} ms</span>
+    <span data-ui-wrap="nowrap">{{ '%.2f'|format(item.time * 1000) }} ms</span>
 {% endmacro %}

@@ -51,7 +51,7 @@ final class ShellParityTest extends WebTestCase
 
         $content = (string) $client->getResponse()->getContent();
         self::assertStringContainsString('UiProfilerShell.boot', $content);
-        self::assertStringContainsString('/_profiler/assets/profiler/shell.js', $content);
+        self::assertStringContainsString('/_profiler/assets/js/shell.js', $content);
         self::assertStringNotContainsString('class SymfonyProfiler', $content);
         self::assertStringNotContainsString('ui-profiler/profiler/shell-chrome.css', $content);
         self::assertStringNotContainsString('ui-profiler/profiler/panel.css', $content);
@@ -115,7 +115,7 @@ final class ShellParityTest extends WebTestCase
     public function testShellRuntimeDefinesCopyToClipboardHandler(): void
     {
         $shellJs = (string) file_get_contents(
-            \dirname(__DIR__, 3) . '/assets/profiler/shell.js',
+            \dirname(__DIR__, 3) . '/assets/js/shell.js',
         );
 
         self::assertStringContainsString('createCopyToClipboard', $shellJs);
@@ -124,9 +124,9 @@ final class ShellParityTest extends WebTestCase
 
     public function testShellStylesheetDefinesProfilerGridLayout(): void
     {
-        $shellCss = \Symfinity\UiProfiler\Asset\ShellChromeStylesheet::CSS;
+        $shellCss = \Symfinity\UiProfiler\Asset\ShellChromeStylesheet::css();
 
-        self::assertStringContainsString('[data-ui-profiler-shell] [data-ui-profiler-main][data-ui-role="grid"]', $shellCss);
+        self::assertStringContainsString('[data-ui-profiler-shell] [data-ui-profiler-main][data-ui-role=grid]', $shellCss);
         self::assertStringContainsString('grid-template-columns: repeat(12', $shellCss);
         self::assertStringContainsString('[data-ui-profiler-shell] {', $shellCss);
         self::assertStringContainsString('background-color: var(--ui-color-surface)', $shellCss);

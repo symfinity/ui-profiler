@@ -10,9 +10,7 @@ use Symfinity\UiKernel\Theme\ThemeColorScheme;
 use Symfinity\UiKernel\Theme\ThemeLineageCatalog;
 use Symfinity\UiKernel\Theme\ThemePreference;
 use Symfinity\UiKernel\Theme\ThemeRegistry;
-use Symfinity\UiProfiler\Asset\ShellChromeStylesheet;
-use Symfinity\UiProfiler\Asset\WdtCriticalCss;
-use Symfinity\UiProfiler\Asset\WdtToolbarStylesheet;
+use Symfinity\UiProfiler\Css\ProfilerCssProvider;
 use Symfinity\UiProfiler\Menu\ProfilerMenuRenderer;
 use Symfinity\UiProfiler\Theme\ThemeContext;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -30,6 +28,7 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
         private readonly CssGenerator $cssGenerator,
         private readonly ThemeRegistry $themeRegistry,
         private readonly ProfilerMenuRenderer $menuRenderer,
+        private readonly ProfilerCssProvider $cssProvider,
         private readonly string $bundlePath,
         private readonly bool $wdtCriticalCssInline,
         private readonly bool $wdtModulePreload,
@@ -47,6 +46,7 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
             new TwigFunction('ui_profiler_toolbar_theme', $this->resolveToolbarThemeId(...)),
             new TwigFunction('ui_profiler_theme_preference', $this->resolvePreference(...)),
             new TwigFunction('ui_profiler_lineage_pairs', $this->resolveLineagePairs(...)),
+            new TwigFunction('ui_profiler_paint_guard_surfaces', $this->paintGuardSurfaces(...)),
             new TwigFunction('ui_profiler_asset_version', $this->resolveAssetVersion(...)),
             new TwigFunction('ui_profiler_is_dark_theme', $this->isDarkTheme(...)),
             new TwigFunction('ui_profiler_wdt_stylesheet', $this->wdtStylesheet(...)),
@@ -101,6 +101,14 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
         return $this->themeContext->lineagePairs();
     }
 
+    /**
+     * @return array{light: string, dark: string}
+     */
+    public function paintGuardSurfaces(?string $lineage = null): array
+    {
+        return $this->themeContext->paintGuardSurfaces($lineage);
+    }
+
     public function resolveAssetVersion(): string
     {
         return $this->assetVersion ?? '0';
@@ -113,12 +121,12 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
 
     public function wdtStylesheet(): string
     {
-        return WdtToolbarStylesheet::CSS;
+        return $this->cssProvider->wdtToolbarStylesheet();
     }
 
     public function shellStylesheet(): string
     {
-        return ShellChromeStylesheet::CSS;
+        return $this->cssProvider->shellStylesheet();
     }
 
     public function profilerThemeBootScript(): string
@@ -192,7 +200,7 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
             return '';
         }
 
-        $css = $this->wdtCriticalThemeTokensCss()."\n".WdtCriticalCss::CSS;
+        $css = $this->wdtCriticalThemeTokensCss()."\n".$this->cssProvider->wdtCriticalCss();
 
         return preg_replace('/\s+/', ' ', trim($css)) ?? trim($css);
     }

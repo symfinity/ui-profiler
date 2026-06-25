@@ -1,6 +1,14 @@
-<div class="sf-toolbar-block sf-toolbar-block-{{ name }} sf-toolbar-status-{{ status|default('normal') }} ui-profiler-wdt__item {{ additional_classes|default('') }}" data-ui-profiler-collector="{{ name }}" {{ block_attrs|default('')|raw }}>
+{% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_item_status %}
+
+<div
+    data-ui-profiler-wdt-item
+    data-ui-profiler-collector="{{ name }}"
+    data-ui-status="{{ wdt_item_status(status|default('normal')) }}"
+    {% if align|default('') == 'end' %}data-ui-align="end"{% endif %}
+    {{ block_attrs|default('')|raw }}
+>
     {% if link is not defined or link %}<a class="ui-profiler-wdt__link" href="{{ url('_profiler', {token: token, panel: name}) }}">{% endif %}
-        <div class="sf-toolbar-icon ui-profiler-wdt__icon">{{ icon|default('') }}</div>
+        <div data-ui-profiler-wdt-icon>{{ icon|default('') }}</div>
     {% if link|default(false) %}</a>{% endif %}
-        <div class="sf-toolbar-info ui-profiler-wdt__info">{{ text|default('') }}</div>
+    <div data-ui-profiler-wdt-info>{{ text|default('') }}</div>
 </div>

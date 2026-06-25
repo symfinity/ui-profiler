@@ -7,33 +7,34 @@
             {{ source('@WebProfiler/Icon/translation.svg') }}
             {% set status_color = collector.countMissings ? 'red' : collector.countFallbacks ? 'yellow' %}
             {% set error_count = collector.countMissings + collector.countFallbacks %}
-            <span class="sf-toolbar-value">{{ error_count ?: collector.countDefines }}</span>
+            <span data-ui-profiler-wdt-value>{{ error_count ?: collector.countDefines }}</span>
         {% endset %}
 
         {% set text %}
-            <div class="sf-toolbar-info-piece">
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Default locale</b>
-                <span class="sf-toolbar-status">
+                <span data-ui-profiler-wdt-status>
                     {{ collector.locale|default('-') }}
                 </span>
             </div>
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Missing messages</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countMissings ? 'red' }}">
+                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.countMissings ? 'red' : 'none') }}">
                     {{ collector.countMissings }}
                 </span>
             </div>
 
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Fallback messages</b>
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.countFallbacks ? 'yellow' }}">
+                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.countFallbacks ? 'yellow' : 'none') }}">
                     {{ collector.countFallbacks }}
                 </span>
             </div>
 
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Defined messages</b>
-                <span class="sf-toolbar-status">{{ collector.countDefines }}</span>
+                <span data-ui-profiler-wdt-status>{{ collector.countDefines }}</span>
             </div>
         {% endset %}
 
@@ -55,8 +56,7 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="translation">
-    <h2>Translation</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Translation' }) }}
     <div data-ui-metrics-grid data-ui-role="grid">
         <div data-ui-role="stat-group">
             {{ ui.metric_cell(collector.locale|default('-'), 'Default locale') }}
@@ -64,8 +64,7 @@
         </div>
     </div>
 
-    <h2>Messages</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Messages' }) }}
     {% if collector.messages is empty %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>No translations have been called.</p>
@@ -87,10 +86,10 @@
 
         <div data-ui-profiler-tabs data-ui-role="tabs">
             <div class="tab {{ collector.countMissings == 0 ? 'active' }}">
-                <h3 class="tab-title">Defined <twig:Badge>{{ collector.countDefines }}</twig:Badge></h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Defined <twig:Badge>{{ collector.countDefines }}</twig:Badge></h3>
 
                 <div class="tab-content">
-                    <p class="help">
+                    <p data-ui-role="typography" data-ui-variant="help">
                         These messages are correctly translated into the given locale.
                     </p>
 
@@ -107,10 +106,10 @@
             </div>
 
             <div class="tab">
-                <h3 class="tab-title">Fallback <twig:Badge variant="{{ collector.countFallbacks ? 'warning' : 'default' }}">{{ collector.countFallbacks }}</twig:Badge></h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Fallback <twig:Badge variant="{{ collector.countFallbacks ? 'warning' : 'default' }}">{{ collector.countFallbacks }}</twig:Badge></h3>
 
                 <div class="tab-content">
-                    <p class="help">
+                    <p data-ui-role="typography" data-ui-variant="help">
                         These messages are not available for the given locale
                         but Symfony found them in the fallback locale catalog.
                     </p>
@@ -128,10 +127,10 @@
             </div>
 
             <div class="tab {{ collector.countMissings > 0 ? 'active' }}">
-                <h3 class="tab-title">Missing <twig:Badge variant="{{ collector.countMissings ? 'danger' : 'default' }}">{{ collector.countMissings }}</twig:Badge></h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Missing <twig:Badge variant="{{ collector.countMissings ? 'danger' : 'default' }}">{{ collector.countMissings }}</twig:Badge></h3>
 
                 <div class="tab-content">
-                    <p class="help">
+                    <p data-ui-role="typography" data-ui-variant="help">
                         These messages are not available for the given locale and cannot
                         be found in the fallback locales. Add them to the translation
                         catalogue to avoid Symfony outputting untranslated contents.
@@ -154,8 +153,7 @@
     {% endif %}
 
     {% if collector.globalParameters|default([]) %}
-        <h2>Global parameters</h2>
-
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Global parameters' }) }}
         <table data-ui-role="table">
             <thead>
             <tr>
@@ -166,8 +164,8 @@
             <tbody>
             {% for id, value in collector.globalParameters %}
                 <tr>
-                    <td class="font-normal text-small nowrap">{{ id }}</td>
-                    <td class="font-normal text-small nowrap">{{ profiler_dump(value) }}</td>
+                    <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ id }}</td>
+                    <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ profiler_dump(value) }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -194,17 +192,17 @@
         <tbody>
         {% for message in messages %}
             <tr>
-                <td class="font-normal text-small nowrap">{{ message.locale }}</td>
+                <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ message.locale }}</td>
                 {% if is_fallback %}
-                    <td class="font-normal text-small nowrap">{{ message.fallbackLocale|default('-') }}</td>
+                    <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ message.fallbackLocale|default('-') }}</td>
                 {% endif %}
-                <td class="font-normal text-small text-bold nowrap">{{ message.domain }}</td>
-                <td class="font-normal text-small nowrap">{{ message.count }}</td>
+                <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap" style="font-weight:bold">{{ message.domain }}</td>
+                <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ message.count }}</td>
                 <td>
-                    <span class="{{ message.id|length < 64 ? 'nowrap' }}">{{ message.id }}</span>
+                    <span{% if message.id|length < 64 %} data-ui-wrap="nowrap"{% endif %}>{{ message.id }}</span>
 
                     {% if message.transChoiceNumber is not null %}
-                        <small class="newline">(pluralization is used)</small>
+                        <small data-ui-display="block">(pluralization is used)</small>
                     {% endif %}
 
                     {% if message.parameters|length > 0 %}
@@ -213,7 +211,7 @@
                             type="button"
                             variant="neutral" appearance="ghost"
                             size="sm"
-                            class="newline text-small"
+                            data-ui-display="block" data-ui-role="typography" data-ui-density="compact"
                             data-ui-profiler-toggle
                             data-ui-profiler-toggle-target="#parameters-{{ loop.index }}"
                             data-ui-profiler-toggle-alt="Hide parameters"
@@ -226,7 +224,7 @@
                         </div>
                     {% endif %}
                 </td>
-                <td class="prewrap">{{ message.translation }}</td>
+                <td data-ui-wrap="pre">{{ message.translation }}</td>
             </tr>
         {% endfor %}
         </tbody>

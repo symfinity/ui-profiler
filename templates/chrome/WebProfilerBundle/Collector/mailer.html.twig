@@ -41,17 +41,17 @@
     {% if events.messages|length %}
         {% set icon %}
             {{ source('@WebProfiler/Icon/mailer.svg') }}
-            <span class="sf-toolbar-value">{{ events.messages|length }}</span>
+            <span data-ui-profiler-wdt-value>{{ events.messages|length }}</span>
         {% endset %}
 
         {% set text %}
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Queued messages</b>
-                <span class="sf-toolbar-status">{{ events.events|filter(e => e.isQueued())|length }}</span>
+                <span data-ui-profiler-wdt-status>{{ events.events|filter(e => e.isQueued())|length }}</span>
             </div>
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Sent messages</b>
-                <span class="sf-toolbar-status">{{ events.events|filter(e => not e.isQueued())|length }}</span>
+                <span data-ui-profiler-wdt-status>{{ events.events|filter(e => not e.isQueued())|length }}</span>
             </div>
         {% endset %}
 
@@ -72,8 +72,7 @@
 {% block panel %}
     <div data-ui-profiler-panel="mailer">
     {% set events = collector.events %}
-    <h2>Emails</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Emails' }) }}
     {% if not events.messages|length %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>No emails were sent.</p>
@@ -89,7 +88,7 @@
 
     {% if events.transports|length > 1 %}
         {% for transport in events.transports %}
-            <h2><code>{{ transport }}</code> transport</h2>
+            {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: '<code>' ~ transport ~ '</code> transport' }) }}
             {{ _self.render_transport_details(collector, transport) }}
         {% endfor %}
     {% elseif events.transports is not empty %}
@@ -107,7 +106,7 @@
                                 <th>#</th>
                                 <th>Subject</th>
                                 <th>To</th>
-                                <th class="visually-hidden">Actions</th>
+                                <th data-ui-sr-only>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -116,7 +115,7 @@
                                     <td>{{ loop.index }}</td>
                                     <td>{{ event.message.headers.get('subject').bodyAsString()|default('(No subject)') }}</td>
                                     <td>{{ event.message.headers.get('to').bodyAsString()|default(event.envelope.recipients|map(addr => addr.toString())|join(', ')) }}</td>
-                                    <td class="visually-hidden"><button class="mailer-email-summary-table-row-button" data-target="#email-{{ loop.index }}">View email details</button></td>
+                                    <td data-ui-sr-only><button class="mailer-email-summary-table-row-button" data-target="#email-{{ loop.index }}">View email details</button></td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -151,13 +150,13 @@
                 Download as EML file
             </a>
 
-            <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+            <pre data-ui-wrap="pre" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
         {% else %}
             <div data-ui-profiler-tabs data-ui-role="tabs">
                 <div class="tab">
-                    <h3 class="tab-title">Email contents</h3>
+                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Email contents</h3>
                     <div class="tab-content">
-                        <div class="card-block">
+                        <div data-ui-part="card-section">
                             <p class="mailer-message-subject">
                                 {{ message.headers.get('subject').bodyAsString()|default('(No subject)') }}
                             </p>
@@ -177,7 +176,7 @@
                         </div>
 
                         {% if message.attachments is defined and message.attachments %}
-                            <div class="card-block">
+                            <div data-ui-part="card-section">
                                 {% set num_of_attachments = message.attachments|length %}
                                 {% set total_attachments_size_in_bytes = message.attachments|reduce((total_size, attachment) => total_size + attachment.body|length, 0) %}
                                 <p class="mailer-message-attachments-title">
@@ -205,16 +204,16 @@
                             </div>
                         {% endif %}
 
-                        <div class="card-block">
+                        <div data-ui-part="card-section">
                             <div data-ui-profiler-tabs data-ui-role="tabs">
                             {% if message.htmlBody is defined %}
                                 {% set textBody = message.textBody %}
                                 {% set htmlBody = message.htmlBody %}
                                 <div class="tab {{ not textBody ? 'disabled' }} {{ textBody ? 'active' }}">
-                                    <h3 class="tab-title">Text content</h3>
+                                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Text content</h3>
                                     <div class="tab-content">
                                         {% if textBody %}
-                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                            <pre class="mailer-email-body" data-ui-wrap="pre" style="max-height: 600px">
                                                 {%- if message.textCharset() %}
                                                     {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
                                                 {%- else %}
@@ -231,19 +230,19 @@
 
                                 {% if htmlBody %}
                                     <div class="tab">
-                                        <h3 class="tab-title">HTML preview</h3>
+                                        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">HTML preview</h3>
                                         <div class="tab-content">
-                                            <pre class="prewrap" style="max-height: 600px"><iframe src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}" style="height: 80vh;width: 100%;"></iframe>
+                                            <pre data-ui-wrap="pre" style="max-height: 600px"><iframe src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}" style="height: 80vh;width: 100%;"></iframe>
                                             </pre>
                                         </div>
                                     </div>
                                 {% endif %}
 
                                 <div class="tab {{ not htmlBody ? 'disabled' }} {{ not textBody and htmlBody ? 'active' }}">
-                                    <h3 class="tab-title">HTML content</h3>
+                                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">HTML content</h3>
                                     <div class="tab-content">
                                         {% if htmlBody %}
-                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                            <pre class="mailer-email-body" data-ui-wrap="pre" style="max-height: 600px">
                                                 {%- if message.htmlCharset() %}
                                                     {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
                                                 {%- else %}
@@ -260,10 +259,10 @@
                             {% else %}
                                 {% set body = message.body ? message.body.toString() : null %}
                                 <div class="tab {{ not body ? 'disabled' }} {{ body ? 'active' }}">
-                                    <h3 class="tab-title">Content</h3>
+                                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Content</h3>
                                     <div class="tab-content">
                                         {% if body %}
-                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                            <pre class="mailer-email-body" data-ui-wrap="pre" style="max-height: 600px">
                                                 {{- body }}
                                             </pre>
                                         {% else %}
@@ -280,21 +279,21 @@
                 </div>
 
                 <div class="tab">
-                    <h3 class="tab-title">MIME parts</h3>
+                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">MIME parts</h3>
                     <div class="tab-content">
-                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.body().asDebugString() }}</pre>
+                        <pre data-ui-wrap="pre" style="max-height: 600px; margin-left: 5px">{{ message.body().asDebugString() }}</pre>
                     </div>
                 </div>
 
                 <div class="tab">
-                    <h3 class="tab-title">Raw Message</h3>
+                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Raw Message</h3>
                     <div class="tab-content">
                         <a class="mailer-message-download-raw" href="data:application/octet-stream;base64,{{ collector.base64Encode(message.toString()) }}" download="email.eml">
                             {{ source('@WebProfiler/Icon/download.svg') }}
                             Download as EML file
                         </a>
 
-                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+                        <pre data-ui-wrap="pre" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,45 @@
+@use '../shared/tokens' as *;
+
+[data-ui-profiler-shell] {
+  font-family: var(--ui-font-family-sans, system-ui, sans-serif);
+  background-color: var(--ui-color-surface);
+  color: var(--ui-color-text);
+  font-size: var(--ui-font-size-md);
+  line-height: 1.4;
+  min-height: 100%;
+  --ui-color-primary-subtle: color-mix(in srgb, var(--ui-color-primary) 12%, var(--ui-color-surface));
+  --ui-profiler-sidebar-width: calc(
+    (min(#{$profiler-grid-max-width}, 100%) - 2 * var(--ui-grid-gap, 1rem) - 11 * var(--ui-grid-gap, 1rem)) * 3 / 12 +
+      2 * var(--ui-grid-gap, 1rem)
+  );
+
+  &[data-ui-role='grid-container'] {
+    box-sizing: border-box;
+    margin-inline: auto;
+    max-width: $profiler-grid-max-width;
+    padding-inline: var(--ui-grid-gap, 1rem);
+    width: 100%;
+  }
+
+  body.width-full &[data-ui-role='grid-container'],
+  &.width-full[data-ui-role='grid-container'] {
+    margin-inline: 0;
+    max-width: none;
+  }
+
+  [role='tabpanel'][hidden] {
+    display: none !important;
+  }
+
+  &.width-full .sql-explain {
+    max-width: unset;
+  }
+
+  &[data-theme$='-dark'] {
+    color-scheme: dark;
+  }
+}
+
+body.width-full .sql-explain {
+  max-width: unset;
+}

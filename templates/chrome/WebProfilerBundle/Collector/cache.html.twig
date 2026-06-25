@@ -5,27 +5,27 @@
     {% if collector.totals.calls > 0 %}
         {% set icon %}
             {{ source('@WebProfiler/Icon/cache.svg') }}
-            <span class="sf-toolbar-value">{{ collector.totals.calls }}</span>
-            <span class="sf-toolbar-info-piece-additional-detail">
-                <span class="sf-toolbar-label">in</span>
-                <span class="sf-toolbar-value">{{ '%0.2f'|format(collector.totals.time * 1000) }}</span>
-                <span class="sf-toolbar-label">ms</span>
+            <span data-ui-profiler-wdt-value>{{ collector.totals.calls }}</span>
+            <span data-ui-profiler-wdt-info-piece-additional-detail>
+                <span data-ui-profiler-wdt-label>in</span>
+                <span data-ui-profiler-wdt-value>{{ '%0.2f'|format(collector.totals.time * 1000) }}</span>
+                <span data-ui-profiler-wdt-label>ms</span>
             </span>
         {% endset %}
         {% set text %}
-        <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-piece>
             <b>Cache Calls</b>
             <span>{{ collector.totals.calls }}</span>
         </div>
-        <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-piece>
             <b>Total time</b>
             <span>{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
         </div>
-        <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-piece>
             <b>Cache hits</b>
             <span>{{ collector.totals.hits }} / {{ collector.totals.reads }}{% if collector.totals.hit_read_ratio is not null %} ({{ collector.totals.hit_read_ratio }}%){% endif %}</span>
         </div>
-        <div class="sf-toolbar-info-piece">
+        <div data-ui-profiler-wdt-info-piece>
             <b>Cache writes</b>
             <span>{{ collector.totals.writes }}</span>
         </div>
@@ -45,8 +45,7 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="cache">
-    <h2>Cache</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Cache' }) }}
     {% if collector.totals.calls == 0 %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>No cache calls were made.</p>
@@ -54,21 +53,21 @@
     {% else %}
         {{ _self.render_metrics(collector.totals, true) }}
 
-        <h2>Pools</h2>
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Pools' }) }}
         <div data-ui-profiler-tabs data-ui-role="tabs">
             {# the empty merge is needed to turn the iterator into an array #}
             {% set cache_pools_with_calls = collector.calls|filter(calls => calls|length > 0)|merge([]) %}
             {% for name, calls in cache_pools_with_calls %}
                 <div class="tab {{ calls|length == 0 ? 'disabled' }}">
-                    <h3 class="tab-title">{{ name }} <twig:Badge>{{ collector.statistics[name].calls }}</twig:Badge></h3>
+                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ name }} <twig:Badge>{{ collector.statistics[name].calls }}</twig:Badge></h3>
 
                     <div class="tab-content">
-                        <h4>Adapter</h4>
+                        <h4 data-ui-role="typography" data-ui-variant="h4">Adapter</h4>
                         <div data-ui-role="card" data-ui-fragment="blocks.card">
                             {% if collector.adapters[name] is defined %}
                                 <code>{{ collector.adapters[name] }}</code>
                             {% else %}
-                                <span class="text-muted">Unable to get the adapter class.</span>
+                                <span data-ui-role="typography" data-ui-variant="muted">Unable to get the adapter class.</span>
                             {% endif %}
                         </div>
                         {% if calls|length == 0 %}
@@ -76,10 +75,10 @@
                                 <p>No calls were made for {{ name }} pool.</p>
                             </div>
                         {% else %}
-                            <h4>Metrics</h4>
+                            <h4 data-ui-role="typography" data-ui-variant="h4">Metrics</h4>
                             {{ _self.render_metrics(collector.statistics[name]) }}
 
-                            <h4>Calls</h4>
+                            <h4 data-ui-role="typography" data-ui-variant="h4">Calls</h4>
                             <table data-ui-role="table">
                                 <thead>
                                     <tr>
@@ -92,9 +91,9 @@
                                 <tbody>
                                 {% for call in calls %}
                                     <tr>
-                                        <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
-                                        <td class="nowrap">{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
-                                        <td class="nowrap">{{ call.name }}({{ call.namespace|default('') }})</td>
+                                        <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-variant="muted" data-ui-wrap="nowrap">{{ loop.index }}</td>
+                                        <td data-ui-wrap="nowrap">{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
+                                        <td data-ui-wrap="nowrap">{{ call.name }}({{ call.namespace|default('') }})</td>
                                         <td>{{ profiler_dump(call.value.result, maxDepth: 2) }}</td>
                                     </tr>
                                 {% endfor %}
@@ -106,7 +105,7 @@
 
                 {% if loop.last %}
                     <div class="tab">
-                        <h3 class="tab-title">Pools without calls <twig:Badge>{{ collector.calls|filter(calls => 0 == calls|length)|length }}</twig:Badge></h3>
+                        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Pools without calls <twig:Badge>{{ collector.calls|filter(calls => 0 == calls|length)|length }}</twig:Badge></h3>
 
                         <div class="tab-content">
                             <table data-ui-role="table">

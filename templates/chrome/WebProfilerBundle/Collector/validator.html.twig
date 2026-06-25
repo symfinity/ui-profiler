@@ -9,7 +9,7 @@
         {% set status_color = collector.violationsCount ? 'red' %}
         {% set icon %}
             {{ source('@WebProfiler/Icon/validator.svg') }}
-            <span class="sf-toolbar-value">
+            <span data-ui-profiler-wdt-value>
                 {{ collector.violationsCount ?: collector.calls|length }}
             </span>
         {% endset %}
@@ -18,12 +18,12 @@
             {{ include('@UiProfiler/_chrome/partials/toolbar-metric.html.twig', {
                 label: 'Validator calls',
                 value: collector.calls|length,
-                status_class: 'sf-toolbar-status',
+                variant: 'neutral',
             }) }}
             {{ include('@UiProfiler/_chrome/partials/toolbar-metric.html.twig', {
                 label: 'Number of violations',
                 value: collector.violationsCount,
-                status_class: 'sf-toolbar-status' ~ (collector.violationsCount > 0 ? ' sf-toolbar-status-red' : ''),
+                variant: collector.violationsCount > 0 ? 'danger' : 'neutral',
             }) }}
         {% endset %}
 
@@ -43,8 +43,7 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="validator">
-    <h2>Validator calls</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Validator calls' }) }}
     {% for call in collector.calls %}
         <div data-ui-profiler-validator-call data-ui-role="stack" data-ui-gap="md">
             <span class="metadata">In

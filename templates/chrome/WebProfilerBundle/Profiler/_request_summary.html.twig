@@ -1,42 +1,36 @@
 {% set status_code = request_collector ? request_collector.statuscode|default(0) : 0 %}
-{% set css_class = status_code > 399 ? 'status-error' : status_code > 299 ? 'status-warning' : 'status-success' %}
+{% set status_variant = status_code > 399 ? 'danger' : status_code > 299 ? 'warning' : 'success' %}
 
 {% if request_collector and request_collector.redirect %}
     {% set redirect = request_collector.redirect %}
     {% set link_to_source_code = redirect.controller.class is defined ? redirect.controller.file|file_link(redirect.controller.line) %}
     {% set redirect_route_name = '@' ~ redirect.route %}
 
-    <div class="status status-compact status-warning">
-        <span class="icon icon-redirect">{{ source('@WebProfiler/Icon/redirect.svg') }}</span>
-
-        <span class="status-response-status-code">{{ redirect.status_code }}</span> redirect from
-
-        <span class="status-request-method">{{ redirect.method }}</span>
-
+    <div data-ui-role="request-status" data-ui-variant="warning" data-ui-density="compact" data-ui-part="redirect">
+        <span data-ui-part="icon">{{ source('@WebProfiler/Icon/redirect.svg') }}</span>
+        <twig:Badge variant="warning">{{ redirect.status_code }}</twig:Badge>
+        redirect from
+        <span data-ui-part="method">{{ redirect.method }}</span>
         {% if link_to_source_code %}
             <a href="{{ link_to_source_code }}" title="{{ redirect.controller.file }}">{{ redirect_route_name }}</a>
         {% else %}
             {{ redirect_route_name }}
         {% endif %}
-
         (<a href="{{ path('_profiler', {token: redirect.token, panel: request.query.get('panel', 'request')}) }}">{{ redirect.token }}</a>)
     </div>
 {% endif %}
 
-<div class="status {{ css_class }}">
+<div data-ui-role="request-status" data-ui-variant="{{ status_variant }}">
     {% if status_code > 399 %}
-        <p class="status-error-details">
-            <span class="icon">{{ source('@WebProfiler/Icon/alert-circle.svg') }}</span>
-            <span class="status-response-status-code">Error {{ status_code }}</span>
-            <span class="status-response-status-text">{{ request_collector.statusText }}</span>
-        </p>
+        <div data-ui-part="error-row">
+            <span data-ui-part="icon">{{ source('@WebProfiler/Icon/alert-circle.svg') }}</span>
+            <twig:Badge variant="danger">Error {{ status_code }}</twig:Badge>
+            <span data-ui-role="typography" data-ui-density="compact">{{ request_collector.statusText }}</span>
+        </div>
     {% endif %}
 
-    <h2>
-        <span class="status-request-method">
-            {{ profile.method|upper }}
-        </span>
-
+    <h2 data-ui-part="title">
+        <span data-ui-part="method">{{ profile.method|upper }}</span>
         {% set profile_title = profile.url|length < 160 ? profile.url : profile.url[:160] ~ '…' %}
         {% if profile.method|upper in ['GET', 'HEAD'] %}
             <a href="{{ profile.url }}">{{ profile_title }}</a>
@@ -45,12 +39,12 @@
         {% endif %}
     </h2>
 
-    <dl class="metadata">
+    <dl data-ui-part="metadata">
         {% if status_code < 400 %}
             <dt>Response</dt>
             <dd>
-                <span class="status-response-status-code">{{ status_code }}</span>
-                <span class="status-response-status-text">{{ request_collector.statusText }}</span>
+                <twig:Badge variant="{{ status_variant }}">{{ status_code }}</twig:Badge>
+                <strong>{{ request_collector.statusText }}</strong>
             </dd>
         {% endif %}
 
@@ -58,8 +52,8 @@
         {% if referer %}
             <dt></dt>
             <dd>
-                <span class="icon icon-referer">{{ source('@WebProfiler/Icon/referrer.svg') }}</span>
-                <a href="{{ referer }}" class="referer">Browse referrer URL</a>
+                <span data-ui-part="referer-icon">{{ source('@WebProfiler/Icon/referrer.svg') }}</span>
+                <a href="{{ referer }}" data-ui-part="referer">Browse referrer URL</a>
             </dd>
         {% endif %}
 
@@ -79,11 +73,9 @@
 {% if request_collector and request_collector.forwardtoken -%}
     {% set forward_profile = profile.childByToken(request_collector.forwardtoken) %}
     {% set controller = forward_profile ? forward_profile.collector('request').controller : 'n/a' %}
-    <div class="status status-compact status-compact-forward">
-        <span class="icon icon-forward">{{ source('@WebProfiler/Icon/forward.svg') }}</span>
-
+    <div data-ui-role="request-status" data-ui-variant="warning" data-ui-density="compact" data-ui-part="forward">
+        <span data-ui-part="icon">{{ source('@WebProfiler/Icon/forward.svg') }}</span>
         Forwarded to
-
         {% set link = controller.file is defined ? controller.file|file_link(controller.line) : null -%}
         {%- if link %}<a href="{{ link }}" title="{{ controller.file }}">{% endif -%}
             {% if controller.class is defined %}
@@ -94,6 +86,5 @@
             {% endif %}
             {%- if link %}</a>{% endif %}
         (<a href="{{ path('_profiler', {token: request_collector.forwardtoken}) }}">{{ request_collector.forwardtoken }}</a>)
-
     </div>
 {%- endif %}

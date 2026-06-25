@@ -11,7 +11,8 @@ All notable changes to `symfinity/ui-profiler` are documented here.
 
 ### Changed
 
-- **122** shell delegation tiers 1–4: core `table`/`tabs`/`stat` role CSS in ux-blocks-core; profiler metrics/templates on `data-ui-role="stat"` + `[data-ui-metrics-grid]`; shell table/tabs/metrics blocks removed; `--header-*` token aliases collapsed to kernel tokens; tabpanels use `hidden` in `shell.js`; **279** shell CSS-body lines + **103** WDT (`active_wave` 8, exit gate ≤477); **88/88** PHPUnit green; ui-lab WDT smoke (T037) still open.
+- **122** Sass refactor: modular SCSS (`shell/`, `wdt/`, `shared/` partials) with nesting, tokens, mixins; expanded compile output.
+- **122** slices 1–5: core `request-status`/`input`/`filter-bar` roles + typography utilities; request summary → Badge/Stack; logger filter → core; collector utility purge; WDT ajax trim; **157** shell + **100** WDT + **32** critical CSS lines; **88/88** PHPUnit green.
 - Stabilization pass (**069**): docs aligned to `ui-lab` dogfood; archive `packages/temp/ui-profiler/` removed.
 - Semver branch-alias target `0.1.x-dev` (tag `v0.1.0` at release).
 

@@ -20,56 +20,57 @@
             {% endif %}
 
             {% if collector.querycount == 0 and collector.invalidEntityCount > 0 %}
-                <span class="sf-toolbar-value">{{ collector.invalidEntityCount }}</span>
-                <span class="sf-toolbar-label">errors</span>
+                <span data-ui-profiler-wdt-value>{{ collector.invalidEntityCount }}</span>
+                <span data-ui-profiler-wdt-label>errors</span>
             {% else %}
-                <span class="sf-toolbar-value">{{ collector.querycount }}</span>
-                <span class="sf-toolbar-info-piece-additional-detail">
-                    <span class="sf-toolbar-label">in</span>
-                    <span class="sf-toolbar-value">{{ '%0.2f'|format(collector.time * 1000) }}</span>
-                    <span class="sf-toolbar-label">ms</span>
+                <span data-ui-profiler-wdt-value>{{ collector.querycount }}</span>
+                <span data-ui-profiler-wdt-info-piece-additional-detail>
+                    <span data-ui-profiler-wdt-label>in</span>
+                    <span data-ui-profiler-wdt-value>{{ '%0.2f'|format(collector.time * 1000) }}</span>
+                    <span data-ui-profiler-wdt-label>ms</span>
                 </span>
             {% endif %}
         {% endset %}
 
         {% set text %}
-            <div class="sf-toolbar-info-piece">
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Database Queries</b>
-                <span class="sf-toolbar-status {{ collector.querycount > 50 ? 'sf-toolbar-status-yellow' : '' }}">{{ collector.querycount }}</span>
+                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.querycount > 50 ? 'yellow' : 'none') }}">{{ collector.querycount }}</span>
             </div>
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Different statements</b>
-                <span class="sf-toolbar-status">{{ collector.groupedQueryCount }}</span>
+                <span data-ui-profiler-wdt-status>{{ collector.groupedQueryCount }}</span>
             </div>
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Query time</b>
                 <span>{{ '%0.2f'|format(collector.time * 1000) }} ms</span>
             </div>
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Invalid entities</b>
-                <span class="sf-toolbar-status {{ collector.invalidEntityCount > 0 ? 'sf-toolbar-status-red' : '' }}">{{ collector.invalidEntityCount }}</span>
+                <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.invalidEntityCount > 0 ? 'red' : 'none') }}">{{ collector.invalidEntityCount }}</span>
             </div>
-            <div class="sf-toolbar-info-piece">
+            <div data-ui-profiler-wdt-info-piece>
                 <b>Managed entities</b>
-                <span class="sf-toolbar-status">{{ collector.managedEntityCount }}</span>
+                <span data-ui-profiler-wdt-status>{{ collector.managedEntityCount }}</span>
             </div>
             {% if collector.cacheEnabled %}
-                <div class="sf-toolbar-info-piece">
+                <div data-ui-profiler-wdt-info-piece>
                     <b>Cache hits</b>
-                    <span class="sf-toolbar-status sf-toolbar-status-green">{{ collector.cacheHitsCount }}</span>
+                    <span data-ui-profiler-wdt-status data-ui-variant="success">{{ collector.cacheHitsCount }}</span>
                 </div>
-                <div class="sf-toolbar-info-piece">
+                <div data-ui-profiler-wdt-info-piece>
                     <b>Cache misses</b>
-                    <span class="sf-toolbar-status {{ collector.cacheMissesCount > 0 ? 'sf-toolbar-status-yellow' : '' }}">{{ collector.cacheMissesCount }}</span>
+                    <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.cacheMissesCount > 0 ? 'yellow' : 'none') }}">{{ collector.cacheMissesCount }}</span>
                 </div>
-                <div class="sf-toolbar-info-piece">
+                <div data-ui-profiler-wdt-info-piece>
                     <b>Cache puts</b>
-                    <span class="sf-toolbar-status {{ collector.cachePutsCount > 0 ? 'sf-toolbar-status-yellow' : '' }}">{{ collector.cachePutsCount }}</span>
+                    <span data-ui-profiler-wdt-status data-ui-variant="{{ wdt_variant(collector.cachePutsCount > 0 ? 'yellow' : 'none') }}">{{ collector.cachePutsCount }}</span>
                 </div>
             {% else %}
-                <div class="sf-toolbar-info-piece">
+                <div data-ui-profiler-wdt-info-piece>
                     <b>Second Level Cache</b>
-                    <span class="sf-toolbar-status">disabled</span>
+                    <span data-ui-profiler-wdt-status>disabled</span>
                 </div>
             {% endif %}
         {% endset %}
@@ -105,8 +106,7 @@
 {% endblock %}
 
 {% block queries %}
-    <h2>Query Metrics</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Query Metrics' }) }}
     <div data-ui-metrics-grid data-ui-role="grid">
         <div data-ui-role="stat-group">
             {{ ui.metric_cell(collector.querycount, 'Database Queries') }}
@@ -128,7 +128,7 @@
     <div data-ui-profiler-tabs data-ui-role="tabs" style="margin-top: 20px;">
         <div class="tab {{ collector.queries is empty ? 'disabled' }}">
             {% set group_queries = request.query.getBoolean('group') %}
-            <h3 class="tab-title">
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">
                 {% if group_queries %}
                     Grouped Statements
                 {% else %}
@@ -150,7 +150,7 @@
 
                     {% for connection, queries in collector.queries %}
                         {% if collector.connections|length > 1 %}
-                            <h3>{{ connection }} <small>connection</small></h3>
+                            <h3 data-ui-role="typography" data-ui-variant="h3">{{ connection }} <small>connection</small></h3>
                         {% endif %}
 
                         {% if queries is empty %}
@@ -165,11 +165,11 @@
                                 <thead>
                                 <tr>
                                     {% if group_queries %}
-                                        <th class="nowrap" onclick="javascript:sortTable(this, 0, 'queries-{{ loop.index }}')" data-sort-direction="1" style="cursor: pointer;">Time<span class="text-muted">&#9660;</span></th>
-                                        <th class="nowrap" onclick="javascript:sortTable(this, 1, 'queries-{{ loop.index }}')" style="cursor: pointer;">Count<span></span></th>
+                                        <th data-ui-wrap="nowrap" onclick="javascript:sortTable(this, 0, 'queries-{{ loop.index }}')" data-sort-direction="1" style="cursor: pointer;">Time<span data-ui-role="typography" data-ui-variant="muted">&#9660;</span></th>
+                                        <th data-ui-wrap="nowrap" onclick="javascript:sortTable(this, 1, 'queries-{{ loop.index }}')" style="cursor: pointer;">Count<span></span></th>
                                     {% else %}
-                                        <th class="nowrap" onclick="javascript:sortTable(this, 0, 'queries-{{ loop.index }}')" data-sort-direction="-1" style="cursor: pointer;">#<span class="text-muted">&#9650;</span></th>
-                                        <th class="nowrap" onclick="javascript:sortTable(this, 1, 'queries-{{ loop.index }}')" style="cursor: pointer;">Time<span></span></th>
+                                        <th data-ui-wrap="nowrap" onclick="javascript:sortTable(this, 0, 'queries-{{ loop.index }}')" data-sort-direction="-1" style="cursor: pointer;">#<span data-ui-role="typography" data-ui-variant="muted">&#9650;</span></th>
+                                        <th data-ui-wrap="nowrap" onclick="javascript:sortTable(this, 1, 'queries-{{ loop.index }}')" style="cursor: pointer;">Time<span></span></th>
                                     {% endif %}
                                     <th style="width: 100%;">Info</th>
                                 </tr>
@@ -181,21 +181,21 @@
                                         {% if group_queries %}
                                             <td class="time-container">
                                                 <span class="time-bar" style="width:{{ '%0.2f'|format(query.executionPercent) }}%"></span>
-                                                <span class="nowrap">{{ '%0.2f'|format(query.executionMS * 1000) }}&nbsp;ms<br />({{ '%0.2f'|format(query.executionPercent) }}%)</span>
+                                                <span data-ui-wrap="nowrap">{{ '%0.2f'|format(query.executionMS * 1000) }}&nbsp;ms<br />({{ '%0.2f'|format(query.executionPercent) }}%)</span>
                                             </td>
-                                            <td class="nowrap">{{ query.count }}</td>
+                                            <td data-ui-wrap="nowrap">{{ query.count }}</td>
                                         {% else %}
-                                            <td class="nowrap">{{ loop.index }}</td>
-                                            <td class="nowrap">{{ '%0.2f'|format(query.executionMS * 1000) }}&nbsp;ms</td>
+                                            <td data-ui-wrap="nowrap">{{ loop.index }}</td>
+                                            <td data-ui-wrap="nowrap">{{ '%0.2f'|format(query.executionMS * 1000) }}&nbsp;ms</td>
                                         {% endif %}
                                         <td>
                                             {{ query.sql|doctrine_prettify_sql }}
 
                                             <div>
-                                                <strong class="font-normal text-small">Parameters</strong>: {{ profiler_dump(query.params, 2) }}
+                                                <strong data-ui-font="sans" data-ui-role="typography" data-ui-density="compact">Parameters</strong>: {{ profiler_dump(query.params, 2) }}
                                             </div>
 
-                                            <div class="text-small font-normal">
+                                            <div data-ui-font="sans" data-ui-role="typography" data-ui-density="compact">
                                                 <a href="#" class="link-inverse" data-ui-profiler-toggle data-ui-profiler-toggle-target="#formatted-query-{{ i }}-{{ loop.parent.loop.index }}" data-ui-profiler-toggle-alt="Hide formatted query">View formatted query</a>
 
                                                 {% if query.runnable %}
@@ -216,14 +216,14 @@
 
                                             <div id="formatted-query-{{ i }}-{{ loop.parent.loop.index }}" class="sql-runnable" data-ui-profiler-toggle-panel hidden>
                                                 {{ query.sql|doctrine_format_sql(highlight = true) }}
-                                                <twig:Button size="sm" class="hidden" data-clipboard-text="{{ query.sql|doctrine_format_sql(highlight = false)|e('html_attr') }}">Copy</twig:Button>
+                                                <twig:Button size="sm" hidden data-clipboard-text="{{ query.sql|doctrine_format_sql(highlight = false)|e('html_attr') }}">Copy</twig:Button>
                                             </div>
 
                                             {% if query.runnable %}
                                                 <div id="original-query-{{ i }}-{{ loop.parent.loop.index }}" class="sql-runnable" data-ui-profiler-toggle-panel hidden>
                                                     {% set runnable_sql = (query.sql ~ ';')|doctrine_replace_query_parameters(query.params) %}
                                                     {{ runnable_sql|doctrine_prettify_sql }}
-                                                    <twig:Button size="sm" class="hidden" data-clipboard-text="{{ runnable_sql|e('html_attr') }}">Copy</twig:Button>
+                                                    <twig:Button size="sm" hidden data-clipboard-text="{{ runnable_sql|e('html_attr') }}">Copy</twig:Button>
                                                 </div>
                                             {% endif %}
 
@@ -245,7 +245,7 @@
                                                             <tr>
                                                                 <td>{{ loop.index }}</td>
                                                                 <td>
-                                                                            <span class="text-small">
+                                                                            <span data-ui-role="typography" data-ui-density="compact">
                                                                                 {% set line_number = trace.line|default(query.backtrace[loop.index].line|default(1)) %}
                                                                                 {% if trace.file is defined %}
                                                                                     <a href="{{ trace.file|file_link(line_number) }}">
@@ -276,7 +276,7 @@
         </div>
 
         <div class="tab {{ collector.connections is empty ? 'disabled' }}">
-            <h3 class="tab-title">Database Connections</h3>
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Database Connections</h3>
             <div class="tab-content">
                 {% if not collector.connections %}
                     <div data-ui-role="empty">
@@ -289,7 +289,7 @@
         </div>
 
         <div class="tab {{ collector.managers is empty ? 'disabled' }}">
-            <h3 class="tab-title">Entity Managers</h3>
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Entity Managers</h3>
             <div class="tab-content">
 
                 {% if not collector.managers %}
@@ -303,7 +303,7 @@
         </div>
 
         <div class="tab {{ not collector.cacheEnabled ? 'disabled' }}">
-            <h3 class="tab-title">Second Level Cache</h3>
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Second Level Cache</h3>
             <div class="tab-content">
 
                 {% if not collector.cacheEnabled %}
@@ -325,17 +325,17 @@
                         </div>
 
                         {% if collector.cacheRegions.hits %}
-                            <h3>Number of cache hits</h3>
+                            <h3 data-ui-role="typography" data-ui-variant="h3">Number of cache hits</h3>
                             {{ helper.render_simple_table('Region', 'Hits', collector.cacheRegions.hits) }}
                         {% endif %}
 
                         {% if collector.cacheRegions.misses %}
-                            <h3>Number of cache misses</h3>
+                            <h3 data-ui-role="typography" data-ui-variant="h3">Number of cache misses</h3>
                             {{ helper.render_simple_table('Region', 'Misses', collector.cacheRegions.misses) }}
                         {% endif %}
 
                         {% if collector.cacheRegions.puts %}
-                            <h3>Number of cache puts</h3>
+                            <h3 data-ui-role="typography" data-ui-variant="h3">Number of cache puts</h3>
                             {{ helper.render_simple_table('Region', 'Puts', collector.cacheRegions.puts) }}
                         {% endif %}
                     {% endif %}
@@ -344,7 +344,7 @@
         </div>
 
         <div class="tab">
-            <h3 class="tab-title">Managed Entities</h3>
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Managed Entities</h3>
             <div class="tab-content">
                 {% if not collector.managedEntityCountByClass %}
                     <div data-ui-role="empty">
@@ -352,7 +352,7 @@
                     </div>
                 {% else %}
                     {% for manager, entityCounts in collector.managedEntityCountByClass %}
-                        <h4>{{ manager }} <small>entity manager</small></h4>
+                        <h4 data-ui-role="typography" data-ui-variant="h4">{{ manager }} <small>entity manager</small></h4>
                         {{ helper.render_simple_table('Class', 'Amount of managed objects', entityCounts) }}
                     {% endfor %}
                 {% endif %}
@@ -360,7 +360,7 @@
         </div>
 
         <div class="tab {{ not collector.entities ? 'disabled' }}">
-            <h3 class="tab-title">Entities Mapping</h3>
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Entities Mapping</h3>
             <div class="tab-content">
 
                 {% if not collector.entities %}
@@ -370,7 +370,7 @@
                 {% else %}
                     {% for manager, classes in collector.entities %}
                         {% if collector.managers|length > 1 %}
-                            <h4>{{ manager }} <small>entity manager</small></h4>
+                            <h4 data-ui-role="typography" data-ui-variant="h4">{{ manager }} <small>entity manager</small></h4>
                         {% endif %}
 
                         {% if classes is empty %}
@@ -392,7 +392,7 @@
                                         <td>
                                             <a href="{{ class.file|file_link(class.line) }}">{{ class. class}}</a>
                                         </td>
-                                        <td class="font-normal">
+                                        <td data-ui-font="sans">
                                             {% if contains_errors %}
                                                 <ul>
                                                     {% for error in collector.mappingErrors[manager][class.class] %}
@@ -465,7 +465,7 @@
             }
 
             header.setAttribute('data-sort-direction', (-1*direction).toString());
-            header.children[0].innerHTML = direction > 0 ? '<span class="text-muted">&#9650;</span>' : '<span class="text-muted">&#9660;</span>';
+            header.children[0].innerHTML = direction > 0 ? '<span data-ui-role="typography" data-ui-variant="muted">&#9650;</span>' : '<span data-ui-role="typography" data-ui-variant="muted">&#9660;</span>';
 
             items.sort(function(a, b) {
                 return direction * (parseFloat(a.children[column].innerHTML) - parseFloat(b.children[column].innerHTML));

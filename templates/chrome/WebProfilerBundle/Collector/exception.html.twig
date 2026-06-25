@@ -24,7 +24,7 @@
     <div data-ui-profiler-panel="exception">
     {# these styles are needed to override some styles from Exception page, which wasn't
        updated yet to the new style of the Symfony Profiler #}
-<h2>Exceptions</h2>
+{{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Exceptions' }) }}
     {% if not collector.hasexception %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>No exception was thrown and caught.</p>

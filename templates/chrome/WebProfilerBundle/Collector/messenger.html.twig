@@ -9,17 +9,19 @@
         {% set status_color = collector.exceptionsCount ? 'red' %}
         {% set icon %}
             {{ source('@WebProfiler/Icon/messenger.svg') }}
-            <span class="sf-toolbar-value">{{ collector.messages|length }}</span>
+            <span data-ui-profiler-wdt-value>{{ collector.messages|length }}</span>
         {% endset %}
 
         {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant %}
             {% for bus in collector.buses %}
                 {% set exceptionsCount = collector.exceptionsCount(bus) %}
-                <div class="sf-toolbar-info-piece">
+                <div data-ui-profiler-wdt-info-piece>
                     <b>{{ bus }}</b>
                     <span
                         title="{{ exceptionsCount }} message(s) with exceptions"
-                        class="sf-toolbar-status sf-toolbar-status-{{ exceptionsCount ? 'red' }}"
+                        data-ui-profiler-wdt-status
+                        data-ui-variant="{{ wdt_variant(exceptionsCount ? 'red' : 'none') }}"
                     >
                         {{ collector.messages(bus)|length }}
                     </span>
@@ -43,24 +45,23 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="messenger">
-    <h2>Messages</h2>
-
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Messages' }) }}
     {% if collector.messages is empty %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>No messages have been collected.</p>
         </div>
     {% elseif 1 == collector.buses|length %}
-        <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
+        <p data-ui-role="typography" data-ui-variant="muted">Ordered list of dispatched messages across all your buses</p>
         {{ _self.render_bus_messages(collector.messages, true) }}
     {% else %}
         <div data-ui-profiler-tabs data-ui-role="tabs" class="message-bus">
             <div class="tab">
                 {% set messages = collector.messages %}
                 {% set exceptionsCount = collector.exceptionsCount %}
-                <h3 class="tab-title">All<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">All<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
 
                 <div class="tab-content">
-                    <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
+                    <p data-ui-role="typography" data-ui-variant="muted">Ordered list of dispatched messages across all your buses</p>
                     {{ _self.render_bus_messages(messages, true) }}
                 </div>
             </div>
@@ -69,10 +70,10 @@
                 <div class="tab message-bus">
                     {% set messages = collector.messages(bus) %}
                     {% set exceptionsCount = collector.exceptionsCount(bus) %}
-                    <h3 class="tab-title">{{ bus }}<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
+                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ bus }}<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
 
                     <div class="tab-content">
-                        <p class="text-muted">Ordered list of messages dispatched on the <code>{{ bus }}</code> bus</p>
+                        <p data-ui-role="typography" data-ui-variant="muted">Ordered list of messages dispatched on the <code>{{ bus }}</code> bus</p>
                         {{ _self.render_bus_messages(messages) }}
                     </div>
                 </div>
@@ -107,7 +108,7 @@
         </thead>
         <tbody id="message-item-{{ discr }}-{{ loop.index0 }}-details" data-ui-profiler-toggle-panel{% if not loop.first %} hidden{% endif %}>
             <tr>
-                <th scope="row" class="font-normal">Caller</th>
+                <th scope="row" data-ui-font="sans">Caller</th>
                 <td class="message-bus-dispatch-caller">
                     In
                     {% set caller = dispatchCall.caller %}
@@ -126,7 +127,7 @@
                         type="button"
                         variant="neutral" appearance="ghost"
                         size="sm"
-                        class="text-small"
+                        data-ui-role="typography" data-ui-density="compact"
                         data-ui-profiler-toggle
                         data-ui-profiler-toggle-target="#messenger-trace-{{ discr }}-{{ loop.index0 }}"
                         data-ui-profiler-toggle-alt="Hide excerpt"
@@ -146,39 +147,39 @@
             </tr>
             {% if showBus %}
                 <tr>
-                    <th scope="row" class="font-normal">Bus</th>
+                    <th scope="row" data-ui-font="sans">Bus</th>
                     <td>{{ dispatchCall.bus }}</td>
                 </tr>
             {% endif %}
             <tr>
-                <th scope="row" class="font-normal">Message</th>
+                <th scope="row" data-ui-font="sans">Message</th>
                 <td>{{ profiler_dump(dispatchCall.message.value, maxDepth: 2) }}</td>
             </tr>
             <tr>
-                <th scope="row" class="font-normal">Envelope stamps <span class="block text-muted">when dispatching</span></th>
+                <th scope="row" data-ui-font="sans">Envelope stamps <span data-ui-display="block" data-ui-role="typography" data-ui-variant="muted">when dispatching</span></th>
                 <td>
                     {% for item in dispatchCall.stamps %}
                         {{ profiler_dump(item) }}
                     {% else %}
-                        <span class="text-muted font-normal">No items</span>
+                        <span data-ui-role="typography" data-ui-variant="muted" data-ui-font="sans">No items</span>
                     {% endfor %}
                 </td>
             </tr>
             {% if dispatchCall.stamps_after_dispatch is defined %}
                 <tr>
-                    <th scope="row" class="font-normal">Envelope stamps <span class="block text-muted">after dispatch</span></th>
+                    <th scope="row" data-ui-font="sans">Envelope stamps <span data-ui-display="block" data-ui-role="typography" data-ui-variant="muted">after dispatch</span></th>
                     <td>
                         {% for item in dispatchCall.stamps_after_dispatch %}
                             {{ profiler_dump(item) }}
                         {% else %}
-                            <span class="text-muted">No items</span>
+                            <span data-ui-role="typography" data-ui-variant="muted">No items</span>
                         {% endfor %}
                     </td>
                 </tr>
             {% endif %}
             {% if dispatchCall.exception is defined %}
                 <tr>
-                    <td class="text-bold">Exception</td>
+                    <td data-ui-role="typography" style="font-weight:bold">Exception</td>
                     <td>
                         {{ profiler_dump(dispatchCall.exception.value, maxDepth: 1) }}
                     </td>

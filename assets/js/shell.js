@@ -55,7 +55,6 @@ export class UiProfilerShell {
         tabGroups.forEach((tabGroup, i) => {
             const tabs = tabGroup.querySelectorAll(':scope > .tab');
             const tabNavigation = document.createElement('div');
-            tabNavigation.classList.add('tab-navigation');
             tabNavigation.setAttribute('data-ui-profiler-tab-navigation', '');
             tabNavigation.setAttribute('role', 'tablist');
 
@@ -65,7 +64,7 @@ export class UiProfilerShell {
                 const tabTitle = tab.querySelector('.tab-title').innerHTML;
 
                 const tabNavigationItem = document.createElement('button');
-                tabNavigationItem.classList.add('tab-control');
+                tabNavigationItem.setAttribute('data-ui-profiler-tab', '');
                 tabNavigationItem.setAttribute('data-tab-id', tabId);
                 tabNavigationItem.setAttribute('role', 'tab');
                 tabNavigationItem.setAttribute('aria-controls', tabId);
@@ -73,7 +72,7 @@ export class UiProfilerShell {
                     selectedTabId = tabId;
                 }
                 if (tab.classList.contains('disabled')) {
-                    tabNavigationItem.classList.add('disabled');
+                    tabNavigationItem.setAttribute('aria-disabled', 'true');
                 }
                 tabNavigationItem.innerHTML = tabTitle;
                 tabNavigation.appendChild(tabNavigationItem);
@@ -83,11 +82,11 @@ export class UiProfilerShell {
             });
 
             tabGroup.insertBefore(tabNavigation, tabGroup.firstChild);
-            document.querySelector('[data-tab-id="' + selectedTabId + '"]').classList.add('active');
+            document.querySelector('[data-tab-id="' + selectedTabId + '"]').setAttribute('aria-selected', 'true');
         });
 
         tabGroups.forEach((tabGroup) => {
-            const tabs = tabGroup.querySelectorAll(':scope > .tab-navigation .tab-control');
+            const tabs = tabGroup.querySelectorAll(':scope > [data-ui-profiler-tab-navigation] [data-ui-profiler-tab]');
             tabs.forEach((tab) => {
                 const tabId = tab.getAttribute('data-tab-id');
                 const tabPanel = document.getElementById(tabId);
@@ -95,13 +94,11 @@ export class UiProfilerShell {
                 tabPanel.setAttribute('aria-labelledby', tabId);
                 tabPanel.querySelector('.tab-title').hidden = true;
 
-                if (tab.classList.contains('active')) {
+                if ('true' === tab.getAttribute('aria-selected')) {
                     tabPanel.hidden = false;
-                    tab.setAttribute('aria-selected', 'true');
                     tab.removeAttribute('tabindex');
                 } else {
                     tabPanel.hidden = true;
-                    tab.removeAttribute('aria-selected');
                     tab.setAttribute('tabindex', '-1');
                 }
 
@@ -117,12 +114,10 @@ export class UiProfilerShell {
                         const siblingTabId = sibling.getAttribute('data-tab-id');
                         const siblingPanel = document.getElementById(siblingTabId);
                         siblingPanel.hidden = true;
-                        sibling.classList.remove('active');
                         sibling.removeAttribute('aria-selected');
                         sibling.setAttribute('tabindex', '-1');
                     });
 
-                    activeTab.classList.add('active');
                     activeTab.setAttribute('aria-selected', 'true');
                     activeTab.removeAttribute('tabindex');
                     const activeTabId = activeTab.getAttribute('data-tab-id');
@@ -230,58 +225,6 @@ export class UiProfilerShell {
 
             toggle.setAttribute('data-processed', 'true');
         });
-
-        const toggles = document.querySelectorAll('.sf-toggle:not([data-processed=true])');
-        toggles.forEach((toggle) => {
-            const elementSelector = toggle.getAttribute('data-toggle-selector');
-            const element = document.querySelector(elementSelector);
-
-            element.classList.add('sf-toggle-content');
-
-            if (toggle.hasAttribute('data-toggle-initial') && 'display' === toggle.getAttribute('data-toggle-initial')) {
-                toggle.classList.add('sf-toggle-on');
-                element.classList.add('sf-toggle-visible');
-            } else {
-                toggle.classList.add('sf-toggle-off');
-                element.classList.add('sf-toggle-hidden');
-            }
-
-            toggle.addEventListener('click', (e) => {
-                const currentToggle = e.currentTarget;
-
-                if (e.target.closest('a, .sf-toggle') !== currentToggle) {
-                    return;
-                }
-
-                e.preventDefault();
-
-                if ('' !== window.getSelection().toString()) {
-                    return;
-                }
-
-                const toggleElement = document.querySelector(currentToggle.getAttribute('data-toggle-selector'));
-
-                currentToggle.classList.toggle('sf-toggle-on');
-                currentToggle.classList.toggle('sf-toggle-off');
-                toggleElement.classList.toggle('sf-toggle-hidden');
-                toggleElement.classList.toggle('sf-toggle-visible');
-
-                if (!currentToggle.hasAttribute('data-toggle-alt-content')) {
-                    return;
-                }
-
-                if (!currentToggle.hasAttribute('data-toggle-original-content')) {
-                    currentToggle.setAttribute('data-toggle-original-content', currentToggle.innerHTML);
-                }
-
-                const currentContent = currentToggle.innerHTML;
-                const originalContent = currentToggle.getAttribute('data-toggle-original-content');
-                const altContent = currentToggle.getAttribute('data-toggle-alt-content');
-                currentToggle.innerHTML = currentContent !== altContent ? altContent : originalContent;
-            });
-
-            toggle.setAttribute('data-processed', 'true');
-        });
     }
 
     createCopyToClipboard() {
@@ -292,7 +235,7 @@ export class UiProfilerShell {
         const copyToClipboardElements = document.querySelectorAll('[data-clipboard-text]');
 
         copyToClipboardElements.forEach((copyToClipboardElement) => {
-            copyToClipboardElement.classList.remove('hidden');
+            copyToClipboardElement.removeAttribute('hidden');
 
             copyToClipboardElement.addEventListener('click', (e) => {
                 e.stopPropagation();
