@@ -69,7 +69,7 @@
     <div data-ui-profiler-shell data-ui-role="grid-container"{% if ssr_theme_id %} data-theme="{{ ssr_theme_id }}"{% endif %}>
         {{ include('@WebProfiler/Profiler/header.html.twig', {profile_type: profile_type}, with_context: false) }}
 
-        <div id="summary">
+        <div id="summary" data-ui-profiler-request-summary>
             {% block summary %}
                 {% if profile is defined %}
                     {% set request_collector = profile.collectors.request|default(false) %}
@@ -86,11 +86,11 @@
         </div>
 
         <div id="content">
-            <div id="main" data-ui-role="grid">
-                <aside id="sidebar" data-ui-role="grid-cell" data-ui-span-md="3" data-ui-span-lg="3">
+            <div id="main" data-ui-profiler-main data-ui-role="grid">
+                <aside id="sidebar" data-ui-profiler-sidebar data-ui-role="grid-cell" data-ui-span-md="3" data-ui-span-lg="3">
                     {% block sidebar %}
-                        <div id="sidebar-contents" data-ui-role="card" data-ui-fragment="blocks.card">
-                            <div id="sidebar-shortcuts">
+                        <div id="sidebar-contents" data-ui-profiler-sidebar-contents data-ui-role="card" data-ui-fragment="blocks.card">
+                            <div id="sidebar-shortcuts" data-ui-profiler-sidebar-shortcuts>
                                 {% block sidebar_shortcuts_links %}
                                     <twig:Stack direction="horizontal" gap="sm" class="shortcuts" data-ui-profiler-shortcuts>
                                         <twig:Button as="a" href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}" variant="neutral" appearance="ghost" size="sm">
@@ -104,7 +104,7 @@
                             </div>
 
                             {% if templates is defined %}
-                                <ul id="menu-profiler" data-ui-role="list" data-ui-fragment="blocks.list">
+                                <ul id="menu-profiler" data-ui-profiler-menu data-ui-role="list" data-ui-fragment="blocks.list">
                                     {% if 'request' is same as(profile_type) %}
                                         {% set excludes = ['command'] %}
                                     {% elseif 'command' is same as(profile_type) %}
@@ -139,9 +139,9 @@
                     {% endblock sidebar %}
                 </aside>
 
-                <div id="collector-wrapper" data-ui-role="grid-cell" data-ui-span-md="9" data-ui-span-lg="9">
+                <div id="collector-wrapper" data-ui-profiler-collector-wrapper data-ui-role="grid-cell" data-ui-span-md="9" data-ui-span-lg="9">
                     <div data-ui-role="card" data-ui-fragment="blocks.card">
-                        <div id="collector-content"{% if ui_profiler_stimulus_enabled() %} data-controller="ui-profiler--tabs ui-profiler--table-search"{% endif %}>
+                        <div id="collector-content" data-ui-profiler-collector-content{% if ui_profiler_stimulus_enabled() %} data-controller="ui-profiler--tabs ui-profiler--table-search"{% endif %}>
                             {{ include('@UiProfiler/_chrome/shell-bootstrap.html.twig') }}
                             {% block panel %}{% endblock %}
                         </div>

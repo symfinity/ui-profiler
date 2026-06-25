@@ -3,7 +3,7 @@
 {% block head %}
     {{ parent() }}
     <style>
-        #collector-content .ui-kernel-profiler-palette {
+        [data-ui-profiler-collector-content] .ui-kernel-profiler-palette {
             background:
                 repeating-conic-gradient(rgba(128, 128, 128, 0.18) 0% 25%, transparent 0% 50%)
                 50% / 10px 10px;
@@ -17,12 +17,12 @@
             padding: 6px;
         }
         @media (min-width: 36rem) {
-            #collector-content .ui-kernel-profiler-palette {
+            [data-ui-profiler-collector-content] .ui-kernel-profiler-palette {
                 grid-template-columns: repeat(16, minmax(0, 1fr));
                 max-width: 40rem;
             }
         }
-        #collector-content .ui-kernel-profiler-palette__swatch {
+        [data-ui-profiler-collector-content] .ui-kernel-profiler-palette__swatch {
             aspect-ratio: 1;
             border: 1px solid rgba(128, 128, 128, 0.35);
             border-radius: 4px;
@@ -34,7 +34,7 @@
             background: transparent !important;
             opacity: 0.45;
         }
-        #collector-content .ui-kernel-profiler-palette-legend {
+        [data-ui-profiler-collector-content] .ui-kernel-profiler-palette-legend {
             color: var(--color-muted, #6c757d);
             font-size: 0.8125rem;
             margin: 0 0 0.75rem;

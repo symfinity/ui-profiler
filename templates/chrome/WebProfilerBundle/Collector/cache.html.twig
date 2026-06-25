@@ -132,16 +132,16 @@
 
 {% macro render_metrics(pool, is_total = false) %}
     <div data-ui-profiler-metrics data-ui-role="grid">
-        <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
             {{ ui.metric_cell(pool.calls, is_total ? 'Total calls' : 'Calls') }}
             {{ ui.metric_cell('%.2f'|format(pool.time * 1000) ~ ' <span class="ui-profiler-metric__unit">ms</span>', is_total ? 'Total time' : 'Time') }}
         </div>
-        <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
             {{ ui.metric_cell(pool.reads, is_total ? 'Total reads' : 'Reads') }}
             {{ ui.metric_cell(pool.writes, is_total ? 'Total writes' : 'Writes') }}
             {{ ui.metric_cell(pool.deletes, is_total ? 'Total deletes' : 'Deletes') }}
         </div>
-        <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
             {{ ui.metric_cell(pool.hits, is_total ? 'Total hits' : 'Hits') }}
             {{ ui.metric_cell(pool.misses, is_total ? 'Total misses' : 'Misses') }}
             {{ ui.metric_cell((pool.hit_read_ratio ?? 0) ~ ' <span class="ui-profiler-metric__unit">%</span>', 'Hits/reads') }}

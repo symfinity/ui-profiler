@@ -82,7 +82,7 @@
             </div>
         {% else %}
             <div data-ui-profiler-metrics data-ui-role="grid">
-                <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+                <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
                     {{ ui.metric_cell(collector.handledCount, 'Handled') }}
                     {{ ui.metric_cell('%.2f'|format(collector.totalTime * 1000) ~ ' <span class="ui-profiler-metric__unit">ms</span>', 'Total time') }}
                 </div>

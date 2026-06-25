@@ -11,7 +11,7 @@ All notable changes to `symfinity/ui-profiler` are documented here.
 
 ### Changed
 
-- **122** shell delegation (in progress): **820** CSS-body lines (`active_wave` 6, baseline 1908); waves 1–6 budget met via ux-blocks-core injection + selector compression (settings, menu, tabs, filter-bar, header/search, logger/events/time panels); parity 86/86 green.
+- **122** shell delegation: **448** CSS-body lines (`active_wave` 8, exit gate ≤477 met); legacy layout IDs migrated to `data-ui-profiler-*` hooks (T034/T036); `ShellSelectorScopeTest` guards forbidden `#summary`/`#sidebar`/… selectors; tab/metric rules scoped under hooks; **88/88** PHPUnit green; ui-lab WDT smoke (T037) still open.
 - Stabilization pass (**069**): docs aligned to `ui-lab` dogfood; archive `packages/temp/ui-profiler/` removed.
 - Semver branch-alias target `0.1.x-dev` (tag `v0.1.0` at release).
 

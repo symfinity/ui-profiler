@@ -168,7 +168,7 @@
     {% set symfony_badge_variant = {dev: 'warning', stable: 'success', eom: 'warning', eol: 'danger'} %}
 
     <div data-ui-profiler-metrics data-ui-role="grid">
-        <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
             {% set symfony_version_status_value %}
                 <twig:Badge variant="{{ symfony_badge_variant[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</twig:Badge>
             {% endset %}
@@ -187,7 +187,7 @@
     <h2>PHP Configuration</h2>
 
     <div data-ui-profiler-metrics data-ui-role="grid">
-        <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
             {% set php_version_value %}
                 {{ collector.phpversion }}{% if collector.phpversionextra %} <span class="ui-profiler-metric__unit">{{ collector.phpversionextra }}</span>{% endif %}
             {% endset %}
@@ -199,7 +199,7 @@
     </div>
 
     <div data-ui-profiler-metrics data-ui-role="grid">
-        <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+        <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
             {% set opcache_icon %}
                 <span class="ui-profiler-metric__icon{{ not collector.haszendopcache ? ' is-inactive' }}" title="{{ collector.zendopcachestatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
             {% endset %}

@@ -131,7 +131,7 @@
                 <div class="tab-content">
                     {% if collector.token %}
                         <div data-ui-profiler-metrics data-ui-role="grid">
-                            <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+                            <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
                                 {{ ui.metric_cell(collector.user, 'Username') }}
                                 {{ ui.metric_cell(source('@WebProfiler/Icon/' ~ (collector.authenticated ? 'yes' : 'no') ~ '.svg'), 'Authenticated') }}
                                 {% if collector.authProfileToken %}
@@ -198,7 +198,7 @@
                 <div class="tab-content">
                     {% if collector.firewall %}
                         <div data-ui-profiler-metrics data-ui-role="grid">
-                            <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+                            <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
                                 {{ ui.metric_cell(collector.firewall.name, 'Name') }}
                                 {{ ui.metric_cell(source('@WebProfiler/Icon/' ~ (collector.firewall.security_enabled ? 'yes' : 'no') ~ '.svg'), 'Security enabled') }}
                                 {{ ui.metric_cell(source('@WebProfiler/Icon/' ~ (collector.firewall.stateless ? 'yes' : 'no') ~ '.svg'), 'Stateless') }}

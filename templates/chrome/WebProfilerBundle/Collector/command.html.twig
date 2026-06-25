@@ -27,7 +27,7 @@
 
             <div class="tab-content">
                 <div data-ui-profiler-metrics data-ui-role="grid">
-                    <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+                    <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
                         {{ ui.metric_cell(collector.duration, 'Duration') }}
                         {{ ui.metric_cell(collector.maxMemoryUsage, 'Peak Memory Usage') }}
                         {{ ui.metric_cell(collector.verbosityLevel, 'Verbosity Level') }}
@@ -35,7 +35,7 @@
                 </div>
 
                 <div data-ui-profiler-metrics data-ui-role="grid">
-                    <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+                    <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
                         {{ ui.metric_cell(source('@WebProfiler/Icon/' ~ (collector.signalable is not empty ? 'yes' : 'no') ~ '.svg'), 'Signalable') }}
                         {{ ui.metric_cell(source('@WebProfiler/Icon/' ~ (collector.interactive ? 'yes' : 'no') ~ '.svg'), 'Interactive') }}
                         {{ ui.metric_cell(source('@WebProfiler/Icon/' ~ (collector.validateInput ? 'yes' : 'no') ~ '.svg'), 'Validate Input') }}

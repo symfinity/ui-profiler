@@ -8,7 +8,7 @@
 {% endmacro %}
 
 {% macro metric_group(cells) %}
-    <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+    <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
         {% for cell in cells %}
             {{ _self.metric_cell(cell.value, cell.label, cell.unit|default(null)) }}
         {% endfor %}

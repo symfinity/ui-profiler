@@ -126,9 +126,9 @@ final class ShellParityTest extends WebTestCase
     {
         $shellCss = \Symfinity\UiProfiler\Asset\ShellChromeStylesheet::CSS;
 
-        self::assertStringContainsString('[data-ui-profiler-shell] #main[data-ui-role="grid"]', $shellCss);
+        self::assertStringContainsString('[data-ui-profiler-shell] [data-ui-profiler-main][data-ui-role="grid"]', $shellCss);
         self::assertStringContainsString('grid-template-columns: repeat(12', $shellCss);
-        self::assertStringContainsString('body {', $shellCss);
+        self::assertStringContainsString('[data-ui-profiler-shell] {', $shellCss);
         self::assertStringContainsString('background-color: var(--ui-color-surface)', $shellCss);
     }
 }

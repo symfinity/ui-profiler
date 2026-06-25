@@ -80,7 +80,7 @@
         </div>
     {% else %}
         <div data-ui-profiler-metrics data-ui-role="grid">
-            <div class="ui-profiler-metric-group" data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
+            <div class="ui-profiler-metric-group" data-ui-profiler-metric-group data-ui-role="stack" data-ui-direction="horizontal" data-ui-gap="none">
                 {{ ui.metric_cell(events.events|filter(e => e.isQueued())|length, 'Queued') }}
                 {{ ui.metric_cell(events.events|filter(e => not e.isQueued())|length, 'Sent') }}
             </div>

@@ -56,6 +56,7 @@ export class UiProfilerShell {
             const tabs = tabGroup.querySelectorAll(':scope > .tab');
             const tabNavigation = document.createElement('div');
             tabNavigation.classList.add('tab-navigation');
+            tabNavigation.setAttribute('data-ui-profiler-tab-navigation', '');
             tabNavigation.setAttribute('role', 'tablist');
 
             let selectedTabId = `tab-${i}-0`;
