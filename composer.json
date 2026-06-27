@@ -64,29 +64,6 @@
             "Symfinity\\UiProfiler\\Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../ui-kernel",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "../ux-blocks-core",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "../ux-blocks-extended",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
     "scripts": {
         "test": "phpunit -c phpunit.xml.dist",
         "scss:compile": "bin/profiler-css-compile",
@@ -94,7 +71,6 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "version": "0.1.0-dev",
     "extra": {
         "branch-alias": {
             "dev-main": "0.1.x-dev"
