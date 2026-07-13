@@ -1,7 +1,7 @@
 name: CI
 
-# Matrix: maintained PHP x Symfony 7.4 (Symfony 8 cells deferred until symfony/monolog-bundle supports ^8).
-# Pin direct symfony/* to matrix minor before update — no symfony/flex (bundle must not scaffold a Flex app on CI).
+# Matrix: maintained PHP x maintained Symfony (floor 7.4.*).
+# Regenerated 2026-07-13 — refresh: split-mirror-docs/scripts/fetch-ci-matrix.sh --gha-json --package-php='>=8.2' --symfony-floor=7.4
 
 on:
   push:
@@ -24,6 +24,10 @@ jobs:
           - { php: '8.3', symfony: '7.4' }
           - { php: '8.4', symfony: '7.4' }
           - { php: '8.5', symfony: '7.4' }
+          - { php: '8.4', symfony: '8.0' }
+          - { php: '8.5', symfony: '8.0' }
+          - { php: '8.4', symfony: '8.1' }
+          - { php: '8.5', symfony: '8.1' }
 
     name: PHPUnit + PHPStan (PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}.*)
 
@@ -48,52 +52,32 @@ jobs:
           coverage: none
           tools: composer:v2
 
-      - name: Install dependencies
-        env:
-          SYMFONY_MINOR: ${{ matrix.symfony }}
+      - name: Pin Symfony ${{ matrix.symfony }}
         run: |
-          set -euo pipefail
-          php <<'PHP'
-          <?php
-          $minor = getenv('SYMFONY_MINOR') ?: '7.4';
-          $manifest = json_decode(file_get_contents('composer.json'), true);
-          $packages = [];
-          foreach (array_merge($manifest['require'] ?? [], $manifest['require-dev'] ?? []) as $name => $_constraint) {
-              if (str_starts_with($name, 'symfony/')) {
-                  $packages[] = $name . ':^' . $minor;
-              }
-          }
-          if ($packages === []) {
-              fwrite(STDERR, "No symfony/* packages found in composer.json\n");
-              exit(1);
-          }
-          passthru('composer require --no-update ' . implode(' ', array_map('escapeshellarg', $packages)));
-          PHP
-          composer update --prefer-dist --no-interaction --no-progress --with-all-dependencies --no-scripts
-          drift=""
-          while IFS= read -r pkg; do
-            ver=$(composer show "$pkg" --installed --format=json | php -r '$d=json_decode(stream_get_contents(STDIN)); echo $d->versions[0];')
-            case "$ver" in
-              v${SYMFONY_MINOR}.*) ;;
-              *) drift="${drift} ${pkg}" ;;
-            esac
-          done < <(composer show --installed --name-only | grep '^symfony/')
-          if [ -n "${drift// }" ]; then
-            for pkg in $drift; do
-              composer require --no-update "${pkg}:^${SYMFONY_MINOR}"
-            done
-            composer update symfony/* --with-all-dependencies --prefer-dist --no-interaction --no-progress --no-scripts
-          fi
-          while IFS= read -r pkg; do
-            ver=$(composer show "$pkg" --installed --format=json | php -r '$d=json_decode(stream_get_contents(STDIN)); echo $d->versions[0];')
-            case "$ver" in
-              v${SYMFONY_MINOR}.*) ;;
-              *)
-                echo "::error::Symfony drift: $pkg $ver (expected ${SYMFONY_MINOR}.*)"
-                exit 1
-                ;;
-            esac
-          done < <(composer show --installed --name-only | grep '^symfony/')
+          composer require --no-update \
+            symfony/config:^${{ matrix.symfony }} \
+            symfony/dependency-injection:^${{ matrix.symfony }} \
+            symfony/framework-bundle:^${{ matrix.symfony }} \
+            symfony/http-foundation:^${{ matrix.symfony }} \
+            symfony/http-kernel:^${{ matrix.symfony }} \
+            symfony/twig-bundle:^${{ matrix.symfony }} \
+            symfony/web-profiler-bundle:^${{ matrix.symfony }} \
+            symfony/asset-mapper:^${{ matrix.symfony }} \
+            symfony/browser-kit:^${{ matrix.symfony }} \
+            symfony/css-selector:^${{ matrix.symfony }} \
+            symfony/form:^${{ matrix.symfony }} \
+            symfony/http-client:^${{ matrix.symfony }} \
+            symfony/mailer:^${{ matrix.symfony }} \
+            symfony/messenger:^${{ matrix.symfony }} \
+            symfony/security-bundle:^${{ matrix.symfony }} \
+            symfony/serializer:^${{ matrix.symfony }} \
+            symfony/translation:^${{ matrix.symfony }} \
+            symfony/validator:^${{ matrix.symfony }} \
+            'symfony/stimulus-bundle:^2.0|^3.0' \
+            'symfony/ux-twig-component:^2.0|^3.0'
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
 
       - name: PHPUnit
         run: vendor/bin/phpunit --colors=always
