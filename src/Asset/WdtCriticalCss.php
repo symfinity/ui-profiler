@@ -17,7 +17,16 @@ final class WdtCriticalCss
 
     public static function css(?string $packageDir = null): string
     {
-        return ProfilerCssProvider::readFile($packageDir ?? \dirname(__DIR__, 2), self::STYLES_PATH);
+        $css = ProfilerCssProvider::readFile($packageDir ?? \dirname(__DIR__, 2), self::STYLES_PATH);
+
+        return self::minifyInline($css);
+    }
+
+    private static function minifyInline(string $css): string
+    {
+        $minified = preg_replace('/\s+/u', ' ', trim($css));
+
+        return is_string($minified) ? $minified : $css;
     }
 
     private function __construct()

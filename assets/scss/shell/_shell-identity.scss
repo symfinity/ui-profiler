@@ -1,118 +1,109 @@
-@use '../shared/tokens' as *;
+@use '../shared/mixins' as *;
 
-// Symfinity profiler shell identity — distinct from stock Symfony Web Profiler chrome
+$profiler-header-search-icon-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='21' height='21' viewBox='0 0 24 24' stroke='%23737373' fill='none' stroke-linecap='round' stroke-linejoin='round' stroke-width='3'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'/%3E%3Ccircle cx='10' cy='10' r='7'/%3E%3Cline x1='21' y1='21' x2='15' y2='15'/%3E%3C/svg%3E");
+$profiler-header-search-icon-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='21' height='21' viewBox='0 0 24 24' stroke='%23a3a3a3' fill='none' stroke-linecap='round' stroke-linejoin='round' stroke-width='3'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'/%3E%3Ccircle cx='10' cy='10' r='7'/%3E%3Cline x1='21' y1='21' x2='15' y2='15'/%3E%3C/svg%3E");
 
-[data-ui-profiler-shell] {
-  background:
-    radial-gradient(
-      120% 80% at 0% 0%,
-      color-mix(in srgb, var(--ui-color-primary) 8%, transparent),
-      transparent 55%
-    ),
-    var(--ui-color-surface);
-  min-height: 100vh;
+[data-ui-profiler-shell] .visually-hidden {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 [data-ui-profiler-header] {
   align-items: center;
+  background: var(--ui-profiler-page-scrim);
+  box-shadow: 0 0 0 5px var(--ui-profiler-page-scrim);
   display: flex;
   flex: 0 0 auto;
   justify-content: space-between;
   overflow: hidden;
-  background: color-mix(in srgb, var(--ui-color-surface-elevated) 88%, var(--ui-color-primary));
-  border: 1px solid color-mix(in srgb, var(--ui-color-border) 80%, var(--ui-color-primary));
-  border-radius: var(--ui-radius-lg, 0.5rem);
-  box-shadow:
-    0 1px 0 color-mix(in srgb, var(--ui-color-primary) 18%, transparent),
-    0 8px 24px color-mix(in srgb, var(--ui-color-text) 6%, transparent);
-  gap: var(--ui-space-md, 1rem);
-  margin-bottom: var(--ui-space-md, 1rem);
-  padding: var(--ui-space-sm, 0.5rem) var(--ui-space-md, 1rem);
+  padding: 0.625rem 0;
   position: relative;
-
-  &::before {
-    background: linear-gradient(
-      90deg,
-      var(--ui-color-primary),
-      color-mix(in srgb, var(--ui-color-accent, var(--ui-color-primary)) 70%, var(--ui-color-primary))
-    );
-    border-radius: var(--ui-radius-lg, 0.5rem) var(--ui-radius-lg, 0.5rem) 0 0;
-    content: '';
-    height: 3px;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-  }
+  z-index: 1;
 
   h1 {
-    background: transparent;
-    box-shadow: none;
-    color: var(--ui-color-text);
-    font-size: var(--ui-font-size-lg, 1.125rem);
-    font-weight: 600;
-    gap: 0.5rem;
-    letter-spacing: -0.01em;
-  }
-
-  [data-ui-profiler-header-brand] {
     align-items: center;
-    display: inline-flex;
-    gap: 0.625rem;
+    background: var(--ui-profiler-page-scrim);
+    box-shadow: 0 0 0 5px var(--ui-profiler-page-scrim);
+    color: var(--ui-color-text-muted);
+    display: flex;
+    font-size: var(--ui-font-size-lg);
+    font-weight: var(--ui-font-weight-medium, 500);
+    margin: 0;
+
+    a {
+      align-items: center;
+      color: inherit;
+      display: flex;
+      text-decoration: none;
+    }
   }
 
   [data-ui-profiler-header-mark] {
     align-items: center;
-    background: color-mix(in srgb, var(--ui-color-primary) 14%, var(--ui-color-surface));
-    border: 1px solid color-mix(in srgb, var(--ui-color-primary) 28%, var(--ui-color-border));
-    border-radius: var(--ui-radius-md, 0.375rem);
-    color: var(--ui-color-primary);
     display: inline-flex;
-    height: 2rem;
-    justify-content: center;
-    width: 2rem;
+    margin-right: 0.375rem;
 
     svg {
-      height: 1.25rem;
-      width: 1.25rem;
+      height: 1.75rem;
+      width: 1.75rem;
     }
   }
 
-  [data-ui-profiler-header-eyebrow] {
-    color: var(--ui-color-text-muted);
-    display: block;
-    font-size: var(--ui-font-size-sm, 0.875rem);
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    line-height: 1.2;
-    text-transform: uppercase;
-  }
+  [data-ui-profiler-header-search] {
+    margin-right: 2px;
 
-  [data-ui-profiler-header-actions] {
-    align-items: center;
-    display: flex;
-    flex-shrink: 0;
-    gap: 0.5rem;
+    input[type='search'] {
+      background-color: transparent;
+      background-image: $profiler-header-search-icon-light;
+      background-position: 0.3125rem center;
+      background-repeat: no-repeat;
+      background-size: 1rem;
+      border: 0;
+      border-radius: 0;
+      box-shadow:
+        inset 0 0 0 1px var(--ui-color-border),
+        0 0 0 3px var(--ui-profiler-page-scrim);
+      color: var(--ui-color-text);
+      font: inherit;
+      font-size: var(--ui-font-size-sm);
+      padding: 0.3125rem 0.5rem 0.3125rem 1.875rem;
+      width: 13.4375rem;
+    }
   }
 }
 
+[data-ui-profiler-shell][data-theme$='-dark'] [data-ui-profiler-header] h1 {
+  color: color-mix(in srgb, var(--ui-color-text) 82%, var(--ui-color-text-muted));
+}
+
+[data-ui-profiler-shell][data-theme$='-dark'] [data-ui-profiler-header] [data-ui-profiler-header-search] input[type='search'] {
+  background-image: $profiler-header-search-icon-dark;
+}
+
 [data-ui-profiler-sidebar-contents][data-ui-role='card'] {
-  border: 1px solid color-mix(in srgb, var(--ui-color-border) 85%, var(--ui-color-primary));
+  border: 1px solid var(--ui-color-border);
   border-radius: var(--ui-radius-lg, 0.5rem);
-  box-shadow:
-    inset 3px 0 0 color-mix(in srgb, var(--ui-color-primary) 55%, transparent),
-    0 4px 18px color-mix(in srgb, var(--ui-color-text) 5%, transparent);
+  @include profiler-shadow-card;
   overflow: hidden;
 }
 
 [data-ui-profiler-collector-wrapper] [data-ui-role='card'] {
   border: 1px solid var(--ui-color-border);
   border-radius: var(--ui-radius-lg, 0.5rem);
-  box-shadow: 0 4px 18px color-mix(in srgb, var(--ui-color-text) 5%, transparent);
+  @include profiler-shadow-card;
   overflow: hidden;
 }
 
 [data-ui-profiler-request-summary] {
-  border-radius: var(--ui-radius-lg, 0.5rem);
-  box-shadow: 0 4px 18px color-mix(in srgb, var(--ui-color-text) 5%, transparent);
+  background: var(--ui-profiler-page-scrim);
+  box-shadow: 0 0 0 5px var(--ui-profiler-page-scrim);
+  color: var(--ui-color-text);
+  margin: 0 0 15px;
 }

@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 #[Group('ui-profiler-runtime')]
 final class DualInteractionParityTest extends WebTestCase
 {
+    use ParityBrowserTrait;
+
     protected static function getKernelClass(): string
     {
         return ParityKernelWithRuntime::class;
@@ -21,8 +23,7 @@ final class DualInteractionParityTest extends WebTestCase
         $client = static::createClient(['debug' => true]);
         $client->request('GET', '/parity/rich');
 
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token);
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token . '?panel=request');
         self::assertResponseIsSuccessful();
@@ -41,8 +42,7 @@ final class DualInteractionParityTest extends WebTestCase
         $client = static::createClient(['debug' => true]);
         $client->request('GET', '/parity/rich');
 
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token);
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token . '?panel=request');
         self::assertResponseIsSuccessful();

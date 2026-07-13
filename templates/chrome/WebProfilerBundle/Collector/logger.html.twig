@@ -19,7 +19,10 @@
                 this.#updateLogsTable();
 
                 document.querySelectorAll('.log-filter input').forEach((input) => {
-                    input.addEventListener('change', () => { this.#updateLogsTable(); });
+                    input.addEventListener('change', () => {
+                        this.#updateLogsTable();
+                        input.closest('details.log-filter')?.removeAttribute('open');
+                    });
                 });
 
                 document.querySelectorAll('.filter-select-all-or-none button').forEach((link) => {

@@ -1,0 +1,173 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+{% import '@UiProfiler/_chrome/macros/profiler-ui.html.twig' as ui %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block toolbar %}
+    {% if collector.renderCount %}
+        {% set icon %}
+            {{ source('@TwigComponent/Collector/icon.svg') }}
+            <span data-ui-profiler-wdt-value>{{ collector.renderCount }}</span>
+            <span data-ui-profiler-wdt-info-piece-additional-detail">
+                <span data-ui-profiler-wdt-label">in</span>
+                <span data-ui-profiler-wdt-value">{{ collector.renderTime|round }}</span>
+                <span data-ui-profiler-wdt-label">ms</span>
+            </span>
+        {% endset %}
+
+        {% set text %}
+            {% for _component in collector.components %}
+                <div data-ui-profiler-wdt-info-piece">
+                    <b>{{ _component.name }}</b>
+                    <span>{{ _component.render_count }}</span>
+                </div>
+            {% endfor %}
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url}) }}
+    {% endif %}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="twig-component">
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Components' }) }}
+
+        {% if not collector.componentCount|default %}
+            <div data-ui-role="empty" data-ui-profiler-empty-panel>
+                <p>No components were rendered for this request.</p>
+            </div>
+        {% else %}
+            <div data-ui-metrics-grid data-ui-role="grid">
+                <div data-ui-role="stat-group">
+                    {{ ui.metric_cell(collector.componentCount, 'Twig Components') }}
+                    {{ ui.metric_cell(collector.renderCount, 'Render Count') }}
+                    {{ ui.metric_cell(collector.renderTime|round ~ ' <span data-ui-part="unit">ms</span>', 'Render Time') }}
+                    {{ ui.metric_cell((collector.peakMemoryUsage / 1024 / 1024)|number_format(1) ~ ' <span data-ui-part="unit">MiB</span>', 'Memory Usage') }}
+                </div>
+            </div>
+
+            {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Registered components' }) }}
+            {{ block('table_components') }}
+
+            {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Render calls' }) }}
+            {{ block('table_renders') }}
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block table_components %}
+    <table data-ui-role="table" class="twig-component-component">
+        <thead>
+            <tr>
+                <th scope="col" class="key">Name</th>
+                <th scope="col">Metadata</th>
+                <th scope="col" class="num-col">Render Count</th>
+                <th scope="col" class="num-col">Render Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for component in collector.components %}
+                <tr>
+                    <th scope="row">{{ component.name }}</th>
+                    <td>
+                        {% if component.class == 'Symfony\\UX\\TwigComponent\\AnonymousComponent' %}
+                            <span data-ui-role="typography" data-ui-variant="muted">[Anonymous]</span>
+                        {% else %}
+                            {{ profiler_dump(component.class_stub) }}
+                        {% endif %}
+                        {% if component.template_path %}
+                            <a href="{{ component.template_path|file_link(1) }}" data-ui-role="typography" data-ui-variant="muted">
+                                {{- component.template -}}
+                            </a>
+                        {% else %}
+                            <span data-ui-role="typography" data-ui-variant="muted">{{ component.template }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="num-col">{{ component.render_count }}</td>
+                    <td class="num-col">
+                        {{- component.render_time|number_format(2) -}}
+                        <span data-ui-role="typography" data-ui-variant="muted"> ms</span>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block table_renders %}
+    <div class="twig-component-renders">
+        {% set previous_memory = null %}
+        {% for render in collector.renders %}
+            <table
+                data-ui-role="table"
+                class="twig-component-render"
+                style="--render-depth: {{ render.depth }};"
+            >
+                <thead>
+                    <tr
+                        data-ui-profiler-toggle
+                        data-ui-profiler-toggle-target="#render-{{ loop.index }}-details"
+                        {% if loop.first %}data-ui-profiler-toggle-open{% endif %}
+                    >
+                        <th scope="col" class="key">
+                            {% if render.depth %}{{ source('@TwigComponent/Collector/chevron-down.svg') }}{% endif %}
+                            {{ render.name }}
+                        </th>
+                        <th scope="col">
+                            {% if render.class == 'Symfony\\UX\\TwigComponent\\AnonymousComponent' %}
+                                <span data-ui-role="typography" data-ui-variant="muted">[Anonymous]</span>
+                            {% else %}
+                                {{ render.class }}
+                            {% endif %}
+                        </th>
+                        <th scope="col" class="num-col">
+                            {% set render_memory = render.render_memory|default(0) / 1024 / 1024 %}
+                            {% if render_memory == previous_memory %}
+                                <span data-ui-role="typography" data-ui-variant="muted">{{ render_memory|number_format(1) }}</span>
+                            {% else %}
+                                {{- render_memory|number_format(1) -}}
+                            {% endif %}
+                            <span data-ui-role="typography" data-ui-variant="muted"> MiB</span>
+                            {% set previous_memory = render_memory %}
+                        </th>
+                        <th scope="col" class="num-col">
+                            {{ render.render_time|number_format(2) }}
+                            <span data-ui-role="typography" data-ui-variant="muted"> ms</span>
+                        </th>
+                        <th scope="col" class="twig-component-render-toggle">
+                            <twig:Button
+                                as="button"
+                                type="button"
+                                variant="neutral"
+                                appearance="ghost"
+                                size="sm"
+                                class="toggle-button"
+                                aria-label="Toggle details"
+                            >
+                                {{ source('@TwigComponent/Collector/chevron-down.svg') }}
+                            </twig:Button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="render-{{ loop.index }}-details" data-ui-profiler-toggle-panel{% if not loop.first %} hidden{% endif %}>
+                    <tr class="{{ not render.input_props|default ? 'opacity-50' }}">
+                        <th scope="row">Input props</th>
+                        <td colspan="4">{{ profiler_dump(render.input_props) }}</td>
+                    </tr>
+                    <tr class="{{ not render.attributes|default ? 'opacity-50' }}">
+                        <th scope="row">Attributes</th>
+                        <td colspan="4">{{ profiler_dump(render.attributes) }}</td>
+                    </tr>
+                    {% if render.component is defined %}
+                        <tr>
+                            <th scope="row">Component</th>
+                            <td colspan="4">{{ profiler_dump(render.component) }}</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+{% endblock %}

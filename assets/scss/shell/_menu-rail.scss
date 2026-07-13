@@ -1,51 +1,47 @@
 // L2 glue — profiler sidebar menu slots on core list rail variant
 
 [data-ui-role='list'][data-ui-variant='rail'][data-ui-profiler-menu] {
+  padding: 0;
+
   > li {
     &:has([data-ui-profiler-menu-disabled]) {
       order: 1;
     }
 
-    &.selected {
-      &::before {
-        background: linear-gradient(
-          180deg,
-          var(--ui-color-primary),
-          color-mix(in srgb, var(--ui-color-primary) 65%, var(--ui-color-accent, var(--ui-color-primary)))
-        );
-        border-radius: 999px;
-        content: '';
-        height: 1.75rem;
-        left: -6px;
-        position: absolute;
-        top: calc(50% - 0.875rem);
-        width: 4px;
-      }
+    > a {
+      display: block;
+      text-decoration: none;
+    }
 
-      a [data-ui-profiler-menu-label] {
-        background: color-mix(in srgb, var(--ui-color-primary) 10%, var(--ui-color-surface-elevated));
-        border-radius: var(--ui-radius-md, 0.375rem);
+    &.selected > a {
+      background: color-mix(in srgb, var(--ui-color-primary) 10%, var(--ui-color-surface-elevated));
+
+      [data-ui-profiler-menu-label] {
         color: var(--ui-color-primary);
       }
 
-      a [data-ui-profiler-menu-icon] svg,
-      a [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg {
+      [data-ui-profiler-menu-icon] svg,
+      [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg {
         color: var(--ui-color-primary);
       }
     }
 
-    a:hover {
-      [data-ui-profiler-menu-label]:not([data-ui-profiler-menu-disabled]) {
-        background: var(--ui-color-surface-elevated);
+    > a:hover:not(:has([data-ui-profiler-menu-disabled])) {
+      background: var(--ui-color-surface-elevated);
+
+      [data-ui-profiler-menu-label] {
         color: var(--ui-color-primary);
       }
 
       [data-ui-profiler-menu-icon] svg {
         color: var(--ui-color-primary);
       }
+    }
 
-      [data-ui-profiler-menu-label][data-ui-profiler-menu-disabled] {
-        background: transparent;
+    > a:hover:has([data-ui-profiler-menu-disabled]) {
+      background: transparent;
+
+      [data-ui-profiler-menu-label] {
         color: var(--ui-color-text-muted);
       }
 
@@ -71,17 +67,18 @@
 [data-ui-profiler-menu-label] {
   align-items: center;
   background: transparent;
-  border-radius: 4px;
+  box-sizing: border-box;
   color: var(--ui-color-text);
   display: flex;
   gap: 0.5rem;
   overflow: hidden;
   padding: 5px 7px;
+  width: 100%;
 
   strong {
     flex: 1;
     font-size: var(--ui-font-size-md);
-    font-weight: 500;
+    font-weight: var(--ui-font-weight-medium, 500);
   }
 
   &[data-ui-profiler-menu-disabled] {

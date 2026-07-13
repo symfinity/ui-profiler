@@ -43,7 +43,7 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="validator">
-    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Validator calls' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Validator' }) }}
     {% for call in collector.calls %}
         <div data-ui-profiler-validator-call data-ui-role="stack" data-ui-gap="md">
             <span class="metadata">In

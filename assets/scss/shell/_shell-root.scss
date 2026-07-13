@@ -1,4 +1,5 @@
 @use '../shared/tokens' as *;
+@use '../shared/shadow-tokens';
 
 [data-ui-profiler-shell] {
   font-family: var(--ui-font-family-sans, system-ui, sans-serif);
@@ -6,12 +7,10 @@
   color: var(--ui-color-text);
   font-size: var(--ui-font-size-md);
   line-height: 1.4;
-  min-height: 100%;
+  min-height: 100vh;
   --ui-color-primary-subtle: color-mix(in srgb, var(--ui-color-primary) 12%, var(--ui-color-surface));
-  --ui-profiler-sidebar-width: calc(
-    (min(#{$profiler-grid-max-width}, 100%) - 2 * var(--ui-grid-gap, 1rem) - 11 * var(--ui-grid-gap, 1rem)) * 3 / 12 +
-      2 * var(--ui-grid-gap, 1rem)
-  );
+  --ui-profiler-sidebar-width: #{$profiler-sidebar-width};
+  --ui-profiler-page-scrim: var(--ui-color-surface);
 
   &[data-ui-role='grid-container'] {
     box-sizing: border-box;

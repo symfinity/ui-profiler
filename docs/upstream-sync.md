@@ -1,13 +1,31 @@
-# Upstream sync (051 greenfield)
+# Upstream sync
 
-Track Symfony WebProfilerBundle pin used for parity tests and manual smoke.
+UI Profiler decorates Symfony's Web ProfilerBundle — it does not fork profiler data collection.
 
-| Pin | Source | Notes |
-|-----|--------|-------|
-| `^7.4\|\|^8.0` → **7.4.13** | `src/symfinity` product monorepo `composer.lock` | **069** baseline 2026-06-14 — full suite **82/82**; `@group ui-profiler-parity` **53/53**; ZOC **8/8** |
+## What we track
 
-## Process
+| Upstream | Role |
+|----------|------|
+| `symfony/web-profiler-bundle` | Collector data, routes (`/_wdt`, `/_profiler`), toolbar token semantics |
+| `symfony/twig-bundle` | Twig panel and template override hooks |
+| Stock bundle collector templates | Reskinned under `templates/chrome/{BundleName}/` |
 
-1. After `@group ui-profiler-parity` green, record `symfony/web-profiler-bundle` constraint + resolved version here.
-2. When Symfony bumps profiler Twig, diff upstream WebProfilerBundle templates for behavior reference only — **MUST NOT** copy CSS/JS from removed archive.
-3. Re-run full package gate: `./sbin/php vendor/bin/phpunit -c packages/ui-profiler/phpunit.xml.dist`.
+## What we own
+
+| Area | Location |
+|------|----------|
+| Toolbar + profiler shell chrome | `assets/scss/shell/`, `assets/scss/wdt/` |
+| Template overrides | `templates/chrome/` |
+| UI Kernel collector | `src/DataCollector/UiKernelDataCollector.php` |
+| Settings dialog + shell JS | `assets/js/shell.js`, Stimulus controllers |
+
+## After upgrading Symfony
+
+1. Bump `symfony/web-profiler-bundle` in your project
+2. Run [Verification](verification.md) WDT smoke checks
+3. If a stock collector panel looks unstyled, check whether upstream changed collector Twig — open an issue with Symfony version and panel name
+
+## See also
+
+- [Third-party collectors](third-party-collectors.md)
+- [CHANGELOG](../CHANGELOG.md)

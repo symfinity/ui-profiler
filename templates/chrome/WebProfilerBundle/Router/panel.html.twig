@@ -1,0 +1,71 @@
+{% import '@UiProfiler/_chrome/macros/profiler-ui.html.twig' as ui %}
+
+{{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Routing' }) }}
+
+<div data-ui-metrics-grid data-ui-role="grid">
+    {{ ui.metric_cell(request.route ?: '(none)', 'Matched route') }}
+</div>
+
+{% if request.route %}
+    <h3 data-ui-role="typography" data-ui-variant="h3">Route Parameters</h3>
+
+    {% if request.routeParams is empty %}
+        <p data-ui-role="typography" data-ui-variant="muted">No parameters.</p>
+    {% else %}
+        {{ include('@WebProfiler/Profiler/table.html.twig', {data: request.routeParams, labels: ['Name', 'Value']}, with_context: false) }}
+    {% endif %}
+{% endif %}
+
+{% if router.redirect %}
+    <h3 data-ui-role="typography" data-ui-variant="h3">Route Redirection</h3>
+
+    <p data-ui-role="typography" data-ui-variant="muted">This page redirects to:</p>
+    <div data-ui-profiler-note data-ui-wrap="break">
+        {{ router.targetUrl }}
+        {% if router.targetRoute %}
+            <span data-ui-role="typography" data-ui-variant="muted"> (route: "{{ router.targetRoute }}")</span>
+        {% endif %}
+    </div>
+{% endif %}
+
+<h3 data-ui-role="typography" data-ui-variant="h3">Route Matching Logs</h3>
+
+<div data-ui-profiler-note>
+    <strong data-ui-role="typography" data-ui-variant="strong">Path to match:</strong>
+    <code>{{ request.pathinfo }}</code>
+</div>
+
+<table id="router-logs" data-ui-role="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Route name</th>
+            <th scope="col">Path</th>
+            <th scope="col">Log</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for trace in traces %}
+        <tr class="{{ trace.level == 1 ? 'status-warning' : trace.level == 2 ? 'status-success' }}">
+            <td data-ui-role="typography" data-ui-variant="muted" data-ui-wrap="nowrap">{{ loop.index }}</td>
+            <td data-ui-wrap="break">{{ trace.name }}</td>
+            <td data-ui-wrap="break">{{ trace.path }}</td>
+            <td data-ui-wrap="break">
+                {% if trace.level == 1 %}
+                    Path almost matches, but
+                    <span class="newline">{{ trace.log }}</span>
+                {% elseif trace.level == 2 %}
+                    {{ trace.log }}
+                {% else %}
+                    Path does not match
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<p data-ui-role="typography" data-ui-variant="help">
+    Note: These matching logs are based on the current router configuration,
+    which might differ from the configuration used when profiling this request.
+</p>

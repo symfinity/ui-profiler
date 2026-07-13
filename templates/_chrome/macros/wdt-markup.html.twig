@@ -17,5 +17,5 @@
 {%- endmacro %}
 
 {% macro status_badge(color, content) %}
-    <twig:Badge variant="{{ _self.wdt_variant(color) }}" size="sm">{{ content }}</twig:Badge>
+    <span data-ui-role="badge" data-ui-variant="{{ _self.wdt_variant(color) }}" data-ui-size="sm">{{ content }}</span>
 {% endmacro %}

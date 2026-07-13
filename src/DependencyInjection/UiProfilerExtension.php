@@ -41,6 +41,7 @@ final class UiProfilerExtension extends Extension implements PrependExtensionInt
     public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
+        /** @var array{enabled: bool, theme: string, toolbar_theme: string|null, asset_version: string|null, wdt: array{critical_css_inline: bool, module_preload: bool}, legacy_sf_shim: bool} $config */
         $config = $this->processConfiguration($configuration, $configs);
 
         $packageDir = \dirname(__DIR__, 2);

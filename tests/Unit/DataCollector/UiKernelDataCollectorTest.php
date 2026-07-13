@@ -34,7 +34,6 @@ final class UiKernelDataCollectorTest extends TestCase
         $this->activeThemeContext = new ActiveThemeContext(
             new ThemePreferenceCookies(),
             $this->resolver,
-            $this->themeRegistry,
         );
         $this->router = $this->createMock(UrlGeneratorInterface::class);
         $this->variantCatalog = $this->createMock(GraphVariantCatalogPort::class);

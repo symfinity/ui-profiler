@@ -13,6 +13,7 @@ class UiProfilerEventsPanel {
         document.querySelectorAll('#event-filter-dispatcher input, #event-filter-listeners input').forEach((input) => {
             input.addEventListener('change', () => {
                 this.#updatePanels();
+                input.closest('details.log-filter')?.removeAttribute('open');
             });
         });
 

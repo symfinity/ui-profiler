@@ -66,7 +66,7 @@ final class UiKernelDataCollector extends DataCollector
             'lineage' => $preference->lineage,
             'scheme' => $preference->scheme->value,
             'systemPrefersDark' => $systemPrefersDark,
-            'cssBytes' => (int) $request->attributes->get(self::CSS_BYTES_REQUEST_ATTR, 0),
+            'cssBytes' => $this->resolveCssBytes($request),
             'tokenCount' => \count($activeTheme->tokens()->all()),
             'activeTheme' => [
                 'id' => $activeTheme->id(),
@@ -95,44 +95,44 @@ final class UiKernelDataCollector extends DataCollector
 
     public function isEnabled(): bool
     {
-        return (bool) ($this->data['enabled'] ?? false);
+        return $this->dataBool('enabled');
     }
 
     public function getThemeId(): ?string
     {
-        $themeId = $this->data['themeId'] ?? null;
+        $themeId = $this->dataArray()['themeId'] ?? null;
 
         return is_string($themeId) ? $themeId : null;
     }
 
     public function getLineage(): string
     {
-        return (string) ($this->data['lineage'] ?? '');
+        return $this->dataString('lineage');
     }
 
     public function getScheme(): string
     {
-        return (string) ($this->data['scheme'] ?? '');
+        return $this->dataString('scheme');
     }
 
     public function isSystemPrefersDark(): bool
     {
-        return (bool) ($this->data['systemPrefersDark'] ?? false);
+        return $this->dataBool('systemPrefersDark');
     }
 
     public function getCssBytes(): int
     {
-        return (int) ($this->data['cssBytes'] ?? 0);
+        return $this->dataInt('cssBytes');
     }
 
     public function getThemeCount(): int
     {
-        return (int) ($this->data['themeCount'] ?? 0);
+        return $this->dataInt('themeCount');
     }
 
     public function getTokenCount(): int
     {
-        return (int) ($this->data['tokenCount'] ?? 0);
+        return $this->dataInt('tokenCount');
     }
 
     /**
@@ -140,13 +140,21 @@ final class UiKernelDataCollector extends DataCollector
      */
     public function getActiveTheme(): array
     {
-        $activeTheme = $this->data['activeTheme'] ?? [];
+        $activeTheme = $this->dataArray()['activeTheme'] ?? null;
+        if (!\is_array($activeTheme)) {
+            return [
+                'id' => '',
+                'label' => '',
+                'schemaVersion' => '',
+                'scrollMotion' => false,
+            ];
+        }
 
         return [
-            'id' => (string) ($activeTheme['id'] ?? ''),
-            'label' => (string) ($activeTheme['label'] ?? ''),
-            'schemaVersion' => (string) ($activeTheme['schemaVersion'] ?? ''),
-            'scrollMotion' => (bool) ($activeTheme['scrollMotion'] ?? false),
+            'id' => $this->stringValue($activeTheme['id'] ?? null),
+            'label' => $this->stringValue($activeTheme['label'] ?? null),
+            'schemaVersion' => $this->stringValue($activeTheme['schemaVersion'] ?? null),
+            'scrollMotion' => filter_var($activeTheme['scrollMotion'] ?? false, \FILTER_VALIDATE_BOOL),
         ];
     }
 
@@ -155,7 +163,7 @@ final class UiKernelDataCollector extends DataCollector
      */
     public function getThemes(): array
     {
-        $themes = $this->data['themes'] ?? [];
+        $themes = $this->dataArray()['themes'] ?? null;
         if (!\is_array($themes)) {
             return [];
         }
@@ -167,8 +175,8 @@ final class UiKernelDataCollector extends DataCollector
             }
 
             $normalized[] = [
-                'id' => (string) ($theme['id'] ?? ''),
-                'label' => (string) ($theme['label'] ?? ''),
+                'id' => $this->stringValue($theme['id'] ?? null),
+                'label' => $this->stringValue($theme['label'] ?? null),
             ];
         }
 
@@ -180,7 +188,7 @@ final class UiKernelDataCollector extends DataCollector
      */
     public function getSemanticColorSlugs(): array
     {
-        $slugs = $this->data['semantic_color_slugs'] ?? [];
+        $slugs = $this->dataArray()['semantic_color_slugs'] ?? null;
         if (!\is_array($slugs)) {
             return [];
         }
@@ -190,7 +198,7 @@ final class UiKernelDataCollector extends DataCollector
 
     public function getGraphLayerSignature(): string
     {
-        return (string) ($this->data['graph_layer_signature'] ?? '');
+        return $this->dataString('graph_layer_signature');
     }
 
     /**
@@ -198,7 +206,7 @@ final class UiKernelDataCollector extends DataCollector
      */
     public function getColorPalette(): array
     {
-        $palette = $this->data['colorPalette'] ?? [];
+        $palette = $this->dataArray()['colorPalette'] ?? null;
         if (!\is_array($palette)) {
             return [];
         }
@@ -210,9 +218,9 @@ final class UiKernelDataCollector extends DataCollector
             }
 
             $normalized[] = [
-                'cssVar' => (string) ($entry['cssVar'] ?? ''),
-                'value' => (string) ($entry['value'] ?? ''),
-                'shortName' => (string) ($entry['shortName'] ?? ''),
+                'cssVar' => $this->stringValue($entry['cssVar'] ?? null),
+                'value' => $this->stringValue($entry['value'] ?? null),
+                'shortName' => $this->stringValue($entry['shortName'] ?? null),
             ];
         }
 
@@ -221,7 +229,7 @@ final class UiKernelDataCollector extends DataCollector
 
     public function getShowcaseUrl(): ?string
     {
-        $url = $this->data['showcaseUrl'] ?? null;
+        $url = $this->dataArray()['showcaseUrl'] ?? null;
 
         return is_string($url) ? $url : null;
     }
@@ -258,5 +266,54 @@ final class UiKernelDataCollector extends DataCollector
         }
 
         return null;
+    }
+
+    private function resolveCssBytes(Request $request): int
+    {
+        $value = $request->attributes->get(self::CSS_BYTES_REQUEST_ATTR, 0);
+
+        return is_int($value) ? $value : (is_numeric($value) ? (int) $value : 0);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function dataArray(): array
+    {
+        if (!\is_array($this->data)) {
+            return [];
+        }
+
+        /** @var array<string, mixed> $data */
+        $data = $this->data;
+
+        return $data;
+    }
+
+    private function dataString(string $key): string
+    {
+        return $this->stringValue($this->dataArray()[$key] ?? null);
+    }
+
+    private function dataInt(string $key): int
+    {
+        return $this->intValue($this->dataArray()[$key] ?? null);
+    }
+
+    private function dataBool(string $key): bool
+    {
+        $value = $this->dataArray()[$key] ?? false;
+
+        return filter_var($value, \FILTER_VALIDATE_BOOL);
+    }
+
+    private function stringValue(mixed $value): string
+    {
+        return is_string($value) ? $value : (is_scalar($value) ? (string) $value : '');
+    }
+
+    private function intValue(mixed $value): int
+    {
+        return is_int($value) ? $value : (is_numeric($value) ? (int) $value : 0);
     }
 }

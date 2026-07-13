@@ -1,17 +1,17 @@
-{# Minimal WDT skeleton — styled via inline critical.css until toolbar.css + /_wdt hydrate. #}
+{# Minimal WDT skeleton — self-contained flex strip until /_wdt hydrate. #}
 <div id="sfToolbarClearer-{{ token }}" data-ui-profiler-wdt-clearer></div>
 <div id="sfToolbarMainContent-{{ token }}" data-ui-profiler-wdt class="ui-profiler-wdt notranslate" data-theme="{{ ui_profiler_toolbar_theme() }}" data-no-turbolink data-turbo="false">
-    <twig:Stack direction="horizontal" gap="none" density="compact" data-ui-profiler-wdt-strip>
+    <div data-ui-profiler-wdt-strip>
         <div data-ui-profiler-wdt-item data-ui-profiler-collector="request">
-            <twig:Link href="{{ profiler_url }}" appearance="ghost" variant="neutral" size="sm" data-ui-profiler-wdt-trigger class="ui-profiler-wdt__trigger">
-                <twig:Stack direction="horizontal" gap="sm" density="compact" data-ui-profiler-wdt-chip>
-                    <twig:Badge variant="neutral" size="sm"><span data-ui-profiler-wdt-ajax-counter>Loading&hellip;</span></twig:Badge>
-                </twig:Stack>
-            </twig:Link>
+            <a href="{{ profiler_url }}" data-ui-profiler-wdt-trigger class="ui-profiler-wdt__trigger">
+                <span data-ui-profiler-wdt-chip>
+                    <span data-ui-role="badge" data-ui-variant="neutral" data-ui-size="sm"><span data-ui-profiler-wdt-ajax-counter>Loading&hellip;</span></span>
+                </span>
+            </a>
         </div>
-    </twig:Stack>
-    <button data-ui-profiler-wdt-toggle type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle UI Profiler toolbar">
-        <i data-ui-profiler-wdt-toggle-icon="open" title="Close Toolbar"></i>
-        <i data-ui-profiler-wdt-toggle-icon="closed" title="Open Toolbar">{{ source('@UiProfiler/Collector/icon.svg') }}</i>
+    </div>
+    <button data-ui-profiler-wdt-toggle type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle Symfony Toolbar">
+        <i data-ui-profiler-wdt-toggle-icon="open" title="Close Toolbar">{{ source('@WebProfiler/Icon/close.svg') }}</i>
+        <i data-ui-profiler-wdt-toggle-icon="closed" title="Open Toolbar">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
     </button>
 </div>

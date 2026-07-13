@@ -30,7 +30,7 @@
         } %}
         {% set initial_listener_type = 'called' %}
 
-        <div class="event-filters" data-ui-profiler-filter-bar>
+        <div class="log-filters" data-ui-role="filter-bar">
             <details id="event-filter-dispatcher" class="log-filter">
                 <summary>
                     <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
@@ -145,7 +145,7 @@
                                 <tbody>
                                     {% for event in dispatcherData.orphaned_events %}
                                         <tr>
-                                            <td data-ui-font="sans">{{ event }}</td>
+                                            <td>{{ event }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -163,7 +163,7 @@
     <table data-ui-role="table">
         <thead>
             <tr>
-                <th data-ui-role="typography" data-ui-align="end">Priority</th>
+                <th data-ui-wrap="nowrap">Priority</th>
                 <th>Listener</th>
             </tr>
         </thead>
@@ -177,15 +177,15 @@
 
                 <tbody>
                     <tr>
-                        <th colspan="2" class="colored" data-ui-font="sans">{{ listener.event }}</th>
+                        <th colspan="2" class="colored">{{ listener.event }}</th>
                     </tr>
 
                 {% set previous_event = listener.event %}
             {% endif %}
 
             <tr>
-                <td data-ui-role="typography" data-ui-align="end" data-ui-wrap="nowrap">{{ listener.priority|default('-') }}</td>
-                <td data-ui-font="sans"><code class="events-listener-name">{{ listener.pretty|trim('"') }}</code></td>
+                <td data-ui-align="end" data-ui-wrap="nowrap">{{ listener.priority|default('-') }}</td>
+                <td><code class="events-listener-name">{{ listener.pretty|trim('"') }}</code></td>
             </tr>
 
             {% if loop.last %}

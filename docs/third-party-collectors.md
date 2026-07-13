@@ -1,4 +1,4 @@
-# Third-party collectors (051 greenfield)
+# Third-party collectors
 
 Symfinity-owned profiler chrome covers Symfony stock collectors (CO-01–19). Third-party bundles register via standard `data_collector` tags.
 
@@ -16,4 +16,4 @@ Symfinity-owned profiler chrome covers Symfony stock collectors (CO-01–19). Th
 2. Optional: tag `ui_profiler.menu` with label, route, icon metadata.
 3. Optional: add `templates/chrome/{VendorBundle}/Collector/{name}.html.twig` override using ux-blocks only.
 
-See [greenfield-implement-rules.md](greenfield-implement-rules.md) for collector block compatibility and menu registry (`ui_profiler.menu` tag).
+Collector block compatibility and menu registry (`ui_profiler.menu` tag) are documented in bundle tests and `DependencyInjection/` configuration.

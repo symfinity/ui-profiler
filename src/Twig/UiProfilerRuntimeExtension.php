@@ -111,7 +111,13 @@ final class UiProfilerRuntimeExtension extends AbstractExtension
 
     public function resolveAssetVersion(): string
     {
-        return $this->assetVersion ?? '0';
+        if (null !== $this->assetVersion && '' !== $this->assetVersion) {
+            return $this->assetVersion;
+        }
+
+        $path = $this->bundlePath.'/assets/styles/wdt-toolbar.css';
+
+        return is_readable($path) ? (string) filemtime($path) : '0';
     }
 
     public function isDarkTheme(): bool

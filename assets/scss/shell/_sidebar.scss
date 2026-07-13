@@ -4,15 +4,23 @@
   margin-bottom: 1.875rem;
   position: sticky;
   top: $profiler-sidebar-sticky-top;
+  width: $profiler-sidebar-width;
   z-index: $profiler-z-sidebar;
+
+  a {
+    text-decoration: none;
+
+    &:hover,
+    &:focus,
+    &:active,
+    &:visited {
+      text-decoration: none;
+    }
+  }
 }
 
 [data-ui-profiler-sidebar-contents][data-ui-role='card'] {
   margin: 0;
-}
-
-[data-ui-profiler-shell] [data-ui-profiler-sidebar-shortcuts] {
-  padding: 0.3125rem 0.5rem;
 }
 
 [data-ui-profiler-collector-wrapper] {
@@ -50,7 +58,7 @@
     display: none;
   }
 
-  [data-ui-profiler-sidebar]:is(:hover, .expanded) [data-ui-profiler-sidebar-search].sf-toggle-visible {
+  [data-ui-profiler-sidebar]:is(:hover, .expanded) [data-ui-profiler-sidebar-search] {
     display: block;
   }
 
@@ -83,22 +91,6 @@
           display: none;
         }
       }
-
-      [data-ui-profiler-shortcuts] {
-        font-size: 0;
-      }
-    }
-  }
-
-  [data-ui-profiler-shell] [data-ui-profiler-sidebar-shortcuts] {
-    .shortcuts {
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    [data-ui-profiler-shortcuts] [data-ui-role='button'] {
-      justify-content: center;
-      padding-inline: 0.25rem;
     }
   }
 
@@ -114,10 +106,6 @@
 @media (min-width: $profiler-desktop-min) {
   [data-ui-profiler-sidebar] [data-ui-profiler-menu-label] strong {
     display: inline;
-  }
-
-  [data-ui-profiler-shell] [data-ui-profiler-sidebar-shortcuts] .shortcuts {
-    flex-direction: row;
   }
 }
 

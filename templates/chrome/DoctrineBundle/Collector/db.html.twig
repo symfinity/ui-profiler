@@ -106,7 +106,8 @@
 {% endblock %}
 
 {% block queries %}
-    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Query Metrics' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Doctrine' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Query Metrics' }) }}
     <div data-ui-metrics-grid data-ui-role="grid">
         <div data-ui-role="stat-group">
             {{ ui.metric_cell(collector.querycount, 'Database Queries') }}

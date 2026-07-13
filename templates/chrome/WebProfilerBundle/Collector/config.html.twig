@@ -137,7 +137,8 @@
 
 {% block panel %}
     <div data-ui-profiler-panel="config">
-    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Symfony Configuration' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Configuration' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Symfony Configuration' }) }}
     {% if collector.runnerClass is defined and collector.runnerClass is not null %}
         <div data-ui-metrics-grid data-ui-role="grid">
             {{ ui.metric_cell(collector.runnerClass|abbr_class, 'Runner') }}
@@ -182,7 +183,7 @@
 
     <a class="config-symfony-version-roadmap-link" href="https://symfony.com/releases/{{ collector.symfonyminorversion }}">View Symfony {{ collector.symfonyversion }} release details</a>
 
-    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'PHP Configuration' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'PHP Configuration' }) }}
     <div data-ui-metrics-grid data-ui-role="grid">
         <div data-ui-role="stat-group">
             {% set php_version_value %}
@@ -225,7 +226,7 @@
     </p>
 
     {% if collector.bundles %}
-        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Enabled Bundles <small>(' ~ collector.bundles|length ~ ')</small>' }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Enabled Bundles <small>(' ~ collector.bundles|length ~ ')</small>' }) }}
         <table data-ui-role="table">
             <thead>
                 <tr>

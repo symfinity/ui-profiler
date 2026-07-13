@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 #[Group('ui-profiler-parity')]
 final class DisabledProfilerParityTest extends WebTestCase
 {
+    use ParityBrowserTrait;
+
     protected static function getKernelClass(): string
     {
         return DisabledParityKernel::class;
@@ -21,8 +23,7 @@ final class DisabledProfilerParityTest extends WebTestCase
         $client = static::createClient(['debug' => true]);
         $client->request('GET', '/');
 
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token);
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token);
         self::assertResponseIsSuccessful();

@@ -27,6 +27,17 @@ final class SearchParityTest extends WebTestCase
         self::assertResponseIsSuccessful();
 
         self::assertStringContainsString('search/results', $client->getRequest()->getRequestUri());
-        self::assertStringContainsString('limit=10', (string) $client->getResponse()->getContent());
+        $content = (string) $client->getResponse()->getContent();
+        self::assertStringContainsString('limit=10', $content);
+        self::assertStringContainsString('data-ui-role="request-status"', $content);
+        self::assertStringContainsString('>Profile Search</h2>', $content);
+        self::assertStringContainsString('data-ui-profiler-sidebar-search', $content);
+        self::assertStringContainsString('data-ui-role="search-form"', $content);
+        self::assertStringContainsString('data-ui-part="field"', $content);
+        self::assertStringContainsString('data-ui-role="input"', $content);
+        self::assertStringContainsString('data-ui-profiler-shortcut-link', $content);
+        self::assertStringNotContainsString('<div class="status">', $content);
+        self::assertStringNotContainsString('class="form-group"', $content);
+        self::assertStringNotContainsString('twig:SearchForm', $content);
     }
 }

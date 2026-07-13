@@ -27,7 +27,16 @@ final class PrependWebProfilerTemplatesPass implements CompilerPassInterface
             return;
         }
 
-        $bundlePath = (string) $container->getParameter('ui_profiler.bundle_path');
+        if (!$container->hasParameter('ui_profiler.bundle_path')) {
+            return;
+        }
+
+        $bundlePathParam = $container->getParameter('ui_profiler.bundle_path');
+        if (!\is_string($bundlePathParam) || '' === $bundlePathParam) {
+            return;
+        }
+
+        $bundlePath = $bundlePathParam;
         $loader = $container->getDefinition('twig.loader.native_filesystem');
 
         foreach (self::discoverOverrideBundles($bundlePath) as $bundleName) {

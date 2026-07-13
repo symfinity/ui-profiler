@@ -89,7 +89,7 @@
 
     {% if events.transports|length > 1 %}
         {% for transport in events.transports %}
-            {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: '<code>' ~ transport ~ '</code> transport' }) }}
+            {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: '<code>' ~ transport ~ '</code> transport' }) }}
             {{ _self.render_transport_details(collector, transport) }}
         {% endfor %}
     {% elseif events.transports is not empty %}

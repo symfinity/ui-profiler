@@ -30,7 +30,7 @@ final class ProfilerCssProvider
 
     public function wdtCriticalCss(): string
     {
-        return self::readFile($this->packageDir, WdtCriticalCss::STYLES_PATH);
+        return WdtCriticalCss::css($this->packageDir);
     }
 
     public static function readFile(string $packageDir, string $relativePath): string

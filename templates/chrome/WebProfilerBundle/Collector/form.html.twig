@@ -103,7 +103,7 @@
 
 {% macro form_tree_details(name, data, forms_by_hash, show) %}
     <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
-        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: name|default('(no name)') }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: name|default('(no name)') }) }}
         {% if data.type_class is defined %}
             <div class="form-type-class">
                 <span class="form-type-class-label">Form type:</span>

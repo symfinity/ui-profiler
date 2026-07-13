@@ -73,7 +73,7 @@
                             <div class="card">
                                 <div data-ui-part="card-section">
                                     <span class="label">Subject</span>
-                                    <h2 class="m-t-10">{{ message.getSubject() ?? '(empty)' }}</h2>
+                                    <p class="m-t-10" data-ui-role="typography" data-ui-variant="strong">{{ message.getSubject() ?? '(empty)' }}</p>
                                 </div>
                                 {% set notification = message.notification ?? null %}
                                 {% if notification %}

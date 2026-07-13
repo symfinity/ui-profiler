@@ -35,16 +35,27 @@ final class ProfilerMenuRegistryPass implements CompilerPassInterface
                 continue;
             }
 
-            $menuTag = $menuTags[0];
-            $id = $menuTag['id'] ?? $dataCollectorTags[0]['id'] ?? null;
+            $menuTag = $menuTags[0] ?? null;
+            if (!\is_array($menuTag)) {
+                continue;
+            }
+
+            $collectorTag = $dataCollectorTags[0] ?? null;
+            if (!\is_array($collectorTag)) {
+                $collectorTag = [];
+            }
+
+            $id = $menuTag['id'] ?? $collectorTag['id'] ?? null;
             if (!\is_string($id) || '' === $id) {
                 continue;
             }
 
+            $priority = $menuTag['priority'] ?? $collectorTag['priority'] ?? 0;
+
             $entries[$id] = [
-                'title' => (string) ($menuTag['title'] ?? ''),
-                'icon' => (string) ($menuTag['icon'] ?? ''),
-                'priority' => (int) ($menuTag['priority'] ?? $dataCollectorTags[0]['priority'] ?? 0),
+                'title' => $this->stringValue($menuTag['title'] ?? ''),
+                'icon' => $this->stringValue($menuTag['icon'] ?? ''),
+                'priority' => $this->intValue($priority),
             ];
         }
 
@@ -52,10 +63,16 @@ final class ProfilerMenuRegistryPass implements CompilerPassInterface
         $stateHandlerIds = [];
         foreach ($container->findTaggedServiceIds('ui_profiler.menu_state') as $serviceId => $tags) {
             foreach ($tags as $tag) {
-                if (!isset($tag['collector']) || !\is_string($tag['collector']) || '' === $tag['collector']) {
+                if (!\is_array($tag)) {
                     continue;
                 }
-                $stateHandlerIds[$tag['collector']] = (string) $serviceId;
+
+                $collector = $tag['collector'] ?? null;
+                if (!\is_string($collector) || '' === $collector) {
+                    continue;
+                }
+
+                $stateHandlerIds[$collector] = (string) $serviceId;
             }
         }
 
@@ -76,8 +93,16 @@ final class ProfilerMenuRegistryPass implements CompilerPassInterface
      */
     private function loadManifestMenuEntries(ContainerBuilder $container): array
     {
-        $bundlePath = (string) $container->getParameter('ui_profiler.bundle_path');
-        $manifestPath = $bundlePath.'/tests/Fixtures/symfony-collector-chrome-manifest.json';
+        if (!$container->hasParameter('ui_profiler.bundle_path')) {
+            return [];
+        }
+
+        $bundlePathParam = $container->getParameter('ui_profiler.bundle_path');
+        if (!\is_string($bundlePathParam) || '' === $bundlePathParam) {
+            return [];
+        }
+
+        $manifestPath = $bundlePathParam.'/tests/Fixtures/symfony-collector-chrome-manifest.json';
 
         if (!is_file($manifestPath)) {
             return [];
@@ -88,17 +113,23 @@ final class ProfilerMenuRegistryPass implements CompilerPassInterface
 
         $entries = [];
         foreach ($manifest['menu_entries'] ?? [] as $id => $config) {
-            if (!\is_string($id) || !\is_array($config)) {
-                continue;
-            }
-
             $entries[$id] = [
-                'title' => (string) ($config['title'] ?? ''),
-                'icon' => (string) ($config['icon'] ?? ''),
-                'priority' => (int) ($config['priority'] ?? 0),
+                'title' => $this->stringValue($config['title'] ?? ''),
+                'icon' => $this->stringValue($config['icon'] ?? ''),
+                'priority' => $this->intValue($config['priority'] ?? 0),
             ];
         }
 
         return $entries;
+    }
+
+    private function stringValue(mixed $value): string
+    {
+        return \is_string($value) ? $value : (is_scalar($value) ? (string) $value : '');
+    }
+
+    private function intValue(mixed $value): int
+    {
+        return \is_int($value) ? $value : (is_numeric($value) ? (int) $value : 0);
     }
 }

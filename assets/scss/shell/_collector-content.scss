@@ -5,6 +5,24 @@
   margin: 0 0 1.25rem 0;
   padding: 1rem;
 
+  summary {
+    cursor: pointer;
+    display: block;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::marker {
+      content: none;
+    }
+  }
+
+  [data-ui-role='filter-bar'] .log-filter > summary {
+    display: inline-flex;
+  }
+
   [data-ui-role='table'] :is(td, th) :is(.sf-dump, pre.sf-dump, .sf-dump pre.sf-dump) {
     margin-bottom: 0;
   }
@@ -14,7 +32,12 @@
   min-height: 400px;
 }
 
-.sf-serializer,
-.sf-validator {
+[data-ui-profiler-collector-content] p[data-ui-variant='help'] {
+  @include profiler-help-text;
+  margin-block: 1.25rem 0;
+}
+
+[data-ui-profiler-panel='serializer'] .tab,
+[data-ui-profiler-panel='validator'] [data-ui-profiler-validator-call] {
   margin-bottom: 2em;
 }

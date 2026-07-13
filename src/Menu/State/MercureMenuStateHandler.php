@@ -10,9 +10,11 @@ final class MercureMenuStateHandler implements ProfilerMenuStateHandler
 {
     public function disabled(object $collector): bool
     {
-        $count = $collector->count ?? null;
+        if (!\property_exists($collector, 'count') || !\is_int($collector->count)) {
+            return false;
+        }
 
-        return null !== $count && 0 === (int) $count;
+        return 0 === $collector->count;
     }
 
     public function badge(object $collector): ?array

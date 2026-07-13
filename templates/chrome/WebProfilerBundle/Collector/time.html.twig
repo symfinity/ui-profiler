@@ -40,7 +40,8 @@
 {% block panel %}
     <div data-ui-profiler-panel="time">
     {% set has_time_events = collector.events|length > 0 %}
-    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Performance metrics' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Performance' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Performance metrics' }) }}
     <div data-ui-metrics-grid data-ui-role="grid">
         <div data-ui-role="stat-group">
             {{ include('@UiProfiler/_chrome/partials/profiler-metric-cell.html.twig', {
@@ -81,7 +82,7 @@
         {% endif %}
     </div>
 
-    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Execution timeline' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Execution timeline' }) }}
     {% if not collector.isStopwatchInstalled() %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>The Stopwatch component is not installed. If you want to see timing events, run: <code>composer require symfony/stopwatch</code>.</p>

@@ -28,7 +28,7 @@
   :is(.sf-dump pre.sf-dump, .sf-dump .trace, [data-ui-profiler-panel] .trace) {
     background: var(--ui-color-surface);
     border: 1px solid var(--ui-color-border);
-    font-size: 12px;
+    font-size: var(--ui-font-size-sm);
     margin: 0.5em 0;
     overflow: auto;
     padding: 10px;

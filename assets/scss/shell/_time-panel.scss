@@ -89,9 +89,9 @@
     .timeline-label {
       fill: var(--ui-color-text);
       font-family: var(--ui-font-family-sans, system-ui, sans-serif);
-      font-size: 12px;
-      font-weight: normal;
-      line-height: 12px;
+      font-size: var(--ui-font-size-sm);
+      font-weight: var(--ui-font-weight-normal, 400);
+      line-height: var(--ui-line-height-tight, 1.2);
 
       .timeline-sublabel {
         fill: var(--ui-color-text-muted);

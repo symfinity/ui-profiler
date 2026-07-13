@@ -586,30 +586,59 @@ export class UiProfilerWdt {
     }
 
     positionToolbarBlocks(el) {
+        const wdt = this;
         const toolbarBlocks = [...el.querySelectorAll('[data-ui-profiler-wdt-item]')];
+
         for (const block of toolbarBlocks) {
             block.onmouseover = function () {
+                this.setAttribute('data-ui-hover', '');
                 const toolbarInfo = this.querySelector('[data-ui-profiler-wdt-panel]');
                 if (!toolbarInfo) {
                     return;
                 }
-                const pageWidth = document.body.clientWidth;
-                const elementWidth = toolbarInfo.offsetWidth;
-                const leftValue = elementWidth + this.offsetLeft - pageWidth;
-                const rightValue = elementWidth + (pageWidth - this.offsetLeft) - pageWidth;
-                toolbarInfo.style.right = '';
-                toolbarInfo.style.left = '';
-                if (elementWidth > pageWidth) {
-                    toolbarInfo.style.left = '0';
-                } else if (leftValue > 0 && rightValue > 0) {
-                    toolbarInfo.style.right = `${rightValue * -1}px`;
-                } else if (leftValue < 0) {
-                    toolbarInfo.style.left = '0';
-                } else {
-                    toolbarInfo.style.right = '0px';
+
+                requestAnimationFrame(() => {
+                    wdt.positionWdtPanel(this, toolbarInfo);
+                });
+            };
+            block.onmouseout = function () {
+                this.removeAttribute('data-ui-hover');
+                const toolbarInfo = this.querySelector('[data-ui-profiler-wdt-panel]');
+                if (toolbarInfo) {
+                    toolbarInfo.style.left = '';
+                    toolbarInfo.style.right = '';
                 }
             };
         }
+    }
+
+    positionWdtPanel(item, panel) {
+        if ('dump' === item.getAttribute('data-ui-profiler-collector')) {
+            return;
+        }
+
+        const margin = 8;
+        const viewportWidth = document.documentElement.clientWidth;
+
+        panel.style.left = '';
+        panel.style.right = '';
+        panel.style.maxWidth = `${Math.max(viewportWidth - margin * 2, 0)}px`;
+
+        const itemRect = item.getBoundingClientRect();
+        const panelWidth = panel.offsetWidth;
+        let left = 0;
+        const overflowRight = itemRect.left + panelWidth - (viewportWidth - margin);
+
+        if (overflowRight > 0) {
+            left -= overflowRight;
+        }
+
+        const adjustedLeft = itemRect.left + left;
+        if (adjustedLeft < margin) {
+            left += margin - adjustedLeft;
+        }
+
+        panel.style.left = `${left}px`;
     }
 
     load(selector, url, onSuccess, onError, options) {

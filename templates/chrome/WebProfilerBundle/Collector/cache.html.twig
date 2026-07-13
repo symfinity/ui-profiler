@@ -53,7 +53,7 @@
     {% else %}
         {{ _self.render_metrics(collector.totals, true) }}
 
-        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Pools' }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Pools' }) }}
         <div data-ui-profiler-tabs data-ui-role="tabs">
             {# the empty merge is needed to turn the iterator into an array #}
             {% set cache_pools_with_calls = collector.calls|filter(calls => calls|length > 0)|merge([]) %}

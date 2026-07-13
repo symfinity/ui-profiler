@@ -30,13 +30,15 @@
         "symfony/http-kernel": "^7.4||^8.0",
         "symfony/twig-bundle": "^7.4||^8.0",
         "symfony/web-profiler-bundle": "^7.4||^8.0",
-        "symfinity/ui-kernel": "^0.2",
+        "symfinity/ui-kernel": "^0.3.1",
         "symfinity/ux-blocks-core": "^0.1",
         "symfinity/ux-blocks-extended": "^0.1",
         "twig/twig": "^3.0"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.13||^3.0",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^11.0",
         "symfony/asset-mapper": "^7.4||^8.0",
         "symfony/browser-kit": "^7.4||^8.0",
@@ -66,9 +68,16 @@
     },
     "scripts": {
         "test": "phpunit -c phpunit.xml.dist",
+        "phpstan": "phpstan analyse -c phpstan.neon.dist --memory-limit=512M",
         "scss:compile": "bin/profiler-css-compile",
         "scss:check": "bin/profiler-css-compile --check"
     },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/serotoninja"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "extra": {

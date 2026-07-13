@@ -58,7 +58,7 @@
         </div>
     </div>
 
-    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Messages' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Messages' }) }}
     {% if collector.messages is empty %}
         <div data-ui-role="empty" data-ui-profiler-empty-panel>
             <p>No translations have been called.</p>
@@ -147,7 +147,7 @@
     {% endif %}
 
     {% if collector.globalParameters|default([]) %}
-        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Global parameters' }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Global parameters' }) }}
         <table data-ui-role="table">
             <thead>
             <tr>

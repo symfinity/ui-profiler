@@ -52,7 +52,7 @@
                 {{ ui.metric_cell(collector.errorCount, 'HTTP errors') }}
             </div>
         </div>
-        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Clients' }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Clients' }) }}
         <div data-ui-profiler-tabs data-ui-role="tabs">
             {% for name, client in collector.clients %}
                 <div class="tab {{ client.traces|length == 0 ? 'disabled' }}">

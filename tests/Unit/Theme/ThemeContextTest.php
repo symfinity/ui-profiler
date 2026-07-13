@@ -30,7 +30,6 @@ final class ThemeContextTest extends TestCase
         $this->activeThemeContext = new ActiveThemeContext(
             new ThemePreferenceCookies(),
             $this->resolver,
-            $this->registry,
         );
     }
 

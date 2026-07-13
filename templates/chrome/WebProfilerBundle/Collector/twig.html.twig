@@ -68,7 +68,8 @@
             <p>No Twig templates were rendered.</p>
         </div>
     {% else %}
-        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Twig Metrics' }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Twig' }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Twig Metrics' }) }}
         <div data-ui-metrics-grid data-ui-role="grid">
             {{ ui.metric_cell('%.0f'|format(collector.time) ~ ' <span data-ui-part="unit">ms</span>', 'Render time') }}
             <div data-ui-role="stat-group">
@@ -82,7 +83,7 @@
             Render time includes sub-requests rendering time (if any).
         </p>
 
-        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Rendered Templates' }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Rendered Templates' }) }}
         <table data-ui-role="table" id="twig-table">
             <thead>
             <tr>
@@ -105,13 +106,13 @@
                             {{ template }}
                         {% endif %}
                     </td>
-                    <td data-ui-font="sans" data-ui-role="typography" data-ui-align="end">{{ count }}</td>
+                    <td data-ui-font="sans" class="num-col">{{ count }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
 
-        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Rendering Call Graph' }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Rendering Call Graph' }) }}
         <div id="twig-dump">
             {{ collector.htmlcallgraph }}
         </div>

@@ -14,6 +14,8 @@
     {% if ui_profiler_shell_stylesheet()|trim is not empty %}
         <style{% if csp_style_nonce is defined and csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>{{ ui_profiler_shell_stylesheet()|raw }}</style>
     {% endif %}
+    {% block stylesheets %}{% endblock %}
+    {% block javascripts %}{% endblock %}
 {% endblock %}
 
 {% block body_attributes %}{% if ssr_theme_id %} data-theme="{{ ssr_theme_id }}"{% endif %}{% endblock %}
@@ -92,14 +94,14 @@
                         <div id="sidebar-contents" data-ui-profiler-sidebar-contents data-ui-role="card" data-ui-fragment="blocks.card">
                             <div id="sidebar-shortcuts" data-ui-profiler-sidebar-shortcuts>
                                 {% block sidebar_shortcuts_links %}
-                                    <twig:Stack direction="horizontal" gap="sm" class="shortcuts" data-ui-profiler-shortcuts>
-                                        <twig:Button as="a" href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}" variant="neutral" appearance="ghost" size="sm">
+                                    <div class="shortcuts" data-ui-profiler-shortcuts>
+                                        <a data-ui-profiler-shortcut-link href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}">
                                             {{ source('@WebProfiler/Icon/search.svg') }} Search profiles
-                                        </twig:Button>
-                                        <twig:Button as="a" href="{{ path('_profiler', {token: 'latest', type: profile_type}|merge(request.query.all)) }}" variant="neutral" appearance="ghost" size="sm">
+                                        </a>
+                                        <a data-ui-profiler-shortcut-link href="{{ path('_profiler', {token: 'latest', type: profile_type}|merge(request.query.all)) }}">
                                             Latest
-                                        </twig:Button>
-                                    </twig:Stack>
+                                        </a>
+                                    </div>
                                 {% endblock sidebar_shortcuts_links %}
                             </div>
 

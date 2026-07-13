@@ -15,6 +15,9 @@
 
 </div>
 
+> [!WARNING]
+> **Dev/test only.** Flex registers this bundle for `dev` and `test` — do not enable in production.
+
 > [!NOTE]
 > **Read-only mirror.**
 > See [CONTRIBUTING.md](CONTRIBUTING.md) for how to propose changes.

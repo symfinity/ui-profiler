@@ -1,0 +1,34 @@
+// Twig collector — rendered templates table + call graph dump chrome.
+
+[data-ui-profiler-panel='twig'] {
+  #twig-table {
+    thead th {
+      white-space: nowrap;
+    }
+
+    :is(thead th.num-col, tbody td.num-col) {
+      text-align: center;
+      vertical-align: middle;
+      width: 1%;
+    }
+
+    tbody td {
+      position: relative;
+    }
+
+    .template-file-path {
+      color: var(--ui-color-text-muted);
+      display: block;
+    }
+  }
+
+  #twig-dump pre {
+    background-color: var(--ui-color-surface);
+    border: 1px solid var(--ui-color-border);
+    border-radius: var(--ui-radius-md, 6px);
+    box-shadow: 0 0 1px var(--ui-profiler-shadow-sm, rgba(128, 128, 128, 0.2));
+    font-size: var(--ui-font-size-sm);
+    line-height: 1.7;
+    padding: 0.9375rem;
+  }
+}

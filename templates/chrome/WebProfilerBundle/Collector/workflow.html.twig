@@ -171,7 +171,7 @@
         <div data-ui-profiler-tabs data-ui-role="tabs">
             {% for name, data in collector.workflows %}
                 <div class="tab">
-                    <h2 class="tab-title" data-ui-role="typography" data-ui-variant="h2">{{ name }}{% if data.calls|length %} ({{ data.calls|length }}){% endif %}</h2>
+                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ name }}{% if data.calls|length %} ({{ data.calls|length }}){% endif %}</h3>
 
                     <div class="tab-content">
                         <h3 data-ui-role="typography" data-ui-variant="h3">Definition</h3>
@@ -240,10 +240,10 @@
     {% endif %}
 
     <dialog id="detailsDialog">
-        <h2>
+        <h3 data-ui-role="typography" data-ui-variant="h3">
             Event listeners
             <i class="cancel">×</i>
-        </h2>
+        </h3>
 
         <table data-ui-role="table">
             <thead>

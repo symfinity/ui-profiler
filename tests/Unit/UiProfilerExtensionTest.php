@@ -19,10 +19,12 @@ final class UiProfilerExtensionTest extends TestCase
         $extensions = $container->getExtensionConfig('twig');
         self::assertNotEmpty($extensions);
 
-        $paths = $extensions[0]['paths'] ?? [];
+        /** @var array{paths?: array<string, string>} $twigConfig */
+        $twigConfig = $extensions[0];
+        $paths = $twigConfig['paths'] ?? [];
         $matched = false;
         foreach ($paths as $path => $namespace) {
-            if ($namespace === 'UiProfiler' && str_contains((string) $path, 'packages/ui-profiler/templates')) {
+            if ('UiProfiler' === $namespace && str_contains($path, 'packages/ui-profiler/templates')) {
                 $matched = true;
                 break;
             }
@@ -33,7 +35,9 @@ final class UiProfilerExtensionTest extends TestCase
 
         $frameworkConfigs = $container->getExtensionConfig('framework');
         self::assertNotEmpty($frameworkConfigs);
-        $assetPaths = $frameworkConfigs[0]['asset_mapper']['paths'] ?? [];
+        /** @var array{asset_mapper?: array{paths?: array<string, string>}} $frameworkConfig */
+        $frameworkConfig = $frameworkConfigs[0];
+        $assetPaths = $frameworkConfig['asset_mapper']['paths'] ?? [];
         self::assertContains('ui-profiler', $assetPaths);
     }
 

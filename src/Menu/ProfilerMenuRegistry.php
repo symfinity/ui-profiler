@@ -19,7 +19,7 @@ final class ProfilerMenuRegistry
     public function __construct(array $entries = [], array $stateHandlerIds = [])
     {
         foreach ($entries as $id => $config) {
-            if ('' === ($config['title'] ?? '') || '' === ($config['icon'] ?? '')) {
+            if ('' === $config['title'] || '' === $config['icon']) {
                 continue;
             }
 

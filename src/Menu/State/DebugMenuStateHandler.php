@@ -10,9 +10,11 @@ final class DebugMenuStateHandler implements ProfilerMenuStateHandler
 {
     public function disabled(object $collector): bool
     {
-        $count = $collector->dumpsCount ?? null;
+        if (!\property_exists($collector, 'dumpsCount') || !\is_int($collector->dumpsCount)) {
+            return false;
+        }
 
-        return null !== $count && 0 === (int) $count;
+        return 0 === $collector->dumpsCount;
     }
 
     public function badge(object $collector): ?array

@@ -27,7 +27,16 @@ final class PrependWebProfilerTemplatesPassTest extends TestCase
         $calls = $container->getDefinition('twig.loader.native_filesystem')->getMethodCalls();
         self::assertCount(\count($expectedBundles), $calls);
 
-        $paths = array_map(static fn (array $call): string => $call[1][0], $calls);
+        /** @var list<string> $paths */
+        $paths = [];
+        foreach ($calls as $call) {
+            self::assertIsArray($call);
+            self::assertArrayHasKey(1, $call);
+            $args = $call[1];
+            self::assertIsArray($args);
+            self::assertIsString($args[0] ?? null);
+            $paths[] = $args[0];
+        }
         foreach ($expectedBundles as $bundleName) {
             self::assertTrue(
                 array_any($paths, static fn (string $path): bool => str_contains($path, 'templates/chrome/'.$bundleName)),

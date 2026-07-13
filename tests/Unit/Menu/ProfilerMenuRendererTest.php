@@ -32,7 +32,7 @@ final class ProfilerMenuRendererTest extends TestCase
                 return true;
             }
 
-            public function badge(object $collector): ?array
+            public function badge(object $collector): array
             {
                 return ['count' => 3, 'status' => 'warning'];
             }

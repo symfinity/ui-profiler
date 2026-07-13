@@ -80,7 +80,7 @@
 {% endblock %}
 
 {% block panel %}
-    <h2>UI Kernel</h2>
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'UI Kernel' }) }}
 
     <table data-ui-role="table">
         <thead>

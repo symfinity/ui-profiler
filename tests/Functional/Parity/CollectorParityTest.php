@@ -12,6 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 #[Group('ui-profiler-parity')]
 final class CollectorParityTest extends WebTestCase
 {
+    use ParityBrowserTrait;
+
     protected static function getKernelClass(): string
     {
         return ParityKernel::class;
@@ -62,8 +64,7 @@ final class CollectorParityTest extends WebTestCase
             self::assertResponseIsSuccessful();
         }
 
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token, sprintf('Profiler token missing after %s %s', $method, $uri));
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token . '?panel=' . $panel);
         self::assertResponseIsSuccessful();
@@ -79,14 +80,15 @@ final class CollectorParityTest extends WebTestCase
         $client->request('GET', '/parity/exception');
         self::assertResponseStatusCodeSame(500);
 
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token);
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token . '?panel=exception');
         self::assertResponseIsSuccessful();
 
         $content = (string) $client->getResponse()->getContent();
         self::assertStringContainsString('data-ui-profiler-shell', $content);
+        self::assertStringContainsString('data-ui-profiler-panel="exception"', $content);
+        self::assertStringContainsString('data-ui-profiler-exception-delegate', $content);
         self::assertStringContainsString('parity fixture exception', $content);
     }
 
@@ -98,8 +100,7 @@ final class CollectorParityTest extends WebTestCase
         ]);
         self::assertResponseIsSuccessful();
 
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token);
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token . '?panel=form');
         self::assertResponseIsSuccessful();
@@ -115,8 +116,7 @@ final class CollectorParityTest extends WebTestCase
         $client = static::createClient(['debug' => true]);
         $client->followRedirects();
         $client->request('GET', '/');
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token);
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token . '/preferences/theme?scheme=dark');
         self::assertResponseIsSuccessful();
@@ -142,8 +142,7 @@ final class CollectorParityTest extends WebTestCase
     {
         $client = static::createClient(['debug' => true]);
         $client->request('GET', '/');
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token);
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token);
         self::assertResponseIsSuccessful();
@@ -159,13 +158,14 @@ final class CollectorParityTest extends WebTestCase
     {
         $client = static::createClient(['debug' => true]);
         $client->request('GET', '/parity/rich');
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token);
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token . '?panel=events');
         self::assertResponseIsSuccessful();
 
         $content = (string) $client->getResponse()->getContent();
+        self::assertStringContainsString('bootEventsPanel', $content);
+        self::assertStringContainsString('events-panel.js', $content);
         self::assertStringContainsString('Called', $content);
 
         $names = [];
@@ -184,12 +184,25 @@ final class CollectorParityTest extends WebTestCase
         }
     }
 
+    public function testLoggerPanelEmitsFilterJavascript(): void
+    {
+        $client = static::createClient(['debug' => true]);
+        $client->request('GET', '/parity/rich');
+        $token = $this->requireProfilerToken($client);
+
+        $client->request('GET', '/_profiler/' . $token . '?panel=logger');
+        self::assertResponseIsSuccessful();
+
+        $content = (string) $client->getResponse()->getContent();
+        self::assertStringContainsString('SymfonyProfilerLoggerPanel', $content);
+        self::assertStringContainsString('#updateLogsTable', $content);
+    }
+
     public function testKernelThemeCssIsInjectedInShell(): void
     {
         $client = static::createClient(['debug' => true]);
         $client->request('GET', '/');
-        $token = $client->getProfile()?->getToken();
-        self::assertNotNull($token);
+        $token = $this->requireProfilerToken($client);
 
         $client->request('GET', '/_profiler/' . $token);
         self::assertResponseIsSuccessful();

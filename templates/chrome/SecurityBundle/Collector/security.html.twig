@@ -419,7 +419,7 @@
                         </table>
                     {% endif %}
                     {% if collector.accessDecisionLog|default([]) is not empty %}
-                        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Access decision log' }) }}
+                        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Access decision log' }) }}
                         <table data-ui-role="table" class="decision-log">
                             <col style="width: 30px">
                             <col style="width: 120px">

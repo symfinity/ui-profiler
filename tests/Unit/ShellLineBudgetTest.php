@@ -59,7 +59,11 @@ final class ShellLineBudgetTest extends TestCase
      */
     private function loadFixture(): array
     {
-        return json_decode((string) file_get_contents(self::FIXTURE_PATH), true, 512, \JSON_THROW_ON_ERROR);
+        $decoded = json_decode((string) file_get_contents(self::FIXTURE_PATH), true, 512, \JSON_THROW_ON_ERROR);
+        self::assertIsArray($decoded);
+
+        /** @var array<string, mixed> $decoded */
+        return $decoded;
     }
 
     private static function countCssBodyNonEmptyLines(string $css): int

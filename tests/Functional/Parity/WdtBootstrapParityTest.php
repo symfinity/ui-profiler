@@ -51,7 +51,10 @@ final class WdtBootstrapParityTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSame('text/javascript; charset=UTF-8', $client->getResponse()->headers->get('Content-Type'));
-        self::assertStringContainsString('UiProfilerWdt', (string) $client->getResponse()->getContent());
+        $script = (string) $client->getResponse()->getContent();
+        self::assertStringContainsString('UiProfilerWdt', $script);
+        self::assertStringContainsString('positionWdtPanel', $script);
+        self::assertStringContainsString('getBoundingClientRect', $script);
     }
 
     public function testToolbarUsesOwnedStylesheetRoute(): void

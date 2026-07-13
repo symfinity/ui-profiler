@@ -1,5 +1,7 @@
 {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_item_status %}
 
+{% set wdt_item_label = name|replace({'_': ' '})|title %}
+
 <div
     data-ui-profiler-wdt-item
     data-ui-profiler-collector="{{ name }}"
@@ -8,28 +10,27 @@
     {{ block_attrs|default('')|raw }}
 >
     {% if link is not defined or link %}
-        <twig:Link
+        {# Plain anchor — twig:Link drops icon content captured via {% set icon %} in collector blocks. #}
+        <a
             href="{{ url('_profiler', {token: token, panel: name}) }}"
-            appearance="ghost"
-            variant="neutral"
-            size="sm"
             data-ui-profiler-wdt-trigger
             class="ui-profiler-wdt__trigger"
+            aria-label="{{ wdt_item_label }}"
         >
-            <twig:Stack direction="horizontal" gap="sm" density="compact" data-ui-profiler-wdt-chip>
-                {{ icon|default('') }}
-            </twig:Stack>
-        </twig:Link>
+            <span data-ui-profiler-wdt-chip>
+                {{ icon|default('')|raw }}
+            </span>
+        </a>
     {% else %}
-        <button type="button" data-ui-profiler-wdt-trigger class="ui-profiler-wdt__trigger" data-ui-role="button" data-ui-appearance="ghost" data-ui-variant="neutral" data-ui-size="sm">
-            <twig:Stack direction="horizontal" gap="sm" density="compact" data-ui-profiler-wdt-chip>
-                {{ icon|default('') }}
-            </twig:Stack>
+        <button type="button" data-ui-profiler-wdt-trigger class="ui-profiler-wdt__trigger" aria-label="{{ wdt_item_label }}">
+            <span data-ui-profiler-wdt-chip>
+                {{ icon|default('')|raw }}
+            </span>
         </button>
     {% endif %}
     {% if text|default('') is not empty %}
-        <div data-ui-profiler-wdt-panel data-ui-role="card" data-ui-fragment="blocks.card">
-            {{ text }}
+        <div data-ui-profiler-wdt-panel>
+            {{ text|raw }}
         </div>
     {% endif %}
 </div>

@@ -13,6 +13,7 @@ final class ConfigurationTest extends TestCase
 {
     public function testDefaultConfig(): void
     {
+        /** @var array{enabled: bool, theme: string, toolbar_theme: string|null, asset_version: string|null, wdt: array{critical_css_inline: bool, module_preload: bool}, legacy_sf_shim: bool} $config */
         $config = (new Processor())->processConfiguration(new Configuration(), [[]]);
 
         self::assertTrue($config['enabled']);
