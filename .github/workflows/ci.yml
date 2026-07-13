@@ -1,7 +1,7 @@
 name: CI
 
 # Matrix: maintained PHP x Symfony 7.4 (Symfony 8 cells deferred until symfony/monolog-bundle supports ^8).
-# Symfony minor alignment: extra.symfony.require + symfony/flex (dev) — pins transitives (console, event-dispatcher, …).
+# Pin direct symfony/* to matrix minor before update — no symfony/flex (bundle must not scaffold a Flex app on CI).
 
 on:
   push:
@@ -49,19 +49,51 @@ jobs:
           tools: composer:v2
 
       - name: Install dependencies
+        env:
+          SYMFONY_MINOR: ${{ matrix.symfony }}
         run: |
-          composer config extra.symfony.require "${{ matrix.symfony }}.*"
-          composer update --prefer-dist --no-interaction --no-progress --with-all-dependencies
-          composer show --installed --name-only | grep '^symfony/' | while read -r pkg; do
+          set -euo pipefail
+          php <<'PHP'
+          <?php
+          $minor = getenv('SYMFONY_MINOR') ?: '7.4';
+          $manifest = json_decode(file_get_contents('composer.json'), true);
+          $packages = [];
+          foreach (array_merge($manifest['require'] ?? [], $manifest['require-dev'] ?? []) as $name => $_constraint) {
+              if (str_starts_with($name, 'symfony/')) {
+                  $packages[] = $name . ':^' . $minor;
+              }
+          }
+          if ($packages === []) {
+              fwrite(STDERR, "No symfony/* packages found in composer.json\n");
+              exit(1);
+          }
+          passthru('composer require --no-update ' . implode(' ', array_map('escapeshellarg', $packages)));
+          PHP
+          composer update --prefer-dist --no-interaction --no-progress --with-all-dependencies --no-scripts
+          drift=""
+          while IFS= read -r pkg; do
             ver=$(composer show "$pkg" --installed --format=json | php -r '$d=json_decode(stream_get_contents(STDIN)); echo $d->versions[0];')
             case "$ver" in
-              v${{ matrix.symfony }}.*) ;;
+              v${SYMFONY_MINOR}.*) ;;
+              *) drift="${drift} ${pkg}" ;;
+            esac
+          done < <(composer show --installed --name-only | grep '^symfony/')
+          if [ -n "${drift// }" ]; then
+            for pkg in $drift; do
+              composer require --no-update "${pkg}:^${SYMFONY_MINOR}"
+            done
+            composer update symfony/* --with-all-dependencies --prefer-dist --no-interaction --no-progress --no-scripts
+          fi
+          while IFS= read -r pkg; do
+            ver=$(composer show "$pkg" --installed --format=json | php -r '$d=json_decode(stream_get_contents(STDIN)); echo $d->versions[0];')
+            case "$ver" in
+              v${SYMFONY_MINOR}.*) ;;
               *)
-                echo "::error::Symfony drift after flex pin: $pkg $ver (expected ${{ matrix.symfony }}.*)"
+                echo "::error::Symfony drift: $pkg $ver (expected ${SYMFONY_MINOR}.*)"
                 exit 1
                 ;;
             esac
-          done
+          done < <(composer show --installed --name-only | grep '^symfony/')
 
       - name: PHPUnit
         run: vendor/bin/phpunit --colors=always
