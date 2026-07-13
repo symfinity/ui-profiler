@@ -72,6 +72,7 @@ jobs:
             symfony/messenger:^${{ matrix.symfony }} \
             symfony/security-bundle:^${{ matrix.symfony }} \
             symfony/serializer:^${{ matrix.symfony }} \
+            symfony/stopwatch:^${{ matrix.symfony }} \
             symfony/translation:^${{ matrix.symfony }} \
             symfony/validator:^${{ matrix.symfony }} \
             'symfony/stimulus-bundle:^2.0|^3.0' \
