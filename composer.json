@@ -43,6 +43,7 @@
         "symfony/asset-mapper": "^7.4||^8.0",
         "symfony/browser-kit": "^7.4||^8.0",
         "symfony/css-selector": "^7.4||^8.0",
+        "symfony/flex": "^2.4",
         "symfony/form": "^7.4||^8.0",
         "symfony/http-client": "^7.4||^8.0",
         "symfony/mailer": "^7.4||^8.0",
@@ -80,6 +81,11 @@
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true
+        }
+    },
     "extra": {
         "branch-alias": {
             "dev-main": "0.1.x-dev"

@@ -25,6 +25,14 @@ class ParityKernel extends Kernel
 {
     use MicroKernelTrait;
 
+    public function __construct(string $environment, bool $debug)
+    {
+        // Parity functional tests assert profiler collector payloads (events listeners, …).
+        // Always boot with debug so TraceableEventDispatcher is wired — CI WebTestCase
+        // can otherwise leave kernel.debug false despite createClient(['debug' => true]).
+        parent::__construct($environment, true);
+    }
+
     public function registerBundles(): array
     {
         return [
@@ -109,6 +117,10 @@ class ParityKernel extends Kernel
             'paths' => [
                 $fixtureDir . '/templates' => 'parity',
             ],
+        ]);
+
+        $container->extension('twig_component', [
+            'anonymous_template_directory' => 'components',
         ]);
 
         $container->extension('doctrine', [

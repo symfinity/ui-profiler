@@ -1,6 +1,7 @@
 name: CI
 
 # Matrix: maintained PHP x Symfony 7.4 (Symfony 8 cells deferred until symfony/monolog-bundle supports ^8).
+# Symfony minor alignment: extra.symfony.require + symfony/flex (dev) — pins transitives (console, event-dispatcher, …).
 
 on:
   push:
@@ -47,32 +48,20 @@ jobs:
           coverage: none
           tools: composer:v2
 
-      - name: Pin Symfony ${{ matrix.symfony }}
-        run: |
-          composer require --no-update \
-            symfony/config:^${{ matrix.symfony }} \
-            symfony/dependency-injection:^${{ matrix.symfony }} \
-            symfony/framework-bundle:^${{ matrix.symfony }} \
-            symfony/http-foundation:^${{ matrix.symfony }} \
-            symfony/http-kernel:^${{ matrix.symfony }} \
-            symfony/twig-bundle:^${{ matrix.symfony }} \
-            symfony/web-profiler-bundle:^${{ matrix.symfony }} \
-            symfony/yaml:^${{ matrix.symfony }} \
-            symfony/asset-mapper:^${{ matrix.symfony }} \
-            symfony/browser-kit:^${{ matrix.symfony }} \
-            symfony/css-selector:^${{ matrix.symfony }} \
-            symfony/form:^${{ matrix.symfony }} \
-            symfony/http-client:^${{ matrix.symfony }} \
-            symfony/mailer:^${{ matrix.symfony }} \
-            symfony/messenger:^${{ matrix.symfony }} \
-            symfony/monolog-bundle:^3.10 \
-            symfony/security-bundle:^${{ matrix.symfony }} \
-            symfony/serializer:^${{ matrix.symfony }} \
-            symfony/translation:^${{ matrix.symfony }} \
-            symfony/validator:^${{ matrix.symfony }}
-
       - name: Install dependencies
-        run: composer update --prefer-dist --no-interaction --no-progress
+        run: |
+          composer config extra.symfony.require "${{ matrix.symfony }}.*"
+          composer update --prefer-dist --no-interaction --no-progress --with-all-dependencies
+          composer show --installed --name-only | grep '^symfony/' | while read -r pkg; do
+            ver=$(composer show "$pkg" --installed --format=json | php -r '$d=json_decode(stream_get_contents(STDIN)); echo $d->versions[0];')
+            case "$ver" in
+              v${{ matrix.symfony }}.*) ;;
+              *)
+                echo "::error::Symfony drift after flex pin: $pkg $ver (expected ${{ matrix.symfony }}.*)"
+                exit 1
+                ;;
+            esac
+          done
 
       - name: PHPUnit
         run: vendor/bin/phpunit --colors=always
