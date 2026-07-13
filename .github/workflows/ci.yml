@@ -57,7 +57,19 @@ jobs:
             symfony/http-kernel:^${{ matrix.symfony }} \
             symfony/twig-bundle:^${{ matrix.symfony }} \
             symfony/web-profiler-bundle:^${{ matrix.symfony }} \
-            symfony/yaml:^${{ matrix.symfony }}
+            symfony/yaml:^${{ matrix.symfony }} \
+            symfony/asset-mapper:^${{ matrix.symfony }} \
+            symfony/browser-kit:^${{ matrix.symfony }} \
+            symfony/css-selector:^${{ matrix.symfony }} \
+            symfony/form:^${{ matrix.symfony }} \
+            symfony/http-client:^${{ matrix.symfony }} \
+            symfony/mailer:^${{ matrix.symfony }} \
+            symfony/messenger:^${{ matrix.symfony }} \
+            symfony/monolog-bundle:^3.10 \
+            symfony/security-bundle:^${{ matrix.symfony }} \
+            symfony/serializer:^${{ matrix.symfony }} \
+            symfony/translation:^${{ matrix.symfony }} \
+            symfony/validator:^${{ matrix.symfony }}
 
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction --no-progress

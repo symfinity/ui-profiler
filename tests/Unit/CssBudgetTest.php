@@ -99,6 +99,15 @@ final class CssBudgetTest extends TestCase
 
         foreach ($baseline['author_scss'] as $scssRelative) {
             $scssPath = $packageDir.'/'.$scssRelative;
+            if (!is_file($scssPath)) {
+                self::markTestSkipped('Author SCSS not present — split mirror excludes assets/scss; freshness gate runs in monorepo only.');
+
+                return;
+            }
+        }
+
+        foreach ($baseline['author_scss'] as $scssRelative) {
+            $scssPath = $packageDir.'/'.$scssRelative;
             $cssRelative = preg_replace('#^assets/scss/#', 'assets/styles/', $scssRelative);
             $cssRelative = preg_replace('#\.scss$#', '.css', (string) $cssRelative);
             $cssPath = $packageDir.'/'.$cssRelative;
