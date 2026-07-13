@@ -2,7 +2,7 @@
 
 # UI Profiler
 
-### Web Profiler toolbar and panels rebuilt with UI Kernel and UX Blocks
+### Symfony Web Profiler toolbar and panels rebuilt with UI Kernel and UX Blocks
 
 [![PHP Version](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat&logo=php&logoColor=white)](composer.json)
 [![Symfony](https://img.shields.io/badge/Symfony-7.4+-343434?style=flat&logo=symfony&logoColor=white)](composer.json)

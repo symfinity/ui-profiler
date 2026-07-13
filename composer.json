@@ -1,6 +1,6 @@
 {
     "name": "symfinity/ui-profiler",
-    "description": "Web Profiler toolbar and panels rebuilt with UI Kernel and UX Blocks",
+    "description": "Symfony Web Profiler toolbar and panels rebuilt with UI Kernel and UX Blocks",
     "type": "symfony-bundle",
     "license": "MIT",
     "homepage": "https://github.com/symfinity/ui-profiler",
