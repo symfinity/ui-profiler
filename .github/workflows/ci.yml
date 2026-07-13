@@ -57,6 +57,7 @@ jobs:
           composer require --no-update \
             symfony/config:^${{ matrix.symfony }} \
             symfony/dependency-injection:^${{ matrix.symfony }} \
+            symfony/event-dispatcher:^${{ matrix.symfony }} \
             symfony/framework-bundle:^${{ matrix.symfony }} \
             symfony/http-foundation:^${{ matrix.symfony }} \
             symfony/http-kernel:^${{ matrix.symfony }} \

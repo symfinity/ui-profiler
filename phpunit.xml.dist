@@ -4,6 +4,10 @@
          bootstrap="tests/bootstrap.php"
          colors="true"
          cacheDirectory=".phpunit.cache">
+    <php>
+        <env name="APP_ENV" value="test" force="true"/>
+        <env name="APP_DEBUG" value="1" force="true"/>
+    </php>
     <testsuites>
         <testsuite name="default">
             <directory>tests/Unit</directory>
