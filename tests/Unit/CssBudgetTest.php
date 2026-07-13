@@ -101,8 +101,6 @@ final class CssBudgetTest extends TestCase
             $scssPath = $packageDir.'/'.$scssRelative;
             if (!is_file($scssPath)) {
                 self::markTestSkipped('Author SCSS not present — split mirror excludes assets/scss; freshness gate runs in monorepo only.');
-
-                return;
             }
         }
 

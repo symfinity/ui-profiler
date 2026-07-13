@@ -29,11 +29,11 @@ final class ShellLineBudgetTest extends TestCase
         /** @var array{
          *     css_body_lines: int,
          *     active_wave: int,
-         *     wave_ceilings: array<string, int>
+         *     wave_ceilings: array<int|string, int>
          * } $baseline
          */
         $baseline = $this->loadFixture();
-        $activeWave = (string) $baseline['active_wave'];
+        $activeWave = $baseline['active_wave'];
         self::assertArrayHasKey($activeWave, $baseline['wave_ceilings']);
 
         $percent = $baseline['wave_ceilings'][$activeWave];
@@ -46,7 +46,7 @@ final class ShellLineBudgetTest extends TestCase
             sprintf(
                 'Shell CSS-body lines %d exceed wave %s ceiling %d (%d%% of baseline %d). Delegate to ux-blocks-core or update active_wave after wave merge.',
                 $actual,
-                $activeWave,
+                (string) $activeWave,
                 $ceiling,
                 $percent,
                 $baseline['css_body_lines'],
