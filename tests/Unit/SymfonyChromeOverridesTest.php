@@ -9,7 +9,7 @@ use Symfinity\UiProfiler\DependencyInjection\Compiler\PrependWebProfilerTemplate
 
 final class SymfonyChromeOverridesTest extends TestCase
 {
-    private const MANIFEST_PATH = __DIR__.'/../Fixtures/symfony-collector-chrome-manifest.json';
+    private const MANIFEST_PATH = __DIR__.'/../../config/profiler-menu-manifest.json';
 
     public function testManifestBundlesHaveChromeDirectories(): void
     {

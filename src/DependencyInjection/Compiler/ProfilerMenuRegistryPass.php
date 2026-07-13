@@ -102,7 +102,7 @@ final class ProfilerMenuRegistryPass implements CompilerPassInterface
             return [];
         }
 
-        $manifestPath = $bundlePathParam.'/tests/Fixtures/symfony-collector-chrome-manifest.json';
+        $manifestPath = $bundlePathParam.'/config/profiler-menu-manifest.json';
 
         if (!is_file($manifestPath)) {
             return [];

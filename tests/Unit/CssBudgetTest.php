@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 #[Group('ui-profiler-parity')]
 final class CssBudgetTest extends TestCase
 {
-    private const BASELINE_PATH = __DIR__.'/../Fixtures/css-budget-baseline.json';
+    private const BASELINE_PATH = __DIR__.'/../baselines/css-budget-baseline.json';
 
     public function testCompiledCssInventoryDoesNotExceedBaseline(): void
     {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Symfinity\UiProfiler\Tests\Functional\Parity;
 
 use PHPUnit\Framework\Attributes\Group;
-use Symfinity\UiProfiler\Tests\Fixtures\ParityKernel\DisabledParityKernel;
+use Symfinity\UiProfiler\Tests\ParityKernel\DisabledParityKernel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 #[Group('ui-profiler-parity')]

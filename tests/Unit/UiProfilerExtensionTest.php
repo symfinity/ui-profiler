@@ -19,12 +19,15 @@ final class UiProfilerExtensionTest extends TestCase
         $extensions = $container->getExtensionConfig('twig');
         self::assertNotEmpty($extensions);
 
+        $packageDir = \dirname(__DIR__, 2);
+        $templatesDir = $packageDir.'/templates';
+
         /** @var array{paths?: array<string, string>} $twigConfig */
         $twigConfig = $extensions[0];
         $paths = $twigConfig['paths'] ?? [];
         $matched = false;
         foreach ($paths as $path => $namespace) {
-            if ('UiProfiler' === $namespace && str_contains($path, 'packages/ui-profiler/templates')) {
+            if ('UiProfiler' === $namespace && realpath($path) === realpath($templatesDir)) {
                 $matched = true;
                 break;
             }

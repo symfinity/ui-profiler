@@ -7,7 +7,7 @@ namespace Symfinity\UiProfiler\Tests\Functional\Parity;
 use PHPUnit\Framework\Attributes\Group;
 use Symfinity\UiKernel\Theme\ThemeLineageCatalog;
 use Symfinity\UiKernel\Theme\ThemePreferenceCookies;
-use Symfinity\UiProfiler\Tests\Fixtures\ParityKernel\ParityKernel;
+use Symfinity\UiProfiler\Tests\ParityKernel\ParityKernel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 

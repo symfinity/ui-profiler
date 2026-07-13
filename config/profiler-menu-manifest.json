@@ -1,0 +1,61 @@
+{
+    "description": "Symfony ecosystem bundles that ship web-profiler Collector Twig templates. ui-profiler MUST provide templates/chrome/{BundleName}/ overrides for panel/toolbar reskins. Sidebar menu rows MAY use menu_entries instead of thin menu-only chrome.",
+    "bundles": [
+        {
+            "bundle": "WebProfilerBundle",
+            "twig_namespace": "WebProfiler",
+            "collectors": [
+                "ajax",
+                "cache",
+                "command",
+                "config",
+                "events",
+                "exception",
+                "form",
+                "http_client",
+                "logger",
+                "mailer",
+                "memory",
+                "messenger",
+                "notifier",
+                "request",
+                "router",
+                "serializer",
+                "time",
+                "translation",
+                "twig",
+                "validator",
+                "workflow"
+            ]
+        },
+        {
+            "bundle": "SecurityBundle",
+            "twig_namespace": "Security",
+            "collectors": ["security"]
+        },
+        {
+            "bundle": "DoctrineBundle",
+            "twig_namespace": "Doctrine",
+            "collectors": ["db"]
+        },
+        {
+            "bundle": "TwigComponentBundle",
+            "twig_namespace": "TwigComponent",
+            "collectors": ["twig_component"]
+        }
+    ],
+    "menu_entries": {
+        "mercure": {
+            "title": "Mercure",
+            "icon": "@Mercure/Icon/mercure.svg"
+        },
+        "dump": {
+            "title": "Debug",
+            "icon": "@Debug/Profiler/icon.svg"
+        },
+        "twig_component": {
+            "title": "Twig Components",
+            "icon": "@TwigComponent/Collector/icon.svg"
+        }
+    }
+}

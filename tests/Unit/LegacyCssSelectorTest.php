@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 #[Group('ui-profiler-parity')]
 final class LegacyCssSelectorTest extends TestCase
 {
-    private const BASELINE_PATH = __DIR__.'/../Fixtures/css-budget-baseline.json';
+    private const BASELINE_PATH = __DIR__.'/../baselines/css-budget-baseline.json';
 
     /** Forbidden shell/WDT vocabulary — MUST NOT appear in owned CSS (148 gate). */
     private const FORBIDDEN_PATTERNS = [

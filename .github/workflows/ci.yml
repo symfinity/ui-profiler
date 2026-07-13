@@ -1,7 +1,6 @@
 name: CI
 
-# Matrix: maintained PHP x maintained Symfony (package floor Symfony 7.4).
-# Regenerated 2026-07-13 — refresh: split-mirror-docs/scripts/fetch-ci-matrix.sh --gha-json --package-php='>=8.2'
+# Matrix: maintained PHP x Symfony 7.4 (Symfony 8 cells deferred until symfony/monolog-bundle supports ^8).
 
 on:
   push:
@@ -24,10 +23,6 @@ jobs:
           - { php: '8.3', symfony: '7.4' }
           - { php: '8.4', symfony: '7.4' }
           - { php: '8.5', symfony: '7.4' }
-          - { php: '8.4', symfony: '8.0' }
-          - { php: '8.5', symfony: '8.0' }
-          - { php: '8.4', symfony: '8.1' }
-          - { php: '8.5', symfony: '8.1' }
 
     name: PHPUnit + PHPStan (PHP ${{ matrix.php }}, Symfony ${{ matrix.symfony }}.*)
 

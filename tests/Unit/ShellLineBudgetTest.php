@@ -9,7 +9,7 @@ use Symfinity\UiProfiler\Asset\ShellChromeStylesheet;
 
 final class ShellLineBudgetTest extends TestCase
 {
-    private const FIXTURE_PATH = __DIR__.'/../Fixtures/shell-line-budget-baseline.json';
+    private const FIXTURE_PATH = __DIR__.'/../baselines/shell-line-budget-baseline.json';
 
     public function testCurrentCssBodyDoesNotExceedWaveZeroBaseline(): void
     {
