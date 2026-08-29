@@ -1,0 +1,161 @@
+{% extends '@WebProfiler/Profiler/base.html.twig' %}
+
+{% set pref = ui_profiler_theme_preference() %}
+{% set lineage_pair = ui_profiler_lineage_pairs()[pref.lineage] %}
+{% set theme_auto = pref.scheme.value == 'auto' %}
+{% set ssr_theme_id = theme_auto ? null : ui_kernel_active_theme_id() %}
+
+{% block html_attributes %}{% if ssr_theme_id %} data-theme="{{ ssr_theme_id }}"{% endif %}{% endblock %}
+
+{% block head %}
+    {{ include('@UiProfiler/_chrome/theme-paint-guard.html.twig', {pref: pref, lineage_pair: lineage_pair}) }}
+    {{ ui_profiler_theme_boot_script() }}
+    {{ ui_profiler_shell_theme_css() }}
+    {% if ui_profiler_shell_stylesheet()|trim is not empty %}
+        <style{% if csp_style_nonce is defined and csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %}>{{ ui_profiler_shell_stylesheet()|raw }}</style>
+    {% endif %}
+    {% block stylesheets %}{% endblock %}
+    {% block javascripts %}{% endblock %}
+{% endblock %}
+
+{% block body_attributes %}{% if ssr_theme_id %} data-theme="{{ ssr_theme_id }}"{% endif %}{% endblock %}
+
+{% block body %}
+    <script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
+        (function () {
+            const scheme = {{ pref.scheme.value|json_encode|raw }};
+            const pair = {{ lineage_pair|json_encode|raw }};
+
+            const syncThemeTargets = (themeId) => {
+                document.documentElement.setAttribute('data-theme', themeId);
+                document.body.setAttribute('data-theme', themeId);
+                const shell = document.querySelector('[data-ui-profiler-shell]');
+                if (shell instanceof HTMLElement) {
+                    shell.setAttribute('data-theme', themeId);
+                }
+                const settingsDialog = document.getElementById('profiler-settings');
+                if (settingsDialog instanceof HTMLElement) {
+                    settingsDialog.setAttribute('data-theme', themeId);
+                }
+            };
+
+            const applyTheme = (dark) => {
+                const themeId = dark ? pair.dark : pair.light;
+                const colorScheme = dark ? 'dark' : 'light';
+                document.documentElement.style.colorScheme = colorScheme;
+                document.body.style.colorScheme = colorScheme;
+                document.body.classList.remove('theme-light', 'theme-dark');
+                document.body.classList.add(dark ? 'theme-dark' : 'theme-light');
+                syncThemeTargets(themeId);
+            };
+
+            const resolveDark = () => {
+                if (scheme === 'auto') {
+                    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+
+                return scheme === 'dark';
+            };
+
+            const sync = () => applyTheme(resolveDark());
+
+            sync();
+
+            if (scheme === 'auto') {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync);
+            }
+
+            document.addEventListener('DOMContentLoaded', sync);
+        })();
+    </script>
+    <div data-ui-profiler-shell data-ui-role="grid-container"{% if ssr_theme_id %} data-theme="{{ ssr_theme_id }}"{% endif %}>
+        {{ include('@WebProfiler/Profiler/header.html.twig', {profile_type: profile_type}, with_context: false) }}
+
+        <div id="summary" data-ui-profiler-request-summary>
+            {% block summary %}
+                {% if profile is defined %}
+                    {% set request_collector = profile.collectors.request|default(false) %}
+
+                    {{ include('@WebProfiler/Profiler/_%s_summary.html.twig'|format(profile_type), {
+                        profile: profile,
+                        command_collector: profile.collectors.command|default(false),
+                        request_collector: request_collector,
+                        request: request,
+                        token: token,
+                    }, with_context: false) }}
+                {% endif %}
+            {% endblock %}
+        </div>
+
+        <div id="content">
+            <div id="main" data-ui-profiler-main data-ui-role="grid">
+                <aside id="sidebar" data-ui-profiler-sidebar data-ui-role="grid-cell" data-ui-span-md="3" data-ui-span-lg="3">
+                    {% block sidebar %}
+                        <div id="sidebar-contents" data-ui-profiler-sidebar-contents data-ui-role="card" data-ui-fragment="blocks.card">
+                            <div id="sidebar-shortcuts" data-ui-profiler-sidebar-shortcuts>
+                                {% block sidebar_shortcuts_links %}
+                                    <div class="shortcuts" data-ui-profiler-shortcuts>
+                                        <a data-ui-profiler-shortcut-link href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}">
+                                            {{ source('@WebProfiler/Icon/search.svg') }} Search profiles
+                                        </a>
+                                        <a data-ui-profiler-shortcut-link href="{{ path('_profiler', {token: 'latest', type: profile_type}|merge(request.query.all)) }}">
+                                            Latest
+                                        </a>
+                                    </div>
+                                {% endblock sidebar_shortcuts_links %}
+                            </div>
+
+                            {% if templates is defined %}
+                                <ul id="menu-profiler" data-ui-profiler-menu data-ui-role="list" data-ui-variant="rail" data-ui-fragment="blocks.list">
+                                    {% if 'request' is same as(profile_type) %}
+                                        {% set excludes = ['command'] %}
+                                    {% elseif 'command' is same as(profile_type) %}
+                                        {% set excludes = ['request', 'router'] %}
+                                    {% endif %}
+
+                                    {% for name, template in templates|filter((t, n) => n not in excludes) %}
+                                        {% set menu -%}
+                                            {%- set collector = profile.getcollector(name) -%}
+                                            {%- set registry_menu = ui_profiler_menu(name, collector) -%}
+                                            {%- if registry_menu is not empty -%}
+                                                {{- registry_menu|raw -}}
+                                            {%- elseif block('menu', template) is defined -%}
+                                                {% with {collector: collector, profiler_markup_version: profiler_markup_version} %}
+                                                    {{- block('menu', template) -}}
+                                                {% endwith %}
+                                            {%- endif -%}
+                                        {%- endset %}
+                                        {% if menu is not empty %}
+                                            <li class="{{ name }} {{ name == panel ? 'selected' }}">
+                                                <twig:Link href="{{ path('_profiler', {token: token, panel: name, type: profile_type}) }}">
+                                                    {{ menu|raw }}
+                                                </twig:Link>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+
+                        {{ include('@UiProfiler/_chrome/profiler-settings.html.twig', {token: token, panel: panel|default(null), profile_type: profile_type}) }}
+                    {% endblock sidebar %}
+                </aside>
+
+                <div id="collector-wrapper" data-ui-profiler-collector-wrapper data-ui-role="grid-cell" data-ui-span-md="9" data-ui-span-lg="9">
+                    <div data-ui-role="card" data-ui-fragment="blocks.card">
+                        <div id="collector-content" data-ui-profiler-collector-content{% if ui_profiler_stimulus_enabled() %} data-controller="ui-profiler--tabs ui-profiler--table-search"{% endif %}>
+                            {{ include('@UiProfiler/_chrome/shell-bootstrap.html.twig') }}
+                            {% block panel %}{% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ include('@UiProfiler/_chrome/profiler-settings-dialog.html.twig', {
+        token: token,
+        panel: panel|default(null),
+        profile_type: profile_type,
+    }) }}
+{% endblock %}

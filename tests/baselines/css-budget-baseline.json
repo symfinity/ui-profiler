@@ -1,0 +1,23 @@
+{
+    "description": "122 sass author pipeline: edit assets/scss/*.scss; commit assets/styles/*.css via bin/profiler-css-compile.",
+    "exit_policy": "sass_author_pipeline",
+    "files": {
+        "assets/styles/shell-chrome.css": 1103,
+        "assets/styles/wdt-toolbar.css": 394,
+        "assets/styles/wdt-critical.css": 55
+    },
+    "exit_caps": {},
+    "author_scss": [
+        "assets/scss/shell-chrome.scss",
+        "assets/scss/wdt-toolbar.scss",
+        "assets/scss/wdt-critical.scss"
+    ],
+    "r51_rows": {
+        "R51-01": "zero @!WebProfiler includes",
+        "R51-02": "toolbar bootstrap ≤ 5KB",
+        "R51-03": "sass author pipeline (scss → committed css)",
+        "R51-04": "composer-stack CS-*",
+        "R51-05": "dual-interaction DI-T1 native",
+        "R51-06": "greenfield-cutover GC-6"
+    }
+}

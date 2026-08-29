@@ -1,0 +1,40 @@
+// Collector panel tables — uniform cell typography (shell SSOT).
+// ux-blocks table + typography roles load separately and can mix sm/md/compact in one table.
+
+[data-ui-profiler-collector-content] [data-ui-role='table'] {
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-normal, 1.5);
+
+  :is(thead th, tbody :is(th, td)) {
+    font-family: var(--ui-font-family-sans);
+    font-size: var(--ui-font-size-sm);
+    font-variant-ligatures: none;
+  }
+
+  thead th {
+    font-weight: var(--ui-font-weight-semibold, 600);
+  }
+
+  tbody th.colored {
+    background-color: var(--ui-color-surface-elevated);
+    font-weight: var(--ui-font-weight-semibold, 600);
+  }
+
+  // Per-cell typography/density must not bump size inside tables.
+  :is(th, td)[data-ui-role='typography'],
+  :is(th, td)[data-ui-density='compact'] {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  :is(th, td)[data-ui-font='mono'] {
+    font-family: var(--ui-font-family-mono);
+    font-size: inherit;
+  }
+
+  :is(th, td) :is(code, kbd, samp) {
+    font-family: var(--ui-font-family-mono);
+    font-size: inherit;
+  }
+}

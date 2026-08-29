@@ -1,0 +1,226 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+{% import '@UiProfiler/_chrome/macros/profiler-ui.html.twig' as ui %}
+
+{% block toolbar %}
+    {% if collector.messages|length %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/translation.svg') }}
+            {% set status_color = collector.countMissings ? 'red' : collector.countFallbacks ? 'yellow' %}
+            {% set error_count = collector.countMissings + collector.countFallbacks %}
+            <span data-ui-profiler-wdt-value>{{ error_count ?: collector.countDefines }}</span>
+        {% endset %}
+
+        {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Default locale</b>
+                {{ status_badge('none', collector.locale|default('-')) }}
+            </div>
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Missing messages</b>
+                {{ status_badge(collector.countMissings ? 'red' : 'none', collector.countMissings) }}
+            </div>
+
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Fallback messages</b>
+                {{ status_badge(collector.countFallbacks ? 'yellow' : 'none', collector.countFallbacks) }}
+            </div>
+
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Defined messages</b>
+                {{ status_badge('none', collector.countDefines) }}
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: status_color}) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/translation.svg'),
+        title: 'Translation',
+        status: collector.countMissings ? 'error' : (collector.countFallbacks ? 'warning' : null),
+        disabled: collector.messages is empty,
+        count: (collector.countMissings or collector.countFallbacks)
+            ? (collector.countMissings + collector.countFallbacks)
+            : null,
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="translation">
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Translation' }) }}
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
+            {{ ui.metric_cell(collector.locale|default('-'), 'Default locale') }}
+            {{ ui.metric_cell(collector.fallbackLocales|join(', ')|default('-'), 'Fallback locale' ~ (collector.fallbackLocales|length != 1 ? 's' : '')) }}
+        </div>
+    </div>
+
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Messages' }) }}
+    {% if collector.messages is empty %}
+        <div data-ui-role="empty" data-ui-profiler-empty-panel>
+            <p>No translations have been called.</p>
+        </div>
+    {% else %}
+        {% block messages %}
+
+        {# sort translation messages in groups #}
+        {% set messages_defined, messages_missing, messages_fallback = [], [], [] %}
+        {% for message in collector.messages %}
+            {% if message.state == constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_DEFINED') %}
+                {% set messages_defined = messages_defined|merge([message]) %}
+            {% elseif message.state == constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_MISSING') %}
+                {% set messages_missing = messages_missing|merge([message]) %}
+            {% elseif message.state == constant('Symfony\\Component\\Translation\\DataCollectorTranslator::MESSAGE_EQUALS_FALLBACK') %}
+                {% set messages_fallback = messages_fallback|merge([message]) %}
+            {% endif %}
+        {% endfor %}
+
+        <div data-ui-profiler-tabs data-ui-role="tabs">
+            <div class="tab {{ collector.countMissings == 0 ? 'active' }}">
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Defined <twig:Badge>{{ collector.countDefines }}</twig:Badge></h3>
+
+                <div class="tab-content">
+                    <p data-ui-role="typography" data-ui-variant="help">
+                        These messages are correctly translated into the given locale.
+                    </p>
+
+                    {% if messages_defined is empty %}
+                        <div data-ui-role="empty">
+                            <p>None of the used translation messages are defined for the given locale.</p>
+                        </div>
+                    {% else %}
+                        {% block defined_messages %}
+                            {{ _self.render_table(messages_defined) }}
+                        {% endblock %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="tab">
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Fallback <twig:Badge variant="{{ collector.countFallbacks ? 'warning' : 'default' }}">{{ collector.countFallbacks }}</twig:Badge></h3>
+
+                <div class="tab-content">
+                    <p data-ui-role="typography" data-ui-variant="help">
+                        These messages are not available for the given locale
+                        but Symfony found them in the fallback locale catalog.
+                    </p>
+
+                    {% if messages_fallback is empty %}
+                        <div data-ui-role="empty">
+                            <p>No fallback translation messages were used.</p>
+                        </div>
+                    {% else %}
+                        {% block fallback_messages %}
+                            {{ _self.render_table(messages_fallback, true) }}
+                        {% endblock %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="tab {{ collector.countMissings > 0 ? 'active' }}">
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Missing <twig:Badge variant="{{ collector.countMissings ? 'danger' : 'default' }}">{{ collector.countMissings }}</twig:Badge></h3>
+
+                <div class="tab-content">
+                    <p data-ui-role="typography" data-ui-variant="help">
+                        These messages are not available for the given locale and cannot
+                        be found in the fallback locales. Add them to the translation
+                        catalogue to avoid Symfony outputting untranslated contents.
+                    </p>
+
+                    {% if messages_missing is empty %}
+                        <div data-ui-role="empty">
+                            <p>There are no messages of this category.</p>
+                        </div>
+                    {% else %}
+                        {% block missing_messages %}
+                            {{ _self.render_table(messages_missing) }}
+                        {% endblock %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% endblock messages %}
+    {% endif %}
+
+    {% if collector.globalParameters|default([]) %}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Global parameters' }) }}
+        <table data-ui-role="table">
+            <thead>
+            <tr>
+                <th>Message ID</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for id, value in collector.globalParameters %}
+                <tr>
+                    <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ id }}</td>
+                    <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ profiler_dump(value) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    </div>
+{% endblock %}
+
+{% macro render_table(messages, is_fallback) %}
+    <table data-ui-role="table">
+        <thead>
+            <tr>
+                <th>Locale</th>
+                {% if is_fallback %}
+                    <th>Fallback locale</th>
+                {% endif %}
+                <th>Domain</th>
+                <th>Times used</th>
+                <th>Message ID</th>
+                <th>Message Preview</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for message in messages %}
+            <tr>
+                <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ message.locale }}</td>
+                {% if is_fallback %}
+                    <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ message.fallbackLocale|default('-') }}</td>
+                {% endif %}
+                <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap" style="font-weight:bold">{{ message.domain }}</td>
+                <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-wrap="nowrap">{{ message.count }}</td>
+                <td>
+                    <span{% if message.id|length < 64 %} data-ui-wrap="nowrap"{% endif %}>{{ message.id }}</span>
+
+                    {% if message.transChoiceNumber is not null %}
+                        <small data-ui-display="block">(pluralization is used)</small>
+                    {% endif %}
+
+                    {% if message.parameters|length > 0 %}
+                        <twig:Button
+                            as="button"
+                            type="button"
+                            variant="neutral" appearance="ghost"
+                            size="sm"
+                            data-ui-display="block" data-ui-role="typography" data-ui-density="compact"
+                            data-ui-profiler-toggle
+                            data-ui-profiler-toggle-target="#parameters-{{ loop.index }}"
+                            data-ui-profiler-toggle-alt="Hide parameters"
+                        >Show parameters</twig:Button>
+
+                        <div id="parameters-{{ loop.index }}" data-ui-profiler-toggle-panel hidden>
+                            {% for parameters in message.parameters %}
+                                {{ profiler_dump(parameters, maxDepth: 1) }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </td>
+                <td data-ui-wrap="pre">{{ message.translation }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

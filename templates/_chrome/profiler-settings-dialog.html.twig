@@ -1,0 +1,190 @@
+{% set preference = ui_profiler_theme_preference() %}
+{% set theme_auto = preference.scheme.value == 'auto' %}
+{% set ssr_theme_id = theme_auto ? null : ui_kernel_active_theme_id() %}
+{% set theme_route_params = {token: token, type: profile_type|default('request')} %}
+{% if panel %}
+    {% set theme_route_params = theme_route_params|merge({panel: panel}) %}
+{% endif %}
+
+<dialog
+    id="profiler-settings"
+    data-ui-role="dialog"
+    data-ui-fragment="blocks.dialog"
+    {% if ssr_theme_id %}data-theme="{{ ssr_theme_id }}" {% endif %}
+    aria-labelledby="profiler-settings-title"
+    {% if ui_profiler_stimulus_enabled() %}data-controller="ui-profiler--dialog"{% endif %}
+>
+    <twig:Stack gap="lg">
+        <header>
+            <twig:Stack direction="horizontal" gap="md" class="profiler-settings-header">
+                <h3 id="profiler-settings-title">Configuration Settings</h3>
+                <twig:Button type="button" variant="neutral" appearance="ghost" size="sm" data-ui-profiler-settings-close aria-label="Close">&times;</twig:Button>
+            </twig:Stack>
+        </header>
+
+        <twig:Stack gap="sm">
+            <strong>Theme</strong>
+            <div data-ui-role="button-group" data-ui-variant="picker" data-ui-profiler-settings-picker role="group" aria-label="Theme">
+                <twig:Button
+                    as="a"
+                    href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'auto'})) }}"
+                    layout="block"
+                    variant="{{ preference.scheme.value == 'auto' ? 'primary' : 'neutral' }}"
+                    appearance="{{ preference.scheme.value == 'auto' ? 'solid' : 'ghost' }}"
+                    data-turbo="false"
+                    data-no-turbolink
+                >
+                    {{ source('@WebProfiler/Icon/settings-theme-system.svg') }}
+                    <span data-ui-part="label">System / OS</span>
+                </twig:Button>
+                <twig:Button
+                    as="a"
+                    href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'light'})) }}"
+                    layout="block"
+                    variant="{{ preference.scheme.value == 'light' ? 'primary' : 'neutral' }}"
+                    appearance="{{ preference.scheme.value == 'light' ? 'solid' : 'ghost' }}"
+                    data-turbo="false"
+                    data-no-turbolink
+                >
+                    {{ source('@WebProfiler/Icon/settings-theme-light.svg') }}
+                    <span data-ui-part="label">Light</span>
+                </twig:Button>
+                <twig:Button
+                    as="a"
+                    href="{{ path('ui_profiler_theme_preference', theme_route_params|merge({scheme: 'dark'})) }}"
+                    layout="block"
+                    variant="{{ preference.scheme.value == 'dark' ? 'primary' : 'neutral' }}"
+                    appearance="{{ preference.scheme.value == 'dark' ? 'solid' : 'ghost' }}"
+                    data-turbo="false"
+                    data-no-turbolink
+                >
+                    {{ source('@WebProfiler/Icon/settings-theme-dark.svg') }}
+                    <span data-ui-part="label">Dark</span>
+                </twig:Button>
+            </div>
+        </twig:Stack>
+
+        <twig:Stack gap="sm">
+            <strong>Page Width</strong>
+            <div data-ui-role="button-group" data-ui-variant="picker" data-ui-profiler-settings-picker role="radiogroup" aria-label="Page width">
+                <twig:Button
+                    type="button"
+                    layout="block"
+                    variant="neutral"
+                    appearance="ghost"
+                    data-ui-profiler-width="normal"
+                    aria-pressed="false"
+                >
+                    {{ source('@WebProfiler/Icon/settings-width-fixed.svg') }}
+                    <span data-ui-part="label">Fixed width</span>
+                </twig:Button>
+                <twig:Button
+                    type="button"
+                    layout="block"
+                    variant="neutral"
+                    appearance="ghost"
+                    data-ui-profiler-width="full"
+                    aria-pressed="false"
+                >
+                    {{ source('@WebProfiler/Icon/settings-width-fitted.svg') }}
+                    <span data-ui-part="label">Fit to window</span>
+                </twig:Button>
+            </div>
+        </twig:Stack>
+    </twig:Stack>
+</dialog>
+
+<script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>
+(function () {
+    const dialog = document.getElementById('profiler-settings');
+    const openButton = document.getElementById('open-settings');
+    const closeButton = dialog?.querySelector('[data-ui-profiler-settings-close]');
+    const widthButtons = dialog.querySelectorAll('[data-ui-profiler-width]');
+
+    if (!dialog || !openButton) {
+        return;
+    }
+
+    const applyWidthClass = (settingValue) => {
+        const shell = document.querySelector('[data-ui-profiler-shell]');
+        [document.body, shell].forEach((node) => {
+            if (!(node instanceof HTMLElement)) {
+                return;
+            }
+            node.classList.forEach((cssClass) => {
+                if (cssClass.startsWith('width')) {
+                    node.classList.remove(cssClass);
+                }
+            });
+            node.classList.add(settingValue);
+        });
+    };
+
+    const syncWidthVariant = () => {
+        const widthSetting = localStorage.getItem('symfony/profiler/width') || 'width-normal';
+        const widthValue = widthSetting.replace(/^width-/, '');
+
+        widthButtons.forEach((button) => {
+            if (!(button instanceof HTMLElement)) {
+                return;
+            }
+
+            const isActive = button.dataset.uiProfilerWidth === widthValue;
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            button.dataset.uiVariant = isActive ? 'primary' : 'neutral';
+            if (isActive) {
+                delete button.dataset.uiAppearance;
+            } else {
+                button.dataset.uiAppearance = 'ghost';
+            }
+        });
+
+        applyWidthClass(widthSetting);
+    };
+
+    syncWidthVariant();
+
+    widthButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!(button instanceof HTMLElement)) {
+                return;
+            }
+
+            const settingValue = 'width-' + button.dataset.uiProfilerWidth;
+            localStorage.setItem('symfony/profiler/width', settingValue);
+            applyWidthClass(settingValue);
+            syncWidthVariant();
+        });
+    });
+
+    openButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        syncWidthVariant();
+
+        if (typeof dialog.showModal === 'function') {
+            dialog.showModal();
+        } else {
+            dialog.setAttribute('open', 'open');
+        }
+
+        closeButton?.focus();
+    });
+
+    closeButton?.addEventListener('click', () => {
+        dialog.close();
+    });
+
+    dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) {
+            dialog.close();
+        }
+    });
+
+    dialog.addEventListener('close', () => {
+        openButton.focus();
+    });
+})();
+</script>

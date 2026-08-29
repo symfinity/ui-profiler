@@ -1,0 +1,69 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Symfinity\UiProfiler\:
+        resource: '../src/'
+        exclude:
+            - '../src/UiProfilerBundle.php'
+            - '../src/DependencyInjection/'
+
+    Symfinity\UiProfiler\Theme\ThemeContext:
+        arguments:
+            $toolbarThemeOverride: '%ui_profiler.toolbar_theme%'
+
+    Symfinity\UiProfiler\Twig\UiProfilerRuntimeExtension:
+        arguments:
+            $bundlePath: '%ui_profiler.bundle_path%'
+            $wdtCriticalCssInline: '%ui_profiler.wdt.critical_css_inline%'
+            $wdtModulePreload: '%ui_profiler.wdt.module_preload%'
+            $legacySfShim: '%ui_profiler.legacy_sf_shim%'
+            $assetVersion: '%ui_profiler.asset_version%'
+            $uiProfilerEnabled: '%ui_profiler.enabled%'
+            $stimulusEnabled: '%ui_profiler.stimulus_enabled%'
+        tags:
+            - { name: twig.extension }
+
+    Symfinity\UiProfiler\Css\ProfilerCssProvider:
+        arguments:
+            $packageDir: '%ui_profiler.bundle_path%'
+
+    Symfinity\UiProfiler\Menu\ProfilerMenuRegistry:
+        arguments:
+            $entries: []
+            $stateHandlerIds: []
+
+    Symfinity\UiProfiler\Menu\ProfilerMenuRenderer:
+        arguments:
+            $enabled: '%ui_profiler.enabled%'
+            $stateHandlerLocator: '@ui_profiler.menu_state_locator'
+
+    Symfinity\UiProfiler\Controller\ProfilerThemePreferenceController:
+        tags: ['controller.service_arguments']
+
+    Symfinity\UiProfiler\Controller\ProfilerAssetController:
+        arguments:
+            $bundlePath: '%ui_profiler.bundle_path%'
+        tags: ['controller.service_arguments']
+
+    ui_profiler.menu_state_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        arguments: [[]]
+
+    Symfinity\UiProfiler\Menu\State\MercureMenuStateHandler:
+        tags:
+            - { name: ui_profiler.menu_state, collector: mercure }
+
+    Symfinity\UiProfiler\Menu\State\DebugMenuStateHandler:
+        tags:
+            - { name: ui_profiler.menu_state, collector: dump }
+
+    Symfinity\UiProfiler\Menu\State\TwigComponentMenuStateHandler:
+        tags:
+            - { name: ui_profiler.menu_state, collector: twig_component }
+
+    Symfinity\UiProfiler\DataCollector\UiKernelDataCollector:
+        tags:
+            - { name: data_collector, id: 'ui_kernel', template: '@UiProfiler/Collector/ui_kernel.html.twig' }
+            - { name: ui_profiler.menu, title: 'UI Kernel', icon: '@UiProfiler/Collector/icon.svg' }

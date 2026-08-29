@@ -1,0 +1,509 @@
+{% extends request.isXmlHttpRequest ? '@WebProfiler/Profiler/ajax_layout.html.twig' : '@UiProfiler/Profiler/layout.html.twig' %}
+
+{% import _self as helper %}
+{% import '@UiProfiler/_chrome/macros/profiler-ui.html.twig' as ui %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block toolbar %}
+    {% if collector.querycount > 0 or collector.invalidEntityCount > 0 %}
+
+        {% set icon %}
+            {% set status = collector.invalidEntityCount > 0 ? 'red' : collector.querycount > 50 ? 'yellow' %}
+
+            {% if profiler_markup_version >= 3 %}
+                {{ include('@Doctrine/Collector/database.svg') }}
+            {% else %}
+                <span class="icon">{{ include('@Doctrine/Collector/icon.svg') }}</span>
+            {% endif %}
+
+            {% if collector.querycount == 0 and collector.invalidEntityCount > 0 %}
+                <span data-ui-profiler-wdt-value>{{ collector.invalidEntityCount }}</span>
+                <span data-ui-profiler-wdt-label>errors</span>
+            {% else %}
+                <span data-ui-profiler-wdt-value>{{ collector.querycount }}</span>
+                <span data-ui-profiler-wdt-info-piece-additional-detail>
+                    <span data-ui-profiler-wdt-label>in</span>
+                    <span data-ui-profiler-wdt-value>{{ '%0.2f'|format(collector.time * 1000) }}</span>
+                    <span data-ui-profiler-wdt-label>ms</span>
+                </span>
+            {% endif %}
+        {% endset %}
+
+        {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Database Queries</b>
+                {{ status_badge(collector.querycount > 50 ? 'yellow' : 'none', collector.querycount) }}
+            </div>
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Different statements</b>
+                {{ status_badge('none', collector.groupedQueryCount) }}
+            </div>
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Query time</b>
+                <span>{{ '%0.2f'|format(collector.time * 1000) }} ms</span>
+            </div>
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Invalid entities</b>
+                {{ status_badge(collector.invalidEntityCount > 0 ? 'red' : 'none', collector.invalidEntityCount) }}
+            </div>
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Managed entities</b>
+                {{ status_badge('none', collector.managedEntityCount) }}
+            </div>
+            {% if collector.cacheEnabled %}
+                <div data-ui-profiler-wdt-info-piece>
+                    <b>Cache hits</b>
+                    {{ status_badge('success', collector.cacheHitsCount) }}
+                </div>
+                <div data-ui-profiler-wdt-info-piece>
+                    <b>Cache misses</b>
+                    {{ status_badge(collector.cacheMissesCount > 0 ? 'yellow' : 'none', collector.cacheMissesCount) }}
+                </div>
+                <div data-ui-profiler-wdt-info-piece>
+                    <b>Cache puts</b>
+                    {{ status_badge(collector.cachePutsCount > 0 ? 'yellow' : 'none', collector.cachePutsCount) }}
+                </div>
+            {% else %}
+                <div data-ui-profiler-wdt-info-piece>
+                    <b>Second Level Cache</b>
+                    {{ status_badge('none', disabled) }}
+                </div>
+            {% endif %}
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status|default('') }) }}
+
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: include('@Doctrine/Collector/' ~ (profiler_markup_version < 3 ? 'icon' : 'database') ~ '.svg'),
+        title: 'Doctrine',
+        status: collector.invalidEntityCount > 0 ? 'error' : null,
+        disabled: collector.querycount == 0,
+        count: collector.invalidEntityCount ? collector.invalidEntityCount : null,
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="db">
+    {% if 'explain' == page %}
+        {{ render(controller('Doctrine\\Bundle\\DoctrineBundle\\Controller\\ProfilerController::explainAction', {
+            token: token,
+            panel: 'db',
+            connectionName: request.query.get('connection'),
+            query: request.query.get('query')
+        })) }}
+    {% else %}
+        {{ block('queries') }}
+    {% endif %}
+    </div>
+{% endblock %}
+
+{% block queries %}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Doctrine' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Query Metrics' }) }}
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
+            {{ ui.metric_cell(collector.querycount, 'Database Queries') }}
+            {{ ui.metric_cell(collector.groupedQueryCount, 'Different statements') }}
+            {{ ui.metric_cell('%.2f'|format(collector.time * 1000) ~ ' <span data-ui-part="unit">ms</span>', 'Query time') }}
+            {{ ui.metric_cell(collector.invalidEntityCount, 'Invalid entities') }}
+            {{ ui.metric_cell(collector.managedEntityCount, 'Managed entities') }}
+        </div>
+
+        {% if collector.cacheEnabled %}
+            <div data-ui-role="stat-group">
+                {{ ui.metric_cell(collector.cacheHitsCount, 'Cache hits') }}
+                {{ ui.metric_cell(collector.cacheMissesCount, 'Cache misses') }}
+                {{ ui.metric_cell(collector.cachePutsCount, 'Cache puts') }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div data-ui-profiler-tabs data-ui-role="tabs" style="margin-top: 20px;">
+        <div class="tab {{ collector.queries is empty ? 'disabled' }}">
+            {% set group_queries = request.query.getBoolean('group') %}
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">
+                {% if group_queries %}
+                    Grouped Statements
+                {% else %}
+                    Queries
+                {% endif %}
+            </h3>
+
+            <div class="tab-content">
+                {% if not collector.queries %}
+                    <div data-ui-role="empty">
+                        <p>No executed queries.</p>
+                    </div>
+                {% else %}
+                    {% if group_queries %}
+                        <p><a href="{{ path('_profiler', { panel: 'db', token: token }) }}">Show all queries</a></p>
+                    {% else %}
+                        <p><a href="{{ path('_profiler', { panel: 'db', token: token, group: true }) }}">Group similar statements</a></p>
+                    {% endif %}
+
+                    {% for connection, queries in collector.queries %}
+                        {% if collector.connections|length > 1 %}
+                            <h3 data-ui-role="typography" data-ui-variant="h3">{{ connection }} <small>connection</small></h3>
+                        {% endif %}
+
+                        {% if queries is empty %}
+                            <div data-ui-role="empty">
+                                <p>No database queries were performed.</p>
+                            </div>
+                        {% else %}
+                            {% if group_queries %}
+                                {% set queries = collector.groupedQueries[connection] %}
+                            {% endif %}
+                            <table data-ui-role="table" class="alt queries-table">
+                                <thead>
+                                <tr>
+                                    {% if group_queries %}
+                                        <th data-ui-wrap="nowrap" onclick="javascript:sortTable(this, 0, 'queries-{{ loop.index }}')" data-sort-direction="1" style="cursor: pointer;">Time<span data-ui-role="typography" data-ui-variant="muted">&#9660;</span></th>
+                                        <th data-ui-wrap="nowrap" onclick="javascript:sortTable(this, 1, 'queries-{{ loop.index }}')" style="cursor: pointer;">Count<span></span></th>
+                                    {% else %}
+                                        <th data-ui-wrap="nowrap" onclick="javascript:sortTable(this, 0, 'queries-{{ loop.index }}')" data-sort-direction="-1" style="cursor: pointer;">#<span data-ui-role="typography" data-ui-variant="muted">&#9650;</span></th>
+                                        <th data-ui-wrap="nowrap" onclick="javascript:sortTable(this, 1, 'queries-{{ loop.index }}')" style="cursor: pointer;">Time<span></span></th>
+                                    {% endif %}
+                                    <th style="width: 100%;">Info</th>
+                                </tr>
+                                </thead>
+                                <tbody id="queries-{{ loop.index }}">
+                                {% for i, query in queries %}
+                                    {% set i = group_queries ? query.index : i %}
+                                    <tr id="queryNo-{{ i }}-{{ loop.parent.loop.index }}">
+                                        {% if group_queries %}
+                                            <td class="time-container">
+                                                <span class="time-bar" style="width:{{ '%0.2f'|format(query.executionPercent) }}%"></span>
+                                                <span data-ui-wrap="nowrap">{{ '%0.2f'|format(query.executionMS * 1000) }}&nbsp;ms<br />({{ '%0.2f'|format(query.executionPercent) }}%)</span>
+                                            </td>
+                                            <td data-ui-wrap="nowrap">{{ query.count }}</td>
+                                        {% else %}
+                                            <td data-ui-wrap="nowrap">{{ loop.index }}</td>
+                                            <td data-ui-wrap="nowrap">{{ '%0.2f'|format(query.executionMS * 1000) }}&nbsp;ms</td>
+                                        {% endif %}
+                                        <td>
+                                            {{ query.sql|doctrine_prettify_sql }}
+
+                                            <div>
+                                                <strong data-ui-font="sans" data-ui-role="typography" data-ui-density="compact">Parameters</strong>: {{ profiler_dump(query.params, 2) }}
+                                            </div>
+
+                                            <div data-ui-font="sans" data-ui-role="typography" data-ui-density="compact">
+                                                <a href="#" class="link-inverse" data-ui-profiler-toggle data-ui-profiler-toggle-target="#formatted-query-{{ i }}-{{ loop.parent.loop.index }}" data-ui-profiler-toggle-alt="Hide formatted query">View formatted query</a>
+
+                                                {% if query.runnable %}
+                                                    &nbsp;&nbsp;
+                                                    <a href="#" class="link-inverse" data-ui-profiler-toggle data-ui-profiler-toggle-target="#original-query-{{ i }}-{{ loop.parent.loop.index }}" data-ui-profiler-toggle-alt="Hide runnable query">View runnable query</a>
+                                                {% endif %}
+
+                                                {% if query.explainable %}
+                                                    &nbsp;&nbsp;
+                                                    <a class="link-inverse" href="{{ path('_profiler', { panel: 'db', token: token, page: 'explain', connection: connection, query: i }) }}" onclick="return explain(this);" data-target-id="explain-{{ i }}-{{ loop.parent.loop.index }}">Explain query</a>
+                                                {% endif %}
+
+                                                {% if query.backtrace is defined %}
+                                                    &nbsp;&nbsp;
+                                                    <a href="#" class="link-inverse" data-ui-profiler-toggle data-ui-profiler-toggle-target="#backtrace-{{ i }}-{{ loop.parent.loop.index }}" data-ui-profiler-toggle-alt="Hide query backtrace">View query backtrace</a>
+                                                {% endif %}
+                                            </div>
+
+                                            <div id="formatted-query-{{ i }}-{{ loop.parent.loop.index }}" class="sql-runnable" data-ui-profiler-toggle-panel hidden>
+                                                {{ query.sql|doctrine_format_sql(highlight = true) }}
+                                                <twig:Button size="sm" hidden data-clipboard-text="{{ query.sql|doctrine_format_sql(highlight = false)|e('html_attr') }}">Copy</twig:Button>
+                                            </div>
+
+                                            {% if query.runnable %}
+                                                <div id="original-query-{{ i }}-{{ loop.parent.loop.index }}" class="sql-runnable" data-ui-profiler-toggle-panel hidden>
+                                                    {% set runnable_sql = (query.sql ~ ';')|doctrine_replace_query_parameters(query.params) %}
+                                                    {{ runnable_sql|doctrine_prettify_sql }}
+                                                    <twig:Button size="sm" hidden data-clipboard-text="{{ runnable_sql|e('html_attr') }}">Copy</twig:Button>
+                                                </div>
+                                            {% endif %}
+
+                                            {% if query.explainable %}
+                                                <div id="explain-{{ i }}-{{ loop.parent.loop.index }}" class="sql-explain"></div>
+                                            {% endif %}
+
+                                            {% if query.backtrace is defined %}
+                                                <div id="backtrace-{{ i }}-{{ loop.parent.loop.index }}" data-ui-profiler-toggle-panel hidden>
+                                                    <table data-ui-role="table">
+                                                        <thead>
+                                                        <tr>
+                                                            <th scope="col">#</th>
+                                                            <th scope="col">File/Call</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {% for trace in query.backtrace %}
+                                                            <tr>
+                                                                <td>{{ loop.index }}</td>
+                                                                <td>
+                                                                            <span data-ui-role="typography" data-ui-density="compact">
+                                                                                {% set line_number = trace.line|default(query.backtrace[loop.index].line|default(1)) %}
+                                                                                {% if trace.file is defined %}
+                                                                                    <a href="{{ trace.file|file_link(line_number) }}">
+                                                                                {% endif %}
+                                                                                        {{- query.backtrace[loop.index].class|default ~ (query.backtrace[loop.index].class is defined ? trace.type|default('::')) -}}
+                                                                                    <span class="status-warning">{{ query.backtrace[loop.index].function|default(trace.function) }}</span>
+                                                                                {% if trace.file is defined %}
+                                                                                    </a>
+                                                                                {% endif %}
+                                                                                (line {{ line_number }})
+                                                                            </span>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab {{ collector.connections is empty ? 'disabled' }}">
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Database Connections</h3>
+            <div class="tab-content">
+                {% if not collector.connections %}
+                    <div data-ui-role="empty">
+                        <p>There are no configured database connections.</p>
+                    </div>
+                {% else %}
+                    {{ helper.render_simple_table('Name', 'Service', collector.connections) }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab {{ collector.managers is empty ? 'disabled' }}">
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Entity Managers</h3>
+            <div class="tab-content">
+
+                {% if not collector.managers %}
+                    <div data-ui-role="empty">
+                        <p>There are no configured entity managers.</p>
+                    </div>
+                {% else %}
+                    {{ helper.render_simple_table('Name', 'Service', collector.managers) }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab {{ not collector.cacheEnabled ? 'disabled' }}">
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Second Level Cache</h3>
+            <div class="tab-content">
+
+                {% if not collector.cacheEnabled %}
+                    <div data-ui-role="empty">
+                        <p>Second Level Cache is not enabled.</p>
+                    </div>
+                {% else %}
+                    {% if not collector.cacheCounts %}
+                        <div data-ui-role="empty">
+                            <p>Second level cache information is not available.</p>
+                        </div>
+                    {% else %}
+                        <div data-ui-metrics-grid data-ui-role="grid">
+                            <div data-ui-role="stat-group">
+                                {{ ui.metric_cell(collector.cacheCounts.hits, 'Hits') }}
+                                {{ ui.metric_cell(collector.cacheCounts.misses, 'Misses') }}
+                                {{ ui.metric_cell(collector.cacheCounts.puts, 'Puts') }}
+                            </div>
+                        </div>
+
+                        {% if collector.cacheRegions.hits %}
+                            <h3 data-ui-role="typography" data-ui-variant="h3">Number of cache hits</h3>
+                            {{ helper.render_simple_table('Region', 'Hits', collector.cacheRegions.hits) }}
+                        {% endif %}
+
+                        {% if collector.cacheRegions.misses %}
+                            <h3 data-ui-role="typography" data-ui-variant="h3">Number of cache misses</h3>
+                            {{ helper.render_simple_table('Region', 'Misses', collector.cacheRegions.misses) }}
+                        {% endif %}
+
+                        {% if collector.cacheRegions.puts %}
+                            <h3 data-ui-role="typography" data-ui-variant="h3">Number of cache puts</h3>
+                            {{ helper.render_simple_table('Region', 'Puts', collector.cacheRegions.puts) }}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab">
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Managed Entities</h3>
+            <div class="tab-content">
+                {% if not collector.managedEntityCountByClass %}
+                    <div data-ui-role="empty">
+                        <p>No managed entities.</p>
+                    </div>
+                {% else %}
+                    {% for manager, entityCounts in collector.managedEntityCountByClass %}
+                        <h4 data-ui-role="typography" data-ui-variant="h4">{{ manager }} <small>entity manager</small></h4>
+                        {{ helper.render_simple_table('Class', 'Amount of managed objects', entityCounts) }}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab {{ not collector.entities ? 'disabled' }}">
+            <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Entities Mapping</h3>
+            <div class="tab-content">
+
+                {% if not collector.entities %}
+                    <div data-ui-role="empty">
+                        <p>No mapped entities.</p>
+                    </div>
+                {% else %}
+                    {% for manager, classes in collector.entities %}
+                        {% if collector.managers|length > 1 %}
+                            <h4 data-ui-role="typography" data-ui-variant="h4">{{ manager }} <small>entity manager</small></h4>
+                        {% endif %}
+
+                        {% if classes is empty %}
+                            <div data-ui-role="empty">
+                                <p>No loaded entities.</p>
+                            </div>
+                        {% else %}
+                            <table data-ui-role="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Class</th>
+                                    <th scope="col">Mapping errors</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for class in classes %}
+                                    {% set contains_errors = collector.mappingErrors[manager] is defined and collector.mappingErrors[manager][class.class] is defined %}
+                                    <tr class="{{ contains_errors ? 'status-error' }}">
+                                        <td>
+                                            <a href="{{ class.file|file_link(class.line) }}">{{ class. class}}</a>
+                                        </td>
+                                        <td data-ui-font="sans">
+                                            {% if contains_errors %}
+                                                <ul>
+                                                    {% for error in collector.mappingErrors[manager][class.class] %}
+                                                        <li>{{ error }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                No errors.
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">//<![CDATA[
+        function explain(link) {
+            "use strict";
+
+            var targetId = link.getAttribute('data-target-id');
+            var targetElement = document.getElementById(targetId);
+
+            if (targetElement.style.display != 'block') {
+                if (targetElement.getAttribute('data-sfurl') !== link.href) {
+                    fetch(link.href, {
+                        headers: {'X-Requested-With': 'XMLHttpRequest'}
+                    }).then(async function (response) {
+                        targetElement.innerHTML = await response.text()
+                        targetElement.setAttribute('data-sfurl', link.href)
+                    }, function () {
+                        targetElement.innerHTML = 'An error occurred while loading the query explanation.';
+                    })
+                }
+
+                targetElement.style.display = 'block';
+                link.innerHTML = 'Hide query explanation';
+            } else {
+                targetElement.style.display = 'none';
+                link.innerHTML = 'Explain query';
+            }
+
+            return false;
+        }
+
+        function sortTable(header, column, targetId) {
+            "use strict";
+
+            var direction = parseInt(header.getAttribute('data-sort-direction')) || 1,
+                items = [],
+                target = document.getElementById(targetId),
+                rows = target.children,
+                headers = header.parentElement.children,
+                i;
+
+            for (i = 0; i < rows.length; ++i) {
+                items.push(rows[i]);
+            }
+
+            for (i = 0; i < headers.length; ++i) {
+                headers[i].removeAttribute('data-sort-direction');
+                if (headers[i].children.length > 0) {
+                    headers[i].children[0].innerHTML = '';
+                }
+            }
+
+            header.setAttribute('data-sort-direction', (-1*direction).toString());
+            header.children[0].innerHTML = direction > 0 ? '<span data-ui-role="typography" data-ui-variant="muted">&#9650;</span>' : '<span data-ui-role="typography" data-ui-variant="muted">&#9660;</span>';
+
+            items.sort(function(a, b) {
+                return direction * (parseFloat(a.children[column].innerHTML) - parseFloat(b.children[column].innerHTML));
+            });
+
+            for (i = 0; i < items.length; ++i) {
+                target.appendChild(items[i]);
+            }
+        }
+
+        if (navigator.clipboard) {
+            document.querySelectorAll('[data-clipboard-text]').forEach(function(button) {
+                button.classList.remove('hidden');
+                button.addEventListener('click', function() {
+                    navigator.clipboard.writeText(button.getAttribute('data-clipboard-text'));
+                })
+            });
+        }
+
+        //]]></script>
+{% endblock %}
+
+{% macro render_simple_table(label1, label2, data) %}
+    <table data-ui-role="table">
+        <thead>
+        <tr>
+            <th scope="col" class="key">{{ label1 }}</th>
+            <th scope="col">{{ label2 }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for key, value in data %}
+            <tr>
+                <th scope="row">{{ key }}</th>
+                <td>{{ value }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

@@ -1,0 +1,48 @@
+<div id="sfToolbarClearer-{{ token }}" data-ui-profiler-wdt-clearer></div>
+<div
+    id="sfToolbarMainContent-{{ token }}"
+    data-ui-profiler-wdt
+    class="ui-profiler-wdt notranslate"
+    data-theme="{{ ui_profiler_toolbar_theme() }}"
+    data-no-turbolink
+    data-turbo="false"
+>
+    <div data-ui-profiler-wdt-strip>
+        {% for name, template in templates %}
+            {% if block('toolbar', template) is defined %}
+                {% with {
+                    collector: profile ? profile.getcollector(name) : null,
+                    profiler_url: profiler_url,
+                    token: token ?? (profile ? profile.token : null),
+                    name: name,
+                    profiler_markup_version: profiler_markup_version,
+                    csp_script_nonce: csp_script_nonce,
+                    csp_style_nonce: csp_style_nonce,
+                  } %}
+                    {{ block('toolbar', template) }}
+                {% endwith %}
+            {% endif %}
+        {% endfor %}
+        {% if full_stack %}
+            <div data-ui-profiler-wdt-item data-ui-profiler-collector="full-stack" data-ui-status="danger" data-ui-align="end">
+                <button type="button" data-ui-profiler-wdt-trigger class="ui-profiler-wdt__trigger">
+                    <span data-ui-profiler-wdt-chip>
+                        <span data-ui-role="badge" data-ui-variant="danger" data-ui-size="sm">Using symfony/symfony is NOT supported</span>
+                    </span>
+                </button>
+                <div data-ui-profiler-wdt-panel data-ui-status="danger">
+                    <p>This project is using Symfony via the "symfony/symfony" package.</p>
+                    <p>This is NOT supported anymore since Symfony 4.0.</p>
+                    <p>Even if it seems to work well, it has some important limitations with no workarounds.</p>
+                    <p>Using this package also makes your project slower.</p>
+                    <strong>Please, stop using this package and replace it with individual packages instead.</strong>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <button data-ui-profiler-wdt-toggle type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle Symfony Toolbar">
+        <i data-ui-profiler-wdt-toggle-icon="open" title="Close Toolbar">{{ source('@WebProfiler/Icon/close.svg') }}</i>
+        <i data-ui-profiler-wdt-toggle-icon="closed" title="Open Toolbar">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
+    </button>
+</div>

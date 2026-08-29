@@ -1,0 +1,37 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+
+{% block head %}
+    {% if collector.hasexception %}
+        <style>
+            {{ render(controller('web_profiler.controller.exception_panel::stylesheet', {token: token})) }}
+        </style>
+    {% endif %}
+    {{ parent() }}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/exception.svg'),
+        title: 'Exception',
+        status: collector.hasexception ? 'error' : null,
+        disabled: not collector.hasexception,
+        count: collector.hasexception ? 1 : null,
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="exception">
+    {# these styles are needed to override some styles from Exception page, which wasn't
+       updated yet to the new style of the Symfony Profiler #}
+{{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Exceptions' }) }}
+    {% if not collector.hasexception %}
+        <div data-ui-role="empty" data-ui-profiler-empty-panel>
+            <p>No exception was thrown and caught.</p>
+        </div>
+    {% else %}
+        <div data-ui-profiler-exception-delegate>
+            {{ render(controller('web_profiler.controller.exception_panel::body', {token: token})) }}
+        </div>
+    {% endif %}
+    </div>
+{% endblock %}

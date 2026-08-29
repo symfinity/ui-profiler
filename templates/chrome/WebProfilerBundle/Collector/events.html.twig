@@ -1,0 +1,196 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootEventsPanel}from'{{ path('ui_profiler_asset', {assetPath: 'js/panels/events-panel.js', v: ui_profiler_asset_version()}) }}';bootEventsPanel();</script>
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/event.svg'),
+        title: 'Events',
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="events">
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Dispatched Events' }) }}
+    {% if collector.data is empty %}
+        <div data-ui-role="empty" data-ui-profiler-empty-panel>
+            <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
+        </div>
+    {% else %}
+        {% set dispatcher_names = collector.data|keys %}
+        {% set initial_dispatcher = dispatcher_names|first %}
+        {% set initial_dispatcher_data = collector.data[initial_dispatcher] %}
+        {% set listener_labels = {
+            called: 'Called',
+            not_called: 'Not called',
+            orphaned: 'Orphaned',
+        } %}
+        {% set initial_listener_type = 'called' %}
+
+        <div class="log-filters" data-ui-role="filter-bar">
+            <details id="event-filter-dispatcher" class="log-filter">
+                <summary>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="log-filter-summary">
+                        <span class="filter-name">Dispatcher</span>:
+                        <span class="filter-active-value">{{ initial_dispatcher }}</span>
+                    </span>
+                </summary>
+
+                <div class="log-filter-content">
+                    {% for dispatcherName in dispatcher_names %}
+                        <div class="log-filter-option">
+                            <input type="radio" id="filter-event-dispatcher-{{ loop.index }}" name="filter-event-dispatcher" value="{{ dispatcherName }}" {{ dispatcherName == initial_dispatcher ? 'checked' }}>
+                            <label for="filter-event-dispatcher-{{ loop.index }}">{{ dispatcherName }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </details>
+
+            <details id="event-filter-listeners" class="log-filter">
+                <summary>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="log-filter-summary">
+                        <span class="filter-name">Listeners</span>:
+                        <span class="filter-active-value">{{ listener_labels[initial_listener_type] }}</span>
+                        <span class="badge filter-active-badge">{{ initial_dispatcher_data.called_listeners|length }}</span>
+                    </span>
+                </summary>
+
+                <div class="log-filter-content">
+                    <div class="log-filter-option">
+                        <input type="radio" id="filter-event-listener-called" name="filter-event-listener" value="called" checked>
+                        <label for="filter-event-listener-called">
+                            Called
+                            <span class="badge">{{ initial_dispatcher_data.called_listeners|length }}</span>
+                        </label>
+                    </div>
+
+                    <div class="log-filter-option">
+                        <input type="radio" id="filter-event-listener-not-called" name="filter-event-listener" value="not_called">
+                        <label for="filter-event-listener-not-called">
+                            Not called
+                            <span class="badge">{{ initial_dispatcher_data.not_called_listeners|length }}</span>
+                        </label>
+                    </div>
+
+                    <div class="log-filter-option">
+                        <input type="radio" id="filter-event-listener-orphaned" name="filter-event-listener" value="orphaned">
+                        <label for="filter-event-listener-orphaned">
+                            Orphaned
+                            <span class="badge">{{ initial_dispatcher_data.orphaned_events|length }}</span>
+                        </label>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        {% for dispatcherName, dispatcherData in collector.data %}
+            <div
+                class="event-dispatcher-panel"
+                data-dispatcher="{{ dispatcherName }}"
+                data-called-count="{{ dispatcherData.called_listeners|length }}"
+                data-not-called-count="{{ dispatcherData.not_called_listeners|length }}"
+                data-orphaned-count="{{ dispatcherData.orphaned_events|length }}"
+                {{ dispatcherName != initial_dispatcher ? 'hidden' }}
+            >
+                {% if dispatcherData.called_listeners is empty %}
+                    <div data-ui-role="empty" data-ui-profiler-empty-panel>
+                        <p>No events have been recorded. Check that debugging is enabled in the kernel.</p>
+                    </div>
+                {% else %}
+                    <div class="event-listener-panel" data-listener-type="called">
+                        {{ _self.render_table(dispatcherData.called_listeners) }}
+                    </div>
+
+                    <div class="event-listener-panel" data-listener-type="not_called" hidden>
+                        {% if dispatcherData.not_called_listeners is empty %}
+                            <div data-ui-role="empty">
+                                <p>
+                                    <strong>There are no uncalled listeners</strong>.
+                                </p>
+                                <p>
+                                    All listeners were called or an error occurred
+                                    when trying to collect uncalled listeners (in which case check the
+                                    logs to get more information).
+                                </p>
+                            </div>
+                        {% else %}
+                            {{ _self.render_table(dispatcherData.not_called_listeners) }}
+                        {% endif %}
+                    </div>
+
+                    <div class="event-listener-panel" data-listener-type="orphaned" hidden>
+                        {% if dispatcherData.orphaned_events is empty %}
+                            <div data-ui-role="empty">
+                                <p>
+                                    <strong>There are no orphaned events</strong>.
+                                </p>
+                                <p>
+                                    All dispatched events were handled or an error occurred
+                                    when trying to collect orphaned events (in which case check the
+                                    logs to get more information).
+                                </p>
+                            </div>
+                        {% else %}
+                            <table data-ui-role="table">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for event in dispatcherData.orphaned_events %}
+                                        <tr>
+                                            <td>{{ event }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+    </div>
+{% endblock %}
+
+{% macro render_table(listeners) %}
+    <table data-ui-role="table">
+        <thead>
+            <tr>
+                <th data-ui-wrap="nowrap">Priority</th>
+                <th>Listener</th>
+            </tr>
+        </thead>
+
+        {% set previous_event = (listeners|first).event %}
+        {% for listener in listeners %}
+            {% if loop.first or listener.event != previous_event %}
+                {% if not loop.first %}
+                    </tbody>
+                {% endif %}
+
+                <tbody>
+                    <tr>
+                        <th colspan="2" class="colored">{{ listener.event }}</th>
+                    </tr>
+
+                {% set previous_event = listener.event %}
+            {% endif %}
+
+            <tr>
+                <td data-ui-align="end" data-ui-wrap="nowrap">{{ listener.priority|default('-') }}</td>
+                <td><code class="events-listener-name">{{ listener.pretty|trim('"') }}</code></td>
+            </tr>
+
+            {% if loop.last %}
+                </tbody>
+            {% endif %}
+        {% endfor %}
+    </table>
+{% endmacro %}

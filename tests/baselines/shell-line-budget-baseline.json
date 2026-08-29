@@ -1,0 +1,18 @@
+{
+    "capture_date": "2026-06-25",
+    "file": "assets/styles/shell-chrome.css",
+    "css_body_lines": 1908,
+    "css_rule_blocks": 1908,
+    "active_wave": 8,
+    "wave_ceilings": {
+        "0": 100,
+        "1": 90,
+        "2": 80,
+        "3": 70,
+        "4": 65,
+        "5": 55,
+        "6": 45,
+        "7": 35,
+        "8": 25
+    }
+}

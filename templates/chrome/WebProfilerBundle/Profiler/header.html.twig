@@ -1,0 +1,21 @@
+<header data-ui-profiler-header>
+    <h1>
+        <a href="{{ path('_profiler_home') }}">
+            <span data-ui-profiler-header-mark aria-hidden="true">{{ source('@WebProfiler/Icon/symfony.svg') }}</span>
+            Symfony Profiler
+        </a>
+    </h1>
+
+    <div data-ui-profiler-header-search>
+        <form method="get" action="https://symfony.com/search" target="_blank">
+            <input
+                name="q"
+                id="search-id"
+                type="search"
+                placeholder="search on symfony.com"
+                aria-label="Search on symfony.com"
+            >
+            <button type="submit" class="visually-hidden">Search</button>
+        </form>
+    </div>
+</header>

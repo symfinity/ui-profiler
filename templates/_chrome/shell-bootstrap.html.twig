@@ -1,0 +1,2 @@
+{# Owned shell bootstrap — symfinity 051 (SR-1). No stock SymfonyProfiler IIFE. #}
+<script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{UiProfilerShell}from'{{ path('ui_profiler_asset', {assetPath: 'js/shell.js', v: ui_profiler_asset_version()}) }}';UiProfilerShell.boot();</script>

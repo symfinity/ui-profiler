@@ -1,0 +1,118 @@
+@use '../shared/tokens' as *;
+
+[data-ui-profiler-sidebar] {
+  margin-bottom: 1.875rem;
+  position: sticky;
+  top: $profiler-sidebar-sticky-top;
+  width: $profiler-sidebar-width;
+  z-index: $profiler-z-sidebar;
+
+  a {
+    text-decoration: none;
+
+    &:hover,
+    &:focus,
+    &:active,
+    &:visited {
+      text-decoration: none;
+    }
+  }
+}
+
+[data-ui-profiler-sidebar-contents][data-ui-role='card'] {
+  margin: 0;
+}
+
+[data-ui-profiler-collector-wrapper] {
+  min-width: 0;
+
+  [data-ui-role='card'] {
+    min-height: 60vh;
+  }
+}
+
+[data-ui-profiler-settings-trigger] {
+  align-items: center;
+  color: var(--ui-color-text-muted);
+  display: flex;
+  margin: 0.625rem 0 0.3125rem;
+
+  svg {
+    flex-shrink: 0;
+    height: 1.125rem;
+    margin-right: 0.25rem;
+    width: 1.125rem;
+  }
+}
+
+@media (max-width: $profiler-mobile-max) {
+  [data-ui-profiler-settings-trigger] {
+    color: transparent;
+  }
+
+  [data-ui-profiler-sidebar]:is(:hover, .expanded) [data-ui-profiler-settings-trigger] {
+    color: var(--ui-color-text-muted);
+  }
+
+  [data-ui-profiler-sidebar-search] {
+    display: none;
+  }
+
+  [data-ui-profiler-sidebar]:is(:hover, .expanded) [data-ui-profiler-sidebar-search] {
+    display: block;
+  }
+
+  [data-ui-profiler-sidebar] {
+    .module {
+      display: none;
+    }
+
+    &:is(:hover, .expanded) .module {
+      display: block;
+    }
+
+    &:not(:hover):not(.expanded) {
+      [data-ui-profiler-menu-label] {
+        justify-content: center;
+
+        [data-ui-role='badge'] {
+          border-radius: 50%;
+          border: 1px solid var(--ui-color-border);
+          height: 8px;
+          min-width: 0;
+          padding: 0;
+          right: 4px;
+          text-indent: -9999px;
+          top: 50%;
+          width: 8px;
+        }
+
+        strong {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .visible-small {
+    display: inherit;
+  }
+
+  .hidden-small {
+    display: none;
+  }
+}
+
+@media (min-width: $profiler-desktop-min) {
+  [data-ui-profiler-sidebar] [data-ui-profiler-menu-label] strong {
+    display: inline;
+  }
+}
+
+.visible-small {
+  display: none;
+}
+
+.hidden-small {
+  display: inherit;
+}

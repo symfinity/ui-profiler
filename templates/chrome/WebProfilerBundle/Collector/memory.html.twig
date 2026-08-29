@@ -1,0 +1,44 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+{% import '@UiProfiler/_chrome/macros/profiler-ui.html.twig' as ui %}
+
+{% block toolbar %}
+    {% set icon %}
+        {% set status_color = (collector.memory / 1024 / 1024) > 50 ? 'yellow' %}
+        {{ source('@WebProfiler/Icon/memory.svg') }}
+        <span data-ui-profiler-wdt-value>{{ '%.1f'|format(collector.memory / 1024 / 1024) }}</span>
+        <span data-ui-profiler-wdt-label>MiB</span>
+    {% endset %}
+
+    {% set text %}
+        {{ include('@UiProfiler/_chrome/partials/toolbar-metric.html.twig', {
+            label: 'Peak memory usage',
+            value: '%.1f'|format(collector.memory / 1024 / 1024) ~ ' MiB',
+        }) }}
+        {{ include('@UiProfiler/_chrome/partials/toolbar-metric.html.twig', {
+            label: 'PHP memory limit',
+            value: collector.memoryLimit == -1 ? 'Unlimited' : '%.0f MiB'|format(collector.memoryLimit / 1024 / 1024),
+        }) }}
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, name: 'time', status: status_color}) }}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/memory.svg'),
+        title: 'Memory',
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="memory">
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Memory' }) }}
+        <div data-ui-metrics-grid data-ui-role="grid">
+            {{ ui.metric_cell('%.1f'|format(collector.memory / 1024 / 1024) ~ ' <span data-ui-part="unit">MiB</span>', 'Peak memory usage') }}
+            {{ ui.metric_cell(
+                collector.memoryLimit == -1 ? 'Unlimited' : '%.0f MiB'|format(collector.memoryLimit / 1024 / 1024),
+                'PHP memory limit',
+            ) }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,57 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Symfinity\UiProfiler\Tests\Functional\Parity;
+
+use PHPUnit\Framework\Attributes\Group;
+use Symfinity\UiProfiler\Tests\ParityKernel\ParityKernel;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+#[Group('ui-profiler-parity')]
+final class AjaxToolbarParityTest extends WebTestCase
+{
+    use ParityBrowserTrait;
+
+    protected static function getKernelClass(): string
+    {
+        return ParityKernel::class;
+    }
+
+    public function testToolbarIncludesAjaxCollectorBlock(): void
+    {
+        $client = static::createClient(['debug' => true]);
+        $client->request('GET', '/');
+
+        $token = $this->requireProfilerToken($client);
+
+        $client->request('GET', '/_wdt/' . $token);
+        self::assertResponseIsSuccessful();
+
+        $content = (string) $client->getResponse()->getContent();
+        self::assertStringContainsString('data-ui-profiler-collector="ajax"', $content);
+        self::assertStringContainsString('data-ui-profiler-wdt', $content);
+    }
+
+    public function testAjaxFixtureRouteReturnsJson(): void
+    {
+        $client = static::createClient(['debug' => true]);
+        $client->request('GET', '/parity/ajax');
+
+        self::assertResponseIsSuccessful();
+        self::assertJson((string) $client->getResponse()->getContent());
+    }
+
+    public function testToolbarBootstrapUsesModuleRuntimeWithoutEval(): void
+    {
+        $client = static::createClient(['debug' => true]);
+        $client->request('GET', '/');
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $client->getResponse()->getContent();
+
+        self::assertStringContainsString('type="module"', $content);
+        self::assertStringNotContainsString('eval.call', $content);
+        self::assertStringContainsString('sfwdt', $content);
+    }
+}

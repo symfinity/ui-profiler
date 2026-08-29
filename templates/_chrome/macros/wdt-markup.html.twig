@@ -1,0 +1,21 @@
+{# WDT v2 vocabulary — ux-blocks composition; no sf-toolbar-* classes #}
+
+{% macro wdt_variant(color) -%}
+    {%- if color in ['green', 'success'] -%}success
+    {%- elseif color in ['red', 'danger'] -%}danger
+    {%- elseif color in ['yellow', 'warning'] -%}warning
+    {%- else -%}neutral
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro wdt_item_status(color) -%}
+    {%- if color in ['green', 'success'] -%}success
+    {%- elseif color in ['red', 'danger'] -%}danger
+    {%- elseif color in ['yellow', 'warning'] -%}warning
+    {%- else -%}normal
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro status_badge(color, content) %}
+    <span data-ui-role="badge" data-ui-variant="{{ _self.wdt_variant(color) }}" data-ui-size="sm">{{ content }}</span>
+{% endmacro %}

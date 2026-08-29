@@ -1,0 +1,12 @@
+// Document layout reset only — theme paint + color-scheme: theme-paint-guard.html.twig + layout boot script
+
+html {
+  margin: 0;
+  overflow-y: scroll;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}

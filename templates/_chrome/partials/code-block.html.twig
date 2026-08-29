@@ -1,0 +1,4 @@
+{# Shared code excerpt block for collector trace/context panels. #}
+<div class="trace ui-profiler-code-block"{% if id is defined %} id="{{ id }}"{% endif %}>
+    {{ content|raw }}
+</div>

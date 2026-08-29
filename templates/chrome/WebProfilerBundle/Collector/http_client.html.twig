@@ -1,0 +1,138 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+{% import '@UiProfiler/_chrome/macros/profiler-ui.html.twig' as ui %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block toolbar %}
+    {% if collector.requestCount %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/http-client.svg') }}
+            {% set status_color = '' %}
+            <span data-ui-profiler-wdt-value>{{ collector.requestCount }}</span>
+        {% endset %}
+
+        {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Total requests</b>
+                <span>{{ collector.requestCount }}</span>
+            </div>
+            <div data-ui-profiler-wdt-info-piece>
+                <b>HTTP errors</b>
+                {{ status_badge(collector.errorCount > 0 ? 'red' : 'none', collector.errorCount) }}
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: status_color}) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/http-client.svg'),
+        title: 'HTTP Client',
+        disabled: collector.requestCount == 0,
+        count: collector.requestCount ? collector.requestCount : null,
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="http_client">
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'HTTP Client' }) }}
+    {% if collector.requestCount == 0 %}
+        <div data-ui-role="empty" data-ui-profiler-empty-panel>
+            <p>No HTTP requests were made.</p>
+        </div>
+    {% else %}
+        <div data-ui-metrics-grid data-ui-role="grid">
+            <div data-ui-role="stat-group">
+                {{ ui.metric_cell(collector.requestCount, 'Total requests') }}
+                {{ ui.metric_cell(collector.errorCount, 'HTTP errors') }}
+            </div>
+        </div>
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Clients' }) }}
+        <div data-ui-profiler-tabs data-ui-role="tabs">
+            {% for name, client in collector.clients %}
+                <div class="tab {{ client.traces|length == 0 ? 'disabled' }}">
+                    <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ name }} <twig:Badge>{{ client.traces|length }}</twig:Badge></h3>
+                    <div class="tab-content">
+                        {% if client.traces|length == 0 %}
+                            <div data-ui-role="empty">
+                                <p>No requests were made with the "{{ name }}" service.</p>
+                            </div>
+                        {% else %}
+                            <h4 data-ui-role="typography" data-ui-variant="h4">Requests</h4>
+                            {% for trace in client.traces %}
+                                {% set profiler_token = '' %}
+                                {% set profiler_link = '' %}
+                                {% if trace.info.response_headers is defined %}
+                                    {% for header in trace.info.response_headers %}
+                                        {% if header matches '/^x-debug-token: .*$/i' %}
+                                            {% set profiler_token = (header.getValue|slice('x-debug-token: '|length)) %}
+                                        {% endif %}
+                                        {% if header matches '/^x-debug-token-link: .*$/i' %}
+                                            {% set profiler_link = (header.getValue|slice('x-debug-token-link: '|length)) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                <table data-ui-role="table">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            <span class="http-method">{{ trace.method }}</span>
+                                        </th>
+                                        <th data-ui-width="full">
+                                            {{ trace.url }}
+                                        </th>
+                                        {% if profiler_token and profiler_link %}
+                                            <th>
+                                                Profile
+                                            </th>
+                                        {% endif %}
+                                        {% if trace.curlCommand is defined and trace.curlCommand %}
+                                            <th>
+                                                <twig:Button size="sm" hidden title="Copy as cURL" data-clipboard-text="{{ trace.curlCommand }}">Copy as cURL</twig:Button>
+                                            </th>
+                                        {% endif %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if trace.options is not empty %}
+                                        <tr>
+                                            <th data-ui-font="sans">Request options</th>
+                                            <td>{{ profiler_dump(trace.options, maxDepth: 1) }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <th data-ui-font="sans">Response</th>
+                                        <td{% if trace.curlCommand is defined and trace.curlCommand %} colspan="2"{% endif %}>
+                                            {% if trace.http_code >= 500 %}
+                                                {% set responseStatus = 'error' %}
+                                            {% elseif trace.http_code >= 400 %}
+                                                {% set responseStatus = 'warning' %}
+                                            {% else %}
+                                                {% set responseStatus = 'success' %}
+                                            {% endif %}
+                                            <twig:Badge variant="{{ responseStatus == 'error' ? 'danger' : (responseStatus == 'warning' ? 'warning' : 'success') }}">{{ trace.http_code }}</twig:Badge>
+
+                                            {{ profiler_dump(trace.info, maxDepth: 1) }}
+                                        </td>
+                                        {% if profiler_token and profiler_link %}
+                                            <td>
+                                                <span><a href="{{ profiler_link }}" target="_blank">{{ profiler_token }}</a></span>
+                                            </td>
+                                        {% endif %}
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block toolbar %}
+    {% set time = collector.templatecount ? '%0.0f'|format(collector.time) : 'n/a' %}
+    {% set icon %}
+        {{ source('@WebProfiler/Icon/twig.svg') }}
+        <span data-ui-profiler-wdt-value>{{ time }}</span>
+        <span data-ui-profiler-wdt-label>ms</span>
+    {% endset %}
+
+    {% set text %}
+        {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
+        {% set template = collector.templates|keys|first %}
+        {% set file = collector.templatePaths[template]|default(false) %}
+        {% set link = file ? file|file_link(1) : false %}
+        <div data-ui-profiler-wdt-info-piece>
+            <b>Entry View</b>
+            <span>
+                 {% if link %}
+                     <a href="{{ link }}" title="{{ file }}">
+                         {{ template }}
+                     </a>
+                 {% else %}
+                     {{ template }}
+                 {% endif %}
+            </span>
+        </div>
+        <div data-ui-profiler-wdt-info-piece>
+            <b>Render Time</b>
+            <span>{{ time }} ms</span>
+        </div>
+        <div data-ui-profiler-wdt-info-piece>
+            <b>Template Calls</b>
+            {{ status_badge('none', collector.templatecount) }}
+        </div>
+        <div data-ui-profiler-wdt-info-piece>
+            <b>Block Calls</b>
+            {{ status_badge('none', collector.blockcount) }}
+        </div>
+        <div data-ui-profiler-wdt-info-piece>
+            <b>Macro Calls</b>
+            {{ status_badge('none', collector.macrocount) }}
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url}) }}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/twig.svg'),
+        title: 'Twig',
+        disabled: 0 == collector.templateCount,
+    }) }}
+{% endblock %}
+
+{% import '@UiProfiler/_chrome/macros/profiler-ui.html.twig' as ui %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="twig">
+    {% if collector.templatecount == 0 %}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Twig' }) }}
+        <div data-ui-role="empty" data-ui-profiler-empty-panel>
+            <p>No Twig templates were rendered.</p>
+        </div>
+    {% else %}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Twig' }) }}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Twig Metrics' }) }}
+        <div data-ui-metrics-grid data-ui-role="grid">
+            {{ ui.metric_cell('%.0f'|format(collector.time) ~ ' <span data-ui-part="unit">ms</span>', 'Render time') }}
+            <div data-ui-role="stat-group">
+                {{ ui.metric_cell(collector.templatecount, 'Template calls') }}
+                {{ ui.metric_cell(collector.blockcount, 'Block calls') }}
+                {{ ui.metric_cell(collector.macrocount, 'Macro calls') }}
+            </div>
+        </div>
+
+        <p data-ui-role="typography" data-ui-variant="help">
+            Render time includes sub-requests rendering time (if any).
+        </p>
+
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Rendered Templates' }) }}
+        <table data-ui-role="table" id="twig-table">
+            <thead>
+            <tr>
+                <th scope="col">Template Name &amp; Path</th>
+                <th class="num-col" scope="col">Render Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for template, count in collector.templates %}
+                <tr>
+                    {% set file = collector.templatePaths[template]|default(false) %}
+                    {% set link = file ? file|file_link(1) : false %}
+                    <td data-ui-font="sans">
+                        {% if link %}
+                            <a href="{{ link }}" title="{{ file }}" class="stretched-link">
+                                {{ template }}
+                                <span class="template-file-path">{{ file|file_relative|default(file) }}</span>
+                            </a>
+                        {% else %}
+                            {{ template }}
+                        {% endif %}
+                    </td>
+                    <td data-ui-font="sans" class="num-col">{{ count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Rendering Call Graph' }) }}
+        <div id="twig-dump">
+            {{ collector.htmlcallgraph }}
+        </div>
+    {% endif %}
+    </div>
+{% endblock %}

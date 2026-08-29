@@ -1,0 +1,391 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+{% import '@UiProfiler/_chrome/macros/profiler-ui.html.twig' as ui %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block toolbar %}
+    {% if collector.handledCount > 0 %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/serializer.svg') }}
+            <span data-ui-profiler-wdt-value>
+                {{ collector.handledCount }}
+            </span>
+        {% endset %}
+
+        {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Total calls</b>
+                {{ status_badge('none', collector.handledCount) }}
+            </div>
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Total time</b>
+                <span>
+                    {{ '%.2f'|format(collector.totalTime * 1000) }} <span class="unit">ms</span>
+                </span>
+            </div>
+
+            <div class="detailed-metrics">
+                <div>
+                    <div data-ui-profiler-wdt-info-piece>
+                        <b>Serialize</b>
+                        {{ status_badge('none', collector.data.serialize|length) }}
+                    </div>
+                    <div data-ui-profiler-wdt-info-piece>
+                        <b>Deserialize</b>
+                        {{ status_badge('none', collector.data.deserialize|length) }}
+                    </div>
+                </div>
+                <div>
+                    <div data-ui-profiler-wdt-info-piece>
+                        <b>Encode</b>
+                        {{ status_badge('none', collector.data.encode|length) }}
+                    </div>
+                    <div data-ui-profiler-wdt-info-piece>
+                        <b>Decode</b>
+                        {{ status_badge('none', collector.data.decode|length) }}
+                    </div>
+                </div>
+                <div>
+                    <div data-ui-profiler-wdt-info-piece>
+                        <b>Normalize</b>
+                        {{ status_badge('none', collector.data.normalize|length) }}
+                    </div>
+                    <div data-ui-profiler-wdt-info-piece>
+                        <b>Denormalize</b>
+                        {{ status_badge('none', collector.data.denormalize|length) }}
+                    </div>
+                </div>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url}) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/serializer.svg'),
+        title: 'Serializer',
+        disabled: not collector.handledCount,
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="serializer">
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Serializer' }) }}
+    <div>
+        {% if not collector.handledCount %}
+            <div data-ui-role="empty" data-ui-profiler-empty-panel>
+                <p>Nothing was handled by the serializer.</p>
+            </div>
+        {% else %}
+            <div data-ui-metrics-grid data-ui-role="grid">
+                <div data-ui-role="stat-group">
+                    {{ ui.metric_cell(collector.handledCount, 'Handled') }}
+                    {{ ui.metric_cell('%.2f'|format(collector.totalTime * 1000) ~ ' <span data-ui-part="unit">ms</span>', 'Total time') }}
+                </div>
+            </div>
+
+            <div data-ui-profiler-tabs data-ui-role="tabs">
+                {% for serializer in collector.serializerNames %}
+                    {{ _self.render_serializer_tab(collector, serializer) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    </div>
+{% endblock %}
+
+{% macro render_serializer_tab(collector, serializer) %}
+    <div class="tab">
+        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ serializer }} <twig:Badge>{{ collector.handledCount(serializer) }}</twig:Badge></h3>
+        <div class="tab-content">
+            <div data-ui-profiler-tabs data-ui-role="tabs">
+                {{ _self.render_serialize_tab(collector.data(serializer), true, serializer) }}
+                {{ _self.render_serialize_tab(collector.data(serializer), false, serializer) }}
+
+                {{ _self.render_normalize_tab(collector.data(serializer), true, serializer) }}
+                {{ _self.render_normalize_tab(collector.data(serializer), false, serializer) }}
+
+                {{ _self.render_encode_tab(collector.data(serializer), true, serializer) }}
+                {{ _self.render_encode_tab(collector.data(serializer), false, serializer) }}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_serialize_tab(collectorData, serialize, serializer) %}
+    {% set data = serialize ? collectorData.serialize : collectorData.deserialize %}
+    {% set cellPrefix = serialize ? 'serialize' : 'deserialize' %}
+
+    <div class="tab {{ not data ? 'disabled' }}">
+        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ serialize ? 'serialize' : 'deserialize' }} <twig:Badge>{{ data|length }}</twig:Badge></h3>
+        <div class="tab-content">
+            {% if not data|length %}
+                <div data-ui-role="empty">
+                    <p>Nothing was {{ serialize ? 'serialized' : 'deserialized' }}.</p>
+                </div>
+            {% else %}
+                <table data-ui-role="table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Context</th>
+                            <th>Normalizer</th>
+                            <th>Encoder</th>
+                            <th>Time</th>
+                            <th>Caller</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                            <tr>
+                                <td>{{ _self.render_data_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_context_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_normalizer_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_encoder_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_time_cell(item) }}</td>
+                                <td>{{ _self.render_caller_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_caller_cell(item, index, method, serializer) %}
+    {% if item.caller is defined %}
+        {% set trace_id = 'sf-trace-' ~ serializer ~ '-' ~ method ~ '-' ~ index %}
+
+        <span class="metadata">
+            {% set caller = item.caller %}
+            {% if caller.line %}
+                {% set link = caller.file|file_link(caller.line) %}
+                {% if link %}
+                    <a href="{{ link }}" title="{{ caller.file }}">{{ caller.name }}</a>
+                {% else %}
+                    <abbr title="{{ caller.file }}">{{ caller.name }}</abbr>
+                {% endif %}
+            {% else %}
+                {{ caller.name }}
+            {% endif %}
+            line <twig:Button
+                as="button"
+                type="button"
+                variant="neutral" appearance="ghost"
+                size="sm"
+                data-ui-role="typography" data-ui-density="compact"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ trace_id }}"
+                data-ui-profiler-toggle-alt="Hide excerpt"
+            >{{ caller.line }}</twig:Button>
+        </span>
+
+        <div id="{{ trace_id }}" data-ui-profiler-toggle-panel hidden>
+            <div class="trace">
+                {{ caller.file|file_excerpt(caller.line)|replace({
+                    '#DD0000': 'var(--highlight-string)',
+                    '#007700': 'var(--highlight-keyword)',
+                    '#0000BB': 'var(--highlight-default)',
+                    '#FF8000': 'var(--highlight-comment)',
+                })|raw }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_normalize_tab(collectorData, normalize, serializer) %}
+    {% set data = normalize ? collectorData.normalize : collectorData.denormalize %}
+    {% set cellPrefix = normalize ? 'normalize' : 'denormalize' %}
+
+    <div class="tab {{ not data ? 'disabled' }}">
+        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ normalize ? 'normalize' : 'denormalize' }} <twig:Badge>{{ data|length }}</twig:Badge></h3>
+        <div class="tab-content">
+            {% if not data|length %}
+                <div data-ui-role="empty">
+                    <p>Nothing was {{ normalize ? 'normalized' : 'denormalized' }}.</p>
+                </div>
+            {% else %}
+                <table data-ui-role="table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Context</th>
+                            <th>Normalizer</th>
+                            <th>Time</th>
+                            <th>Caller</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                            <tr>
+                                <td>{{ _self.render_data_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_context_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_normalizer_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_time_cell(item) }}</td>
+                                <td>{{ _self.render_caller_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_encode_tab(collectorData, encode, serializer) %}
+    {% set data = encode ? collectorData.encode : collectorData.decode %}
+    {% set cellPrefix = encode ? 'encode' : 'decode' %}
+
+    <div class="tab {{ not data ? 'disabled' }}">
+        <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">{{ encode ? 'encode' : 'decode' }} <twig:Badge>{{ data|length }}</twig:Badge></h3>
+        <div class="tab-content">
+            {% if not data|length %}
+                <div data-ui-role="empty">
+                    <p>Nothing was {{ encode ? 'encoded' : 'decoded' }}.</p>
+                </div>
+            {% else %}
+                <table data-ui-role="table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Context</th>
+                            <th>Encoder</th>
+                            <th>Time</th>
+                            <th>Caller</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                            <tr>
+                                <td>{{ _self.render_data_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_context_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_encoder_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                                <td>{{ _self.render_time_cell(item) }}</td>
+                                <td>{{ _self.render_caller_cell(item, loop.index, cellPrefix, serializer) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_data_cell(item, index, method, serializer) %}
+    {% set data_id = 'data-' ~ serializer ~ '-' ~ method ~ '-' ~ index %}
+
+    <span data-ui-wrap="nowrap">{{ item.dataType }}</span>
+
+    <div>
+        <twig:Button
+            as="button"
+            type="button"
+            variant="neutral" appearance="ghost"
+            size="sm"
+            data-ui-role="typography" data-ui-density="compact"
+            data-ui-profiler-toggle
+            data-ui-profiler-toggle-target="#{{ data_id }}"
+            data-ui-profiler-toggle-alt="Hide contents"
+        >Show contents</twig:Button>
+        <div id="{{ data_id }}" class="context" data-ui-profiler-toggle-panel hidden>
+            {{ profiler_dump(item.data) }}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_context_cell(item, index, method, serializer) %}
+    {% set context_id = 'context-' ~ serializer ~ '-' ~ method ~ '-' ~ index %}
+
+    {% if item.type %}
+        <span data-ui-wrap="nowrap">Type: {{ item.type }}</span>
+        <div data-ui-wrap="nowrap">Format: {{ item.format ? item.format : 'none' }}</div>
+    {% else %}
+        <span data-ui-wrap="nowrap">Format: {{ item.format ? item.format : 'none' }}</span>
+    {% endif %}
+
+    <div>
+        <twig:Button
+            as="button"
+            type="button"
+            variant="neutral" appearance="ghost"
+            size="sm"
+            data-ui-role="typography" data-ui-density="compact"
+            data-ui-profiler-toggle
+            data-ui-profiler-toggle-target="#{{ context_id }}"
+            data-ui-profiler-toggle-alt="Hide context"
+        >Show context</twig:Button>
+        <div id="{{ context_id }}" class="context" data-ui-profiler-toggle-panel hidden>
+            {{ profiler_dump(item.context) }}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_normalizer_cell(item, index, method, serializer) %}
+    {% set nested_normalizers_id = 'nested-normalizers-' ~ serializer ~ '-' ~ method ~ '-' ~ index %}
+
+    {% if item.normalizer is defined %}
+        <span data-ui-wrap="nowrap"><a href="{{ item.normalizer.file|file_link(item.normalizer.line) }}" title="{{ item.normalizer.file }}">{{ item.normalizer.class }}</a> ({{ '%.2f'|format(item.normalizer.time * 1000) }} ms)</span>
+    {% endif %}
+
+    {% if item.normalization|length > 1 %}
+        <div>
+            <twig:Button
+                as="button"
+                type="button"
+                variant="neutral" appearance="ghost"
+                size="sm"
+                data-ui-role="typography" data-ui-density="compact"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ nested_normalizers_id }}"
+                data-ui-profiler-toggle-alt="Hide nested normalizers"
+            >Show nested normalizers</twig:Button>
+            <div id="{{ nested_normalizers_id }}" class="context" data-ui-profiler-toggle-panel hidden>
+                <ul data-ui-role="typography" data-ui-density="compact" style="line-height:80%;margin-top:10px">
+                    {% for normalizer in item.normalization %}
+                        <li><span data-ui-wrap="nowrap">x{{ normalizer.calls }} <a href="{{ normalizer.file|file_link(normalizer.line) }}" title="{{ normalizer.file }}">{{ normalizer.class }}</a> ({{ '%.2f'|format(normalizer.time * 1000) }} ms)</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_encoder_cell(item, index, method, serializer) %}
+    {% set nested_encoders_id = 'nested-encoders-' ~ serializer ~ '-' ~ method ~ '-' ~ index %}
+
+    {% if item.encoder is defined %}
+        <span data-ui-wrap="nowrap"><a href="{{ item.encoder.file|file_link(item.encoder.line) }}" title="{{ item.encoder.file }}">{{ item.encoder.class }}</a> ({{ '%.2f'|format(item.encoder.time * 1000) }} ms)</span>
+    {% endif %}
+
+    {% if item.encoding|length > 1 %}
+        <div>
+            <twig:Button
+                as="button"
+                type="button"
+                variant="neutral" appearance="ghost"
+                size="sm"
+                data-ui-role="typography" data-ui-density="compact"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ nested_encoders_id }}"
+                data-ui-profiler-toggle-alt="Hide nested encoders"
+            >Show nested encoders</twig:Button>
+            <div id="{{ nested_encoders_id }}" class="context" data-ui-profiler-toggle-panel hidden>
+                <ul data-ui-role="typography" data-ui-density="compact" style="line-height:80%;margin-top:10px">
+                    {% for encoder in item.encoding %}
+                        <li><span data-ui-wrap="nowrap">x{{ encoder.calls }} <a href="{{ encoder.file|file_link(encoder.line) }}" title="{{ encoder.file }}">{{ encoder.class }}</a> ({{ '%.2f'|format(encoder.time * 1000) }} ms)</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_time_cell(item) %}
+    <span data-ui-wrap="nowrap">{{ '%.2f'|format(item.time * 1000) }} ms</span>
+{% endmacro %}

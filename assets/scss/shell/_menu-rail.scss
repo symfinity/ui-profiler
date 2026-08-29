@@ -1,0 +1,96 @@
+// L2 glue — profiler sidebar menu slots on core list rail variant
+
+[data-ui-role='list'][data-ui-variant='rail'][data-ui-profiler-menu] {
+  padding: 0;
+
+  > li {
+    &:has([data-ui-profiler-menu-disabled]) {
+      order: 1;
+    }
+
+    > a {
+      display: block;
+      text-decoration: none;
+    }
+
+    &.selected > a {
+      background: color-mix(in srgb, var(--ui-color-primary) 10%, var(--ui-color-surface-elevated));
+
+      [data-ui-profiler-menu-label] {
+        color: var(--ui-color-primary);
+      }
+
+      [data-ui-profiler-menu-icon] svg,
+      [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg {
+        color: var(--ui-color-primary);
+      }
+    }
+
+    > a:hover:not(:has([data-ui-profiler-menu-disabled])) {
+      background: var(--ui-color-surface-elevated);
+
+      [data-ui-profiler-menu-label] {
+        color: var(--ui-color-primary);
+      }
+
+      [data-ui-profiler-menu-icon] svg {
+        color: var(--ui-color-primary);
+      }
+    }
+
+    > a:hover:has([data-ui-profiler-menu-disabled]) {
+      background: transparent;
+
+      [data-ui-profiler-menu-label] {
+        color: var(--ui-color-text-muted);
+      }
+
+      [data-ui-profiler-menu-disabled] [data-ui-profiler-menu-icon] svg {
+        color: var(--ui-color-border);
+      }
+    }
+  }
+}
+
+[data-ui-profiler-menu-icon] {
+  color: var(--ui-color-text-muted);
+  display: flex;
+  margin-right: 0.25rem;
+  text-align: center;
+
+  :is(img, svg) {
+    height: 24px;
+    max-width: 24px;
+  }
+}
+
+[data-ui-profiler-menu-label] {
+  align-items: center;
+  background: transparent;
+  box-sizing: border-box;
+  color: var(--ui-color-text);
+  display: flex;
+  gap: 0.5rem;
+  overflow: hidden;
+  padding: 5px 7px;
+  width: 100%;
+
+  strong {
+    flex: 1;
+    font-size: var(--ui-font-size-md);
+    font-weight: var(--ui-font-weight-medium, 500);
+  }
+
+  &[data-ui-profiler-menu-disabled] {
+    &,
+    strong,
+    [data-ui-profiler-menu-icon] {
+      color: var(--ui-color-text-muted);
+      font-weight: normal;
+    }
+
+    [data-ui-profiler-menu-icon] {
+      color: var(--ui-color-border);
+    }
+  }
+}

@@ -1,0 +1,440 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new SymfonyProfilerLoggerPanel();
+        });
+
+        class SymfonyProfilerLoggerPanel {
+            constructor() {
+                this.#initializeLogsTable();
+            }
+
+            #initializeLogsTable() {
+                this.#updateLogsTable();
+
+                document.querySelectorAll('.log-filter input').forEach((input) => {
+                    input.addEventListener('change', () => {
+                        this.#updateLogsTable();
+                        input.closest('details.log-filter')?.removeAttribute('open');
+                    });
+                });
+
+                document.querySelectorAll('.filter-select-all-or-none button').forEach((link) => {
+                    link.addEventListener('click', () => {
+                        const selectAll = link.classList.contains('select-all');
+                        link.closest('.log-filter-content').querySelectorAll('input').forEach((input) => {
+                            input.checked = selectAll;
+                        });
+
+                        this.#updateLogsTable();
+                    });
+                });
+
+                document.body.addEventListener('click', (event) => {
+                    document.querySelectorAll('details.log-filter').forEach((filterElement) => {
+                        if (!filterElement.contains(event.target) && filterElement.open) {
+                            filterElement.open = false;
+                        }
+                    });
+                });
+            }
+
+            #updateLogsTable() {
+                const logs = document.querySelector('table.logs');
+                if (null === logs) {
+                    return;
+                }
+
+                const typeLabels = {
+                    all: 'All messages',
+                    error: 'Errors',
+                    deprecation: 'Deprecations',
+                };
+                const selectedTypeInput = document.querySelector('#log-filter-type input:checked');
+                const selectedType = selectedTypeInput ? selectedTypeInput.value : 'all';
+                const typeCounts = {
+                    all: {{ collector.processedLogs|length }},
+                    error: {{ collector.counterrors|default(0) }},
+                    deprecation: {{ collector.countdeprecations|default(0) }},
+                };
+                const typeValue = document.querySelector('#log-filter-type .filter-active-value');
+                const typeBadge = document.querySelector('#log-filter-type .filter-active-badge');
+                if (typeValue && selectedTypeInput) {
+                    typeValue.innerText = typeLabels[selectedType] ?? selectedType;
+                }
+                if (typeBadge && selectedTypeInput) {
+                    typeBadge.innerText = String(typeCounts[selectedType] ?? 0);
+                }
+                const priorities = document.querySelectorAll('#log-filter-priority input');
+                const allPriorities = Array.from(priorities).map((input) => input.value);
+                const selectedPriorities = Array.from(priorities).filter((input) => input.checked).map((input) => input.value);
+                const channels = document.querySelectorAll('#log-filter-channel input');
+                const selectedChannels = Array.from(channels).filter((input) => input.checked).map((input) => input.value);
+
+                /* hide rows that don't match the current filters */
+                let numVisibleRows = 0;
+                logs.querySelectorAll('tbody tr').forEach((row) => {
+                    if ('all' !== selectedType && selectedType !== row.getAttribute('data-type')) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    const priority = row.getAttribute('data-priority');
+                    if (false === selectedPriorities.includes(priority) && true === allPriorities.includes(priority)) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    if ('' !== row.getAttribute('data-channel') && false === selectedChannels.includes(row.getAttribute('data-channel'))) {
+                        row.style.display = 'none';
+                        return;
+                    }
+
+                    row.style.display = 'table-row';
+                    numVisibleRows++;
+                });
+
+                document.querySelector('table.logs').style.display = 0 === numVisibleRows ? 'none' : 'table';
+                const logEmpty = document.querySelector('[data-ui-role="log-empty"]');
+                if (logEmpty) {
+                    if (0 === numVisibleRows) {
+                        logEmpty.removeAttribute('hidden');
+                    } else {
+                        logEmpty.setAttribute('hidden', '');
+                    }
+                }
+
+                /* update the selected totals of all filters */
+                const priorityValue = document.querySelector('#log-filter-priority .filter-active-value');
+                if (priorityValue) {
+                    priorityValue.innerText = (priorities.length === selectedPriorities.length) ? 'All' : String(selectedPriorities.length);
+                }
+                const channelValue = document.querySelector('#log-filter-channel .filter-active-value');
+                if (channelValue) {
+                    channelValue.innerText = (channels.length === selectedChannels.length) ? 'All' : String(selectedChannels.length);
+                }
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block toolbar %}
+    {% if collector.counterrors or collector.countdeprecations or collector.countwarnings %}
+        {% set icon %}
+            {% set status_color = collector.counterrors ? 'red' : collector.countwarnings ? 'yellow' : 'none' %}
+            {{ source('@WebProfiler/Icon/logger.svg') }}
+            <span data-ui-profiler-wdt-value>{{ collector.counterrors ?: (collector.countdeprecations + collector.countwarnings) }}</span>
+        {% endset %}
+
+        {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Errors</b>
+                {{ status_badge(collector.counterrors ? 'red' : 'none', collector.counterrors|default(0)) }}
+            </div>
+
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Warnings</b>
+                {{ status_badge(collector.countwarnings ? 'yellow' : 'none', collector.countwarnings|default(0)) }}
+            </div>
+
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Deprecations</b>
+                {{ status_badge(collector.countdeprecations ? 'none' : 'none', collector.countdeprecations|default(0)) }}
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: status_color}) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/logger.svg'),
+        title: 'Logs',
+        status: collector.counterrors ? 'error' : (collector.countwarnings ? 'warning' : null),
+        disabled: collector.logs is empty,
+        count: (collector.counterrors or collector.countdeprecations or collector.countwarnings)
+            ? (collector.counterrors ?: (collector.countdeprecations + collector.countwarnings))
+            : null,
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="logger">
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Log Messages' }) }}
+    {% if collector.processedLogs is empty %}
+        <div data-ui-role="empty" data-ui-profiler-empty-panel>
+            <p>No log messages available.</p>
+        </div>
+    {% else %}
+        {% set has_error_logs = collector.processedLogs|column('type')|filter(type => 'error' == type)|length > 0 %}
+        {% set has_deprecation_logs = collector.processedLogs|column('type')|filter(type => 'deprecation' == type)|length > 0 %}
+
+        {% set filters = collector.filters %}
+        {% set type_labels = {
+            all: 'All messages',
+            error: 'Errors',
+            deprecation: 'Deprecations',
+        } %}
+        {% set initially_active_type = has_error_logs ? 'error' : has_deprecation_logs ? 'deprecation' : 'all' %}
+        {% set priority_values = filters.priority|map((label, value) => value) %}
+        {% set initially_selected_priorities = priority_values|filter(value => 'debug' != value)|length %}
+        {% set level_initial_value = initially_selected_priorities == priority_values|length ? 'All' : initially_selected_priorities %}
+        {% set initially_selected_channels = filters.channel|filter(value => 'event' != value)|length %}
+        {% set channel_initial_value = initially_selected_channels == filters.channel|length ? 'All' : initially_selected_channels %}
+        <div class="log-filters" data-ui-role="filter-bar">
+            <details id="log-filter-type" class="log-filter">
+                <summary>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="log-filter-summary">
+                        <span class="filter-name">Type</span>:
+                        <span class="filter-active-value">{{ type_labels[initially_active_type] }}</span>
+                        <span class="filter-active-badge"><twig:Badge>{{ initially_active_type == 'error' ? collector.counterrors|default(0) : (initially_active_type == 'deprecation' ? collector.countdeprecations|default(0) : collector.processedLogs|length) }}</twig:Badge></span>
+                    </span>
+                </summary>
+
+                <div class="log-filter-content">
+                    <div class="log-filter-option">
+                        <input type="radio" id="filter-log-type-all" name="filter-log-type" value="all" {{ 'all' == initially_active_type ? 'checked' }}>
+                        <label for="filter-log-type-all">All messages</label>
+                    </div>
+
+                    <div class="log-filter-option">
+                        <input type="radio" id="filter-log-type-error" name="filter-log-type" value="error" {{ 'error' == initially_active_type ? 'checked' }}>
+                        <label for="filter-log-type-error">
+                            Errors
+                            <twig:Badge variant="{{ collector.counterrors ? 'danger' : 'secondary' }}">{{ collector.counterrors|default(0) }}</twig:Badge>
+                        </label>
+                    </div>
+
+                    <div class="log-filter-option">
+                        <input type="radio" id="filter-log-type-deprecation" name="filter-log-type" value="deprecation" {{ 'deprecation' == initially_active_type ? 'checked' }}>
+                        <label for="filter-log-type-deprecation">
+                            Deprecations
+                            <twig:Badge variant="{{ collector.countdeprecations ? 'warning' : 'secondary' }}">{{ collector.countdeprecations|default(0) }}</twig:Badge>
+                        </label>
+                    </div>
+                </div>
+            </details>
+
+            <details id="log-filter-priority" class="log-filter">
+                <summary>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="log-filter-summary">
+                        <span class="filter-name">Level</span>:
+                        <span class="filter-active-value">{{ level_initial_value }}</span>
+                        <span class="filter-active-badge"><twig:Badge>{{ filters.priority|length }}</twig:Badge></span>
+                    </span>
+                </summary>
+
+                <div class="log-filter-content">
+                    <div class="filter-select-all-or-none">
+                        <button type="button" class="btn btn-link select-all" data-ui-role="button" data-ui-variant="link">Select All</button>
+                        <button type="button" class="btn btn-link select-none" data-ui-role="button" data-ui-variant="link">Select None</button>
+                    </div>
+
+                    {% for label, value in filters.priority %}
+                        <div class="log-filter-option">
+                            <input {{ 'debug' != value ? 'checked' }} type="checkbox" id="filter-log-level-{{ value }}" name="filter-log-level-{{ value }}" value="{{ value }}">
+                            <label for="filter-log-level-{{ value }}">{{ label }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </details>
+
+            <details id="log-filter-channel" class="log-filter">
+                <summary>
+                    <span class="icon">{{ source('@WebProfiler/Icon/filter.svg') }}</span>
+                    <span class="log-filter-summary">
+                        <span class="filter-name">Channel</span>:
+                        <span class="filter-active-value">{{ channel_initial_value }}</span>
+                        <span class="filter-active-badge"><twig:Badge>{{ filters.channel|length }}</twig:Badge></span>
+                    </span>
+                </summary>
+
+                <div class="log-filter-content">
+                    <div class="filter-select-all-or-none">
+                        <button type="button" class="btn btn-link select-all" data-ui-role="button" data-ui-variant="link">Select All</button>
+                        <button type="button" class="btn btn-link select-none" data-ui-role="button" data-ui-variant="link">Select None</button>
+                    </div>
+
+                    {% for value in filters.channel %}
+                        <div class="log-filter-option">
+                            <input {{ 'event' != value ? 'checked' }} type="checkbox" id="filter-log-channel-{{ value }}" name="filter-log-channel-{{ value }}" value="{{ value }}">
+                            <label for="filter-log-channel-{{ value }}">{{ value|title }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </details>
+        </div>
+
+        <table data-ui-role="table" class="logs">
+            <colgroup>
+                <col style="width: 140px">
+                <col>
+            </colgroup>
+
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for log in collector.processedLogs %}
+                    {% set css_class = 'error' == log.type ? 'error'
+                        : (log.priorityName in ['WARNING', 'warning'] or 'deprecation' == log.type) ? 'warning'
+                        : 'silenced' == log.type ? 'silenced'
+                    %}
+                    <tr class="log-status-{{ css_class }}" data-type="{{ log.type }}" data-priority="{{ log.priority }}" data-channel="{{ log.channel }}" style="{{ 'event' == log.channel or 'DEBUG' == log.priorityName ? 'display: none' }}">
+                        <td class="log-timestamp">
+                            <time data-ui-display="block" title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date(constant('DateTimeInterface::RFC3339_EXTENDED')) }}" data-convert-to-user-timezone data-render-as-time data-render-with-millisecond-precision>
+                                {{ log.timestamp|date('H:i:s.v') }}
+                            </time>
+
+                            {% if log.type in ['error', 'deprecation', 'silenced'] or log.priorityName in ['WARNING', 'warning'] %}
+                                <twig:Badge variant="{{ css_class == 'error' ? 'danger' : (css_class == 'warning' ? 'warning' : 'secondary') }}">
+                                    {% if 'error' == log.type or log.priorityName in ['WARNING', 'warning'] %}
+                                        {{ log.priorityName|lower }}
+                                    {% else %}
+                                        {{ log.type|lower }}
+                                    {% endif %}
+                                </twig:Badge>
+                            {% else %}
+                                <twig:Badge variant="secondary">{{ log.priorityName|lower }}</twig:Badge>
+                            {% endif %}
+                        </td>
+
+                        <td data-ui-font="sans">
+                            {{ _self.render_log_message('debug', loop.index, log) }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div data-ui-role="log-empty" hidden>
+            <p>There are no log messages.</p>
+        </div>
+    {% endif %}
+
+    {% set compilerLogTotal = collector.compilerLogs|reduce((total, logs) => total + logs|length, 0) %}
+    <details data-ui-role="compilation-logs">
+        <summary>
+            <h4 data-ui-role="typography" data-ui-variant="h4">Container Compilation Logs <span data-ui-role="typography" data-ui-variant="muted">({{ compilerLogTotal }})</span></h4>
+            <p data-ui-role="typography" data-ui-variant="muted">Log messages generated during the compilation of the service container.</p>
+        </summary>
+
+        {% if collector.compilerLogs is empty %}
+            <div data-ui-role="empty">
+                <p>There are no compiler log messages.</p>
+            </div>
+        {% else %}
+            <table data-ui-role="table" class="container-logs">
+                <thead>
+                <tr>
+                    <th>Messages</th>
+                    <th data-ui-width="full">Class</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for class, logs in collector.compilerLogs %}
+                    <tr>
+                        <td data-ui-font="sans" data-ui-role="typography" data-ui-density="compact" data-ui-align="end">{{ logs|length }}</td>
+                        <td data-ui-font="sans">
+                            {% set context_id = 'context-compiler-' ~ loop.index %}
+
+                            <twig:Button
+                                as="button"
+                                type="button"
+                                variant="neutral" appearance="ghost"
+                                size="sm"
+                                data-ui-profiler-toggle
+                                data-ui-profiler-toggle-target="#{{ context_id }}"
+                                data-ui-profiler-toggle-alt="{{ class }}"
+                            >{{ class }}</twig:Button>
+
+                            <div id="{{ context_id }}" class="context" data-ui-profiler-toggle-panel hidden>
+                                <ul data-ui-wrap="break">
+                                    {% for log in logs %}
+                                        <li>{{ profiler_dump_log(log.message) }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </details>
+    </div>
+{% endblock %}
+
+{% macro render_log_message(category, log_index, log) %}
+    {% set has_context = log.context is defined and log.context is not empty %}
+    {% set has_trace = log.context.exception.trace is defined %}
+
+    {% if not has_context %}
+        {{ profiler_dump_log(log.message) }}
+    {% else %}
+        {{ profiler_dump_log(log.message, log.context) }}
+    {% endif %}
+
+    <div class="log-metadata">
+        {% if log.channel %}
+            <span><twig:Badge>{{ log.channel }}</twig:Badge></span>
+        {% endif %}
+
+        {% if log.errorCount is defined and log.errorCount > 1 %}
+            <span class="log-num-occurrences" data-ui-role="typography" data-ui-variant="muted">{{ log.errorCount }} times</span>
+        {% endif %}
+
+        {% if has_context %}
+            {% set context_id = 'context-' ~ category ~ '-' ~ log_index %}
+            <span><twig:Button
+                as="button"
+                type="button"
+                variant="neutral" appearance="ghost"
+                size="sm"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ context_id }}"
+                data-ui-profiler-toggle-alt="Hide context"
+            >Show context</twig:Button></span>
+        {% endif %}
+
+        {% if has_trace %}
+            {% set trace_id = 'trace-' ~ category ~ '-' ~ log_index %}
+            <span><twig:Button
+                as="button"
+                type="button"
+                variant="neutral" appearance="ghost"
+                size="sm"
+                data-ui-profiler-toggle
+                data-ui-profiler-toggle-target="#{{ trace_id }}"
+                data-ui-profiler-toggle-alt="Hide trace"
+            >Show trace</twig:Button></span>
+        {% endif %}
+
+        {% if has_context %}
+            <div id="{{ context_id }}" class="context" data-ui-profiler-toggle-panel hidden>
+                {{ profiler_dump(log.context, maxDepth: 1) }}
+            </div>
+        {% endif %}
+
+        {% if has_trace %}
+            <div id="{{ trace_id }}" class="context" data-ui-profiler-toggle-panel hidden>
+                {{ profiler_dump(log.context.exception.trace, maxDepth: 1) }}
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}

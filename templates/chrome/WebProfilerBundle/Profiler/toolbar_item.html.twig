@@ -1,0 +1,36 @@
+{% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_item_status %}
+
+{% set wdt_item_label = name|replace({'_': ' '})|title %}
+
+<div
+    data-ui-profiler-wdt-item
+    data-ui-profiler-collector="{{ name }}"
+    data-ui-status="{{ wdt_item_status(status|default('normal')) }}"
+    {% if align|default('') == 'end' %}data-ui-align="end"{% endif %}
+    {{ block_attrs|default('')|raw }}
+>
+    {% if link is not defined or link %}
+        {# Plain anchor — twig:Link drops icon content captured via {% set icon %} in collector blocks. #}
+        <a
+            href="{{ url('_profiler', {token: token, panel: name}) }}"
+            data-ui-profiler-wdt-trigger
+            class="ui-profiler-wdt__trigger"
+            aria-label="{{ wdt_item_label }}"
+        >
+            <span data-ui-profiler-wdt-chip>
+                {{ icon|default('')|raw }}
+            </span>
+        </a>
+    {% else %}
+        <button type="button" data-ui-profiler-wdt-trigger class="ui-profiler-wdt__trigger" aria-label="{{ wdt_item_label }}">
+            <span data-ui-profiler-wdt-chip>
+                {{ icon|default('')|raw }}
+            </span>
+        </button>
+    {% endif %}
+    {% if text|default('') is not empty %}
+        <div data-ui-profiler-wdt-panel>
+            {{ text|raw }}
+        </div>
+    {% endif %}
+</div>

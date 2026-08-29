@@ -1,0 +1,377 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.data.nb_errors > 0 or collector.data.forms|length %}
+        {% set status_color = collector.data.nb_errors ? 'red' %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/form.svg') }}
+            <span data-ui-profiler-wdt-value>
+                {{ collector.data.nb_errors ?: collector.data.forms|length }}
+            </span>
+        {% endset %}
+
+        {% set text %}
+            {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import status_badge %}
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Number of forms</b>
+                {{ status_badge('none', collector.data.forms|length) }}
+            </div>
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Number of errors</b>
+                {{ status_badge(collector.data.nb_errors > 0 ? 'red' : 'none', collector.data.nb_errors) }}
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: status_color}) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/form.svg'),
+        title: 'Forms',
+        status: collector.data.nb_errors ? 'error' : null,
+        disabled: collector.data.forms is empty,
+        count: collector.data.nb_errors > 0 ? collector.data.nb_errors : null,
+    }) }}
+{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="module"{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}>import{bootFormPanel}from'{{ path('ui_profiler_asset', {assetPath: 'js/panels/form-panel.js', v: ui_profiler_asset_version()}) }}';bootFormPanel();</script>
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="form">
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Forms' }) }}
+    {% if collector.data.forms|length %}
+        <div id="tree-menu" class="tree">
+            <ul>
+            {% for formName, formData in collector.data.forms %}
+                {{ _self.form_tree_entry(formName, formData, true) }}
+            {% endfor %}
+            </ul>
+        </div>
+
+        <div id="tree-details-container">
+            {% for formName, formData in collector.data.forms %}
+                {{ _self.form_tree_details(formName, formData, collector.data.forms_by_hash, loop.first) }}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div data-ui-role="empty" data-ui-profiler-empty-panel>
+            <p>No forms were submitted.</p>
+        </div>
+    {% endif %}
+    </div>
+{% endblock %}
+
+{% macro form_tree_entry(name, data, is_root) %}
+    {% set has_error = data.errors is defined and data.errors|length > 0 %}
+    <li>
+        <div class="tree-inner" data-tab-target-id="{{ data.id }}-details" title="{{ name|default('(no name)') }}">
+            {% if has_error %}
+                <div class="badge-error">{{ data.errors|length }}</div>
+            {% endif %}
+
+            {% if data.children is not empty %}
+                <button class="toggle-button" data-toggle-target-id="{{ data.id }}-children">
+                    {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                </button>
+            {% else %}
+                <div class="toggle-icon empty"></div>
+            {% endif %}
+
+            <span {% if has_error or data.has_children_error|default(false) %}class="has-error"{% endif %}>
+                {{ name|default('(no name)') }}
+            </span>
+        </div>
+
+        {% if data.children is not empty %}
+            <ul id="{{ data.id }}-children" {% if not is_root and not data.has_children_error|default(false) %}hidden{% endif %}>
+                {% for childName, childData in data.children %}
+                    {{ _self.form_tree_entry(childName, childData, false) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endmacro %}
+
+{% macro form_tree_details(name, data, forms_by_hash, show) %}
+    <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: name|default('(no name)') }) }}
+        {% if data.type_class is defined %}
+            <div class="form-type-class">
+                <span class="form-type-class-label">Form type:</span>
+                {{ profiler_dump(data.type_class) }}
+            </div>
+        {% endif %}
+
+        {% set form_has_errors = data.errors ?? [] is not empty %}
+        <div data-ui-profiler-tabs data-ui-role="tabs">
+            <div class="tab {{ form_has_errors ? 'active' : 'disabled' }}">
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Errors</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_errors(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ not form_has_errors ? 'active' }}">
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Default Data</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_default_data(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ (data.submitted_data ?? []) is empty ? 'disabled' }}">
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Submitted Data</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_submitted_data(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ (data.passed_options ?? []) is empty ? 'disabled' }}">
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Passed Options</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_passed_options(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ (data.resolved_options ?? []) is empty ? 'disabled' }}">
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">Resolved Options</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_resolved_options(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ (data.view_vars ?? []) is empty ? 'disabled' }}">
+                <h3 class="tab-title" data-ui-role="typography" data-ui-variant="h3">View Vars</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_view_variables(data) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for childName, childData in data.children %}
+        {{ _self.form_tree_details(childName, childData, forms_by_hash) }}
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_form_errors(data) %}
+    {% if data.errors is defined and data.errors|length > 0 %}
+        <div class="errors">
+            <table data-ui-role="table" id="{{ data.id }}-errors">
+                <thead>
+                <tr>
+                    <th>Message</th>
+                    <th>Origin</th>
+                    <th>Cause</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for error in data.errors %}
+                    <tr>
+                        <td>{{ error.message }}</td>
+                        <td>
+                            {% if error.origin is empty %}
+                                <em>This form.</em>
+                            {% elseif forms_by_hash[error.origin] is not defined %}
+                                <em>Unknown.</em>
+                            {% else %}
+                                {{ forms_by_hash[error.origin].name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if error.trace %}
+                                <span data-ui-display="block">Caused by:</span>
+                                {% for stacked in error.trace %}
+                                    {{ profiler_dump(stacked) }}
+                                {% endfor %}
+                            {% else %}
+                                <em>Unknown.</em>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div data-ui-role="empty">
+            <p>This form has no errors.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_default_data(data) %}
+    {% if data.default_data is defined %}
+        <table data-ui-role="table">
+            <thead>
+            <tr>
+                <th style="width: 180px">Property</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th data-ui-font="sans" scope="row">Model Format</th>
+                <td>
+                    {% if data.default_data.model is defined %}
+                        {{ profiler_dump(data.default_data.seek('model')) }}
+                    {% else %}
+                        <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th data-ui-font="sans" scope="row">Normalized Format</th>
+                <td>{{ profiler_dump(data.default_data.seek('norm')) }}</td>
+            </tr>
+            <tr>
+                <th data-ui-font="sans" scope="row">View Format</th>
+                <td>
+                    {% if data.default_data.view is defined %}
+                        {{ profiler_dump(data.default_data.seek('view')) }}
+                    {% else %}
+                        <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <div data-ui-role="empty">
+            <p>This form has default data defined.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_submitted_data(data) %}
+    {% if data.submitted_data.norm is defined %}
+        <table data-ui-role="table">
+            <thead>
+            <tr>
+                <th style="width: 180px">Property</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th data-ui-font="sans" scope="row">View Format</th>
+                <td>
+                    {% if data.submitted_data.view is defined %}
+                        {{ profiler_dump(data.submitted_data.seek('view')) }}
+                    {% else %}
+                        <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th data-ui-font="sans" scope="row">Normalized Format</th>
+                <td>{{ profiler_dump(data.submitted_data.seek('norm')) }}</td>
+            </tr>
+            <tr>
+                <th data-ui-font="sans" scope="row">Model Format</th>
+                <td>
+                    {% if data.submitted_data.model is defined %}
+                        {{ profiler_dump(data.submitted_data.seek('model')) }}
+                    {% else %}
+                        <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <div data-ui-role="empty">
+            <p>This form was not submitted.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_passed_options(data) %}
+    {% if data.passed_options ?? [] is not empty %}
+        <table data-ui-role="table">
+            <thead>
+            <tr>
+                <th style="width: 180px">Option</th>
+                <th>Passed Value</th>
+                <th>Resolved Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for option, value in data.passed_options %}
+                <tr>
+                    <th>{{ option }}</th>
+                    <td>{{ profiler_dump(value) }}</td>
+                    <td>
+                        {# values can be stubs #}
+                        {% set option_value = (value.value is defined) ? value.value : value %}
+                        {% set resolved_option_value = (data.resolved_options[option].value is defined)
+                            ? data.resolved_options[option].value
+                            : data.resolved_options[option] %}
+                        {% if resolved_option_value == option_value %}
+                            <em data-ui-font="sans" data-ui-role="typography" data-ui-variant="muted">same as passed value</em>
+                        {% else %}
+                            {{ profiler_dump(data.resolved_options.seek(option)) }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div data-ui-role="empty">
+            <p>No options were passed when constructing this form.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_resolved_options(data) %}
+    <table data-ui-role="table">
+        <thead>
+        <tr>
+            <th style="width: 180px">Option</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for option, value in data.resolved_options ?? [] %}
+            <tr>
+                <th scope="row">{{ option }}</th>
+                <td>{{ profiler_dump(value) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro render_form_view_variables(data) %}
+    <table data-ui-role="table">
+        <thead>
+        <tr>
+            <th style="width: 180px">Variable</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for variable, value in data.view_vars ?? [] %}
+            <tr>
+                <th scope="row">{{ variable }}</th>
+                <td>{{ profiler_dump(value) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

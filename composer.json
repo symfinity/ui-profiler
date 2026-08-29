@@ -1,0 +1,94 @@
+{
+    "name": "symfinity/ui-profiler",
+    "description": "Symfony Web Profiler toolbar and panels rebuilt with UI Kernel and UX Blocks",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "homepage": "https://github.com/symfinity/ui-profiler",
+    "support": {
+        "issues": "https://github.com/symfinity/ui-profiler/issues",
+        "source": "https://github.com/symfinity/ui-profiler"
+    },
+    "authors": [
+        {
+            "name": "Symfinity",
+            "email": "dev@symfinity.net",
+            "homepage": "https://symfinity.net/"
+        }
+    ],
+    "keywords": [
+        "symfony",
+        "symfony-bundle",
+        "web-profiler",
+        "debug-toolbar",
+        "ui-kernel"
+    ],
+    "require": {
+        "php": ">=8.2",
+        "symfony/config": "^7.4||^8.0",
+        "symfony/dependency-injection": "^7.4||^8.0",
+        "symfony/framework-bundle": "^7.4||^8.0",
+        "symfony/http-kernel": "^7.4||^8.0",
+        "symfony/twig-bundle": "^7.4||^8.0",
+        "symfony/web-profiler-bundle": "^7.4||^8.0",
+        "symfinity/ui-kernel": "^0.3.1",
+        "symfinity/ux-blocks-core": "^0.1",
+        "symfinity/ux-blocks-extended": "^0.1",
+        "twig/twig": "^3.0"
+    },
+    "require-dev": {
+        "doctrine/doctrine-bundle": "^2.13||^3.0",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^11.0",
+        "symfony/asset-mapper": "^7.4||^8.0",
+        "symfony/browser-kit": "^7.4||^8.0",
+        "symfony/css-selector": "^7.4||^8.0",
+        "symfony/event-dispatcher": "^7.4||^8.0",
+        "symfony/form": "^7.4||^8.0",
+        "symfony/http-client": "^7.4||^8.0",
+        "symfony/http-foundation": "^7.4||^8.0",
+        "symfony/mailer": "^7.4||^8.0",
+        "symfony/messenger": "^7.4||^8.0",
+        "symfony/security-bundle": "^7.4||^8.0",
+        "symfony/serializer": "^7.4||^8.0",
+        "symfony/stopwatch": "^7.4||^8.0",
+        "symfony/translation": "^7.4||^8.0",
+        "symfony/validator": "^7.4||^8.0"
+    },
+    "suggest": {
+        "symfinity/ux-runtime": "Optional Stimulus transport for dual-interaction mode"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfinity\\UiProfiler\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Symfinity\\UiProfiler\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit -c phpunit.xml.dist",
+        "phpstan": "phpstan analyse -c phpstan.neon.dist --memory-limit=512M",
+        "scss:compile": "bin/profiler-css-compile",
+        "scss:check": "bin/profiler-css-compile --check"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/serotoninja"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        },
+        "symfony": {
+            "allow-contrib": false,
+            "require": "^7.4||^8.0"
+        }
+    }
+}

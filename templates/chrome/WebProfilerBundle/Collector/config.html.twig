@@ -1,0 +1,248 @@
+{% extends '@UiProfiler/Profiler/layout.html.twig' %}
+{% import '@UiProfiler/_chrome/macros/profiler-ui.html.twig' as ui %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block toolbar %}
+    {% from '@UiProfiler/_chrome/macros/wdt-markup.html.twig' import wdt_variant, status_badge %}
+    {% if 'unknown' == collector.symfonyState %}
+        {% set block_status = '' %}
+        {% set symfony_version_status = 'Unable to retrieve information about the Symfony version.' %}
+    {% elseif 'eol' == collector.symfonyState %}
+        {% set block_status = 'red' %}
+        {% set symfony_version_status = 'This Symfony version will no longer receive security fixes.' %}
+    {% elseif 'eom' == collector.symfonyState %}
+        {% set block_status = 'yellow' %}
+        {% set symfony_version_status = 'This Symfony version will only receive security fixes.' %}
+    {% elseif 'dev' == collector.symfonyState %}
+        {% set block_status = 'yellow' %}
+        {% set symfony_version_status = 'This Symfony version is still in the development phase.' %}
+    {% else %}
+        {% set block_status = '' %}
+        {% set symfony_version_status = '' %}
+    {% endif %}
+
+    {% set icon %}
+        <span data-ui-profiler-wdt-label>
+            {{ source('@WebProfiler/Icon/symfony.svg') }}
+        </span>
+        <span data-ui-profiler-wdt-value>{{ collector.symfonyState is defined ? collector.symfonyversion : 'n/a' }}</span>
+    {% endset %}
+
+    {% set text %}
+        {% if symfony_version_status %}
+            <div data-ui-profiler-wdt-info-group>
+                <div data-ui-profiler-wdt-info-piece>
+                    <span>{{ symfony_version_status }}</span>
+                </div>
+            </div>
+        {% endif %}
+
+        <div data-ui-profiler-wdt-info-group>
+            <div data-ui-profiler-wdt-info-piece>
+                <b>Profiler token</b>
+                <span>
+                    {% if profiler_url %}
+                        <a href="{{ profiler_url }}">{{ collector.token }}</a>
+                    {% else %}
+                        {{ collector.token }}
+                    {% endif %}
+                </span>
+            </div>
+
+            {% if collector.runnerClass is defined and collector.runnerClass is not null %}
+                <div data-ui-profiler-wdt-info-piece data-ui-profiler-wdt-info-runner>
+                    <b>Runner</b>
+                    <span>{{ collector.runnerClass|abbr_class }}</span>
+                </div>
+            {% endif %}
+
+            {% if 'n/a' is not same as(collector.env) %}
+                <div data-ui-profiler-wdt-info-piece>
+                    <b>Environment</b>
+                    <span>{{ collector.env }}</span>
+                </div>
+            {% endif %}
+
+            {% if 'n/a' is not same as(collector.debug) %}
+                <div data-ui-profiler-wdt-info-piece>
+                    <b>Debug</b>
+                    {{ status_badge(collector.debug ? 'green' : 'red', collector.debug ? 'enabled' : 'disabled') }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div data-ui-profiler-wdt-info-group>
+            <div data-ui-profiler-wdt-info-piece data-ui-profiler-wdt-info-php>
+                <b>PHP version</b>
+                <span{% if collector.phpversionextra %} title="{{ collector.phpversion ~ collector.phpversionextra }}"{% endif %}>
+                    {{ collector.phpversion }}
+                    &nbsp; <a href="{{ path('_profiler_phpinfo') }}">View phpinfo()</a>
+                </span>
+            </div>
+
+            <div data-ui-profiler-wdt-info-piece data-ui-profiler-wdt-info-php-ext>
+                <b>PHP Extensions</b>
+                {% if collector.hasXdebugInfo %}
+                    <a href="{{ path('_profiler_xdebug') }}" title="View xdebug_info()">
+                {% endif %}
+                {{ status_badge(collector.hasXdebug ? 'green' : 'gray', 'Xdebug ' ~ (collector.hasXdebug ? '✓' : '✗')) }}
+                {% if collector.hasXdebugInfo %}
+                    </a>
+                {% endif %}
+                {{ status_badge(collector.hasapcu ? 'green' : 'gray', 'APCu ' ~ (collector.hasapcu ? '✓' : '✗')) }}
+                {{ status_badge(collector.haszendopcache ? 'green' : 'red', 'OPcache ' ~ (collector.haszendopcache ? '✓' : '✗')) }}
+            </div>
+
+            <div data-ui-profiler-wdt-info-piece>
+                <b>PHP SAPI</b>
+                <span>{{ collector.sapiName }}</span>
+            </div>
+        </div>
+
+        <div data-ui-profiler-wdt-info-group>
+            {% if collector.symfonyversion is defined %}
+                <div data-ui-profiler-wdt-info-piece>
+                    <b>Resources</b>
+                    <span>
+                        <a href="https://symfony.com/doc/{{ collector.symfonyversion }}/index.html" rel="help">
+                            Read Symfony {{ collector.symfonyversion }} Docs
+                        </a>
+                    </span>
+                </div>
+                <div data-ui-profiler-wdt-info-piece>
+                    <b>Help</b>
+                    <span>
+                        <a href="https://symfony.com/support">
+                            Symfony Support Channels
+                        </a>
+                    </span>
+                </div>
+            {% endif %}
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: true, name: 'config', status: block_status, align: 'end'}) }}
+{% endblock %}
+
+{% block menu %}
+    {{ include('@UiProfiler/_chrome/partials/collector-menu-label.html.twig', {
+        icon: source('@WebProfiler/Icon/config.svg'),
+        title: 'Configuration',
+        status: collector.symfonyState == 'eol' ? 'error' : (collector.symfonyState in ['eom', 'dev'] ? 'warning' : null),
+    }) }}
+{% endblock %}
+
+{% block panel %}
+    <div data-ui-profiler-panel="config">
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-heading.html.twig', { title: 'Configuration' }) }}
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Symfony Configuration' }) }}
+    {% if collector.runnerClass is defined and collector.runnerClass is not null %}
+        <div data-ui-metrics-grid data-ui-role="grid">
+            {{ ui.metric_cell(collector.runnerClass|abbr_class, 'Runner') }}
+        </div>
+    {% endif %}
+
+    <div data-ui-metrics-grid data-ui-role="grid">
+        {% set symfony_version_value %}
+            {{ collector.symfonyversion }}
+            {% if collector.symfonylts %}
+                <abbr class="config-symfony-version-lts" title="This is a Long-Term Support version">(LTS)</abbr>
+            {% endif %}
+        {% endset %}
+        {{ ui.metric_cell(symfony_version_value, 'Symfony version') }}
+
+        {% if 'n/a' is not same as(collector.env) %}
+            {{ ui.metric_cell(collector.env, 'Environment') }}
+        {% endif %}
+
+        {% if 'n/a' is not same as(collector.debug) %}
+            {{ ui.metric_cell(collector.debug ? 'enabled' : 'disabled', 'Debug') }}
+        {% endif %}
+    </div>
+
+    {% set symfony_status = {dev: 'In Development', stable: 'Maintained', eom: 'Security Fixes Only', eol: 'Unmaintained'} %}
+    {% set symfony_badge_variant = {dev: 'warning', stable: 'success', eom: 'warning', eol: 'danger'} %}
+
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
+            {% set symfony_version_status_value %}
+                <twig:Badge variant="{{ symfony_badge_variant[collector.symfonystate] }}">{{ symfony_status[collector.symfonystate]|upper }}</twig:Badge>
+            {% endset %}
+            {{ ui.metric_cell(symfony_version_status_value, 'Your Symfony version status') }}
+
+            {% if collector.symfonylts %}
+                {{ ui.metric_cell(collector.symfonyeom, 'Bug fixes ' ~ (collector.symfonystate in ['eom', 'eol'] ? 'ended on' : 'until')) }}
+            {% endif %}
+
+            {{ ui.metric_cell(collector.symfonyeol, (collector.symfonylts ? 'Security fixes' : 'Bug fixes and security fixes') ~ ' ' ~ ('eol' == collector.symfonystate ? 'ended on' : 'until')) }}
+        </div>
+    </div>
+
+    <a class="config-symfony-version-roadmap-link" href="https://symfony.com/releases/{{ collector.symfonyminorversion }}">View Symfony {{ collector.symfonyversion }} release details</a>
+
+    {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'PHP Configuration' }) }}
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
+            {% set php_version_value %}
+                {{ collector.phpversion }}{% if collector.phpversionextra %} <span data-ui-part="unit">{{ collector.phpversionextra }}</span>{% endif %}
+            {% endset %}
+            {{ ui.metric_cell(php_version_value, 'PHP version') }}
+            {{ ui.metric_cell(collector.phparchitecture ~ ' <span data-ui-part="unit">bits</span>', 'Architecture') }}
+            {{ ui.metric_cell(collector.phpintllocale, 'Intl locale') }}
+            {{ ui.metric_cell(collector.phptimezone, 'Timezone') }}
+        </div>
+    </div>
+
+    <div data-ui-metrics-grid data-ui-role="grid">
+        <div data-ui-role="stat-group">
+            {% set opcache_icon %}
+                <span data-ui-part="icon"{{ not collector.haszendopcache ? ' is-inactive' }}" title="{{ collector.zendopcachestatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.haszendopcache ? 'yes' : 'no') ~ '.svg') }}</span>
+            {% endset %}
+            {{ ui.metric_cell(opcache_icon, 'OPcache') }}
+
+            {% set apcu_icon %}
+                <span data-ui-part="icon"{{ not collector.hasapcu ? ' is-inactive' }}" title="{{ collector.apcustatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasapcu ? 'yes' : 'no') ~ '.svg') }}</span>
+            {% endset %}
+            {{ ui.metric_cell(apcu_icon, 'APCu') }}
+
+            {% set xdebug_icon %}
+                {% if collector.hasXdebugInfo %}
+                    <a href="{{ path('_profiler_xdebug') }}" title="View xdebug_info()" class="link">
+                {% endif %}
+                <span data-ui-part="icon"{{ not collector.hasxdebug ? ' is-inactive' }}" title="{{ collector.xdebugstatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
+                {% if collector.hasXdebugInfo %}
+                    </a>
+                {% endif %}
+            {% endset %}
+            {{ ui.metric_cell(xdebug_icon, 'Xdebug') }}
+        </div>
+    </div>
+
+    <p>
+        <a href="{{ path('_profiler_phpinfo') }}">View full PHP configuration</a>
+    </p>
+
+    {% if collector.bundles %}
+        {{ include('@UiProfiler/_chrome/partials/collector-panel-subheading.html.twig', { title: 'Enabled Bundles <small>(' ~ collector.bundles|length ~ ')</small>' }) }}
+        <table data-ui-role="table">
+            <thead>
+                <tr>
+                    <th class="key">Name</th>
+                    <th>Class</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for name in collector.bundles|keys|sort %}
+                <tr>
+                    <th scope="row" data-ui-font="sans">{{ name }}</th>
+                    <td data-ui-font="sans">{{ profiler_dump(collector.bundles[name]) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    </div>
+{% endblock %}

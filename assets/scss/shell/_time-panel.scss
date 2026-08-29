@@ -1,0 +1,116 @@
+@use '../shared/mixins' as *;
+
+// Performance panel (time collector) — ports stock time.css.twig (044 T028 gap)
+[data-ui-profiler-panel='time'] {
+  #timeline-control {
+    align-items: center;
+    background: var(--ui-color-surface);
+    border: 1px solid var(--ui-color-border);
+    border-radius: var(--ui-radius-md, 6px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 1em;
+    margin: 1em 0;
+    padding: 0.625rem 0.75rem;
+
+    label {
+      font-weight: 600;
+    }
+
+    input[data-ui-role='input'] {
+      max-width: 6em;
+      text-align: right;
+    }
+
+    p[data-ui-variant='help'] {
+      @include profiler-help-text;
+      margin: 0;
+    }
+  }
+
+  p[data-ui-variant='help'] {
+    @include profiler-help-text;
+    margin-top: 0;
+  }
+
+  .timeline-subrequest-pattern {
+    fill: color-mix(in srgb, var(--ui-color-text-muted) 35%, var(--ui-color-surface));
+  }
+}
+
+[data-ui-profiler-shell][data-theme$='-dark'] [data-ui-profiler-panel='time'] .timeline-subrequest-pattern {
+  fill: color-mix(in srgb, var(--ui-color-text-muted) 55%, var(--ui-color-surface));
+}
+
+[data-ui-profiler-timeline] {
+  .legends {
+    font-size: var(--ui-font-size-sm);
+    line-height: 1.5;
+    margin-bottom: 0.5em;
+
+    .timeline-category {
+      background: var(--ui-color-surface-elevated);
+      border: 1px solid var(--ui-color-border);
+      border-left: 0.75em solid var(--ui-color-border);
+      border-radius: var(--ui-radius-sm, 4px);
+      color: var(--ui-color-text);
+      cursor: pointer;
+      display: none;
+      font: inherit;
+      line-height: 1.4;
+      margin: 0 0.5em 0.5em 0;
+      opacity: 0.45;
+      padding: 0.25em 0.625em 0.25em 0.5em;
+
+      &.active {
+        opacity: 1;
+      }
+
+      &.present {
+        display: inline-flex;
+      }
+    }
+  }
+
+  + p[data-ui-variant='help'] {
+    @include profiler-help-text;
+    margin-top: 0;
+  }
+
+  .timeline-graph {
+    background-color: var(--ui-color-surface);
+    border: 1px solid var(--ui-color-border);
+    border-radius: var(--ui-radius-sm, 4px);
+    display: block;
+    margin: 0 0 1em;
+    min-height: 4rem;
+    width: 100%;
+
+    .timeline-label {
+      fill: var(--ui-color-text);
+      font-family: var(--ui-font-family-sans, system-ui, sans-serif);
+      font-size: var(--ui-font-size-sm);
+      font-weight: var(--ui-font-weight-normal, 400);
+      line-height: var(--ui-line-height-tight, 1.2);
+
+      .timeline-sublabel {
+        fill: var(--ui-color-text-muted);
+      }
+    }
+
+    :is(.timeline-subrequest, .timeline-border) {
+      fill: none;
+      stroke: var(--ui-color-border);
+      stroke-width: 1px;
+    }
+
+    .timeline-subrequest {
+      fill: url(#subrequest);
+      fill-opacity: 0.5;
+    }
+
+    .timeline-period {
+      stroke-width: 0;
+    }
+  }
+}
