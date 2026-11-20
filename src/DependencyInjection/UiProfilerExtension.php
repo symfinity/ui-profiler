@@ -14,28 +14,28 @@ final class UiProfilerExtension extends Extension implements PrependExtensionInt
 {
     public function prepend(ContainerBuilder $container): void
     {
-        if (!$container->hasExtension('stimulus') || !$this->isEnabled($container)) {
+        // Stimulus controller path: appended by AppendStimulusControllerPathPass, never prepended
+        // as stimulus.controller_paths config (that would drop the app's own controllers folder).
+        // Asset mapper paths must be prepended here. framework is already loaded by the time load() runs.
+        $configs = $container->getExtensionConfig($this->getAlias());
+        if ($configs === []) {
             return;
         }
 
-        $packageDir = \dirname(__DIR__, 2);
-
-        $container->prependExtensionConfig('stimulus', [
-            'controller_paths' => [
-                $packageDir . '/assets/controllers',
-            ],
-        ]);
-    }
-
-    private function isEnabled(ContainerBuilder $container): bool
-    {
-        foreach ($container->getExtensionConfig($this->getAlias()) as $config) {
-            if (($config['enabled'] ?? false) === true) {
-                return true;
-            }
+        $config = $this->processConfiguration(new Configuration(), $configs);
+        if (!$config['enabled']) {
+            return;
         }
 
-        return false;
+        $assets = \dirname(__DIR__, 2).'/assets';
+        $mapped = realpath($assets);
+        $container->prependExtensionConfig('framework', [
+            'asset_mapper' => [
+                'paths' => [
+                    (false !== $mapped ? $mapped : $assets) => 'ui-profiler',
+                ],
+            ],
+        ]);
     }
 
     public function load(array $configs, ContainerBuilder $container): void
@@ -64,14 +64,6 @@ final class UiProfilerExtension extends Extension implements PrependExtensionInt
             $container->prependExtensionConfig('twig', [
                 'paths' => [
                     $packageDir . '/templates' => 'UiProfiler',
-                ],
-            ]);
-
-            $container->prependExtensionConfig('framework', [
-                'asset_mapper' => [
-                    'paths' => [
-                        $packageDir . '/assets' => 'ui-profiler',
-                    ],
                 ],
             ]);
         }

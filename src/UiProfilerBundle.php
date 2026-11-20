@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Symfinity\UiProfiler;
 
+use Symfinity\UiProfiler\DependencyInjection\Compiler\AppendStimulusControllerPathPass;
 use Symfinity\UiProfiler\DependencyInjection\Compiler\PrependWebProfilerTemplatesPass;
 use Symfinity\UiProfiler\DependencyInjection\Compiler\ProfilerMenuRegistryPass;
 use Symfinity\UiProfiler\DependencyInjection\Compiler\RegisterUiKernelCollectorPass;
 use Symfinity\UiProfiler\DependencyInjection\Compiler\StimulusIntegrationPass;
 use Symfinity\UiProfiler\DependencyInjection\UiProfilerExtension;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\TwigConfigurator;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
@@ -27,8 +29,10 @@ final class UiProfilerBundle extends AbstractBundle
         parent::build($container);
         $container->addCompilerPass(new PrependWebProfilerTemplatesPass());
         $container->addCompilerPass(new ProfilerMenuRegistryPass());
-        $container->addCompilerPass(new RegisterUiKernelCollectorPass());
+        // Priority 1: drop the collector before FrameworkBundle's ProfilerPass (priority 0) wires it into the profiler.
+        $container->addCompilerPass(new RegisterUiKernelCollectorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1);
         $container->addCompilerPass(new StimulusIntegrationPass());
+        $container->addCompilerPass(new AppendStimulusControllerPathPass());
     }
 
     public function getContainerExtension(): ExtensionInterface

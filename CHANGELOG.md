@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-11-20
+
+### Fixed
+
+- Enabling the profiler no longer replaces the app's Stimulus controller directory. The profiler's controllers are added beside it, so the app's own controllers still connect
+- The UI kernel collector is registered before Symfony's profiler pass, so a dev kernel compiles with debug turned off
+- PHPUnit bootstrap registers this package's PSR-4 prefixes from `composer.json` after loading the monorepo or package autoload, and narrows the decoded autoload sections before reading `psr-4`
+
 ## [0.1.0] - 2026-07-13
 
 ### Added

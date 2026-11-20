@@ -36,6 +36,10 @@ final class UiProfilerExtensionTest extends TestCase
         self::assertTrue($matched, 'Expected @UiProfiler alias path when enabled');
         self::assertTrue($container->getParameter('ui_profiler.enabled'));
 
+        $container->registerExtension($extension);
+        $container->prependExtensionConfig('symfinity_ui_profiler', ['enabled' => true]);
+        $extension->prepend($container);
+
         $frameworkConfigs = $container->getExtensionConfig('framework');
         self::assertNotEmpty($frameworkConfigs);
         /** @var array{asset_mapper?: array{paths?: array<string, string>}} $frameworkConfig */

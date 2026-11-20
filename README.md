@@ -91,7 +91,7 @@ assets/scss/
 
 | Path | Role |
 |------|------|
-| `assets/controllers/` | Stimulus controllers (dialog, tabs, table-search) — AssetMapper + `UiProfilerExtension` |
+| `assets/controllers/` | Stimulus controllers (dialog, tabs, table-search). AssetMapper maps them, and `AppendStimulusControllerPathPass` adds that directory beside the app's own controllers |
 | `assets/js/shell.js` | Profiler shell ES module (`UiProfilerShell`) |
 | `assets/js/wdt.js` | Web Debug Toolbar ES module (`UiProfilerWdt`) |
 | `assets/js/panels/*.js` | Collector panel boot scripts (time, form, events) |
